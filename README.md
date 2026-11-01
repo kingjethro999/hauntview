@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HauntView 👻
 
-## Getting Started
+A local web testing engine with 16 automated testing profiles for responsive design, resilience, accessibility, security, and performance testing. Built with Next.js, TypeScript, and Playwright.
 
-First, run the development server:
+## 16 Testing Profiles
+
+**Responsive Design (3)**: Mobile, Tablet, Desktop
+**Resilience (5)**: Image Failure, Font Failure, JavaScript Disabled, Network Resilience, Offline
+**Analysis (7)**: Console Errors, Accessibility, Broken Links, Form Resilience, Security Hygiene, Performance, Reduced Motion
+**Orchestration (1)**: Full Test Suite
+
+## Features
+
+✅ Local-only execution (no external API calls)
+✅ Screenshot comparisons with visual diffs
+✅ HTML and Markdown downloadable reports
+✅ MCP integration with Kiro for AI-powered analysis
+✅ Detailed findings with severity levels and recommendations
+✅ Real browser testing via Playwright
+
+## Quick Start
 
 ```bash
+git clone https://github.com/yourusername/hauntview.git
+cd hauntview
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 to begin testing.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Web UI
 
-## Learn More
+1. Enter target URL
+2. Select test profiles
+3. Run tests
+4. View findings and download reports
 
-To learn more about Next.js, take a look at the following resources:
+### MCP Integration (Kiro)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run mcp
+# Connect to port 5050 in Kiro
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```
+hauntview/
+├── app/                    # Next.js app
+├── src/testing/            # 16 test profiles
+├── src/lib/                # Core infrastructure
+├── .kiro/                  # Kiro specs, steering, hooks
+└── __tests__/              # Test suite
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Documentation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `.kiro/specs/hauntview-core/` - System architecture specs
+- `.kiro/specs/hauntview-testing-profiles/` - Profile specifications
+- `ARCHITECTURE.md` - Detailed implementation guide
+- `USER_GUIDE.md` - How to use each profile
+
+## API Reference
+
+```
+POST /api/test/run
+GET /api/test/status/:runId
+GET /api/test/results/:runId
+GET /api/reports/:runId/download?format=html|md
+```
+
+## Performance
+
+- Single profile: 10-30 seconds
+- Full suite (16 profiles): 2-10 minutes
+
+## License
+
+MIT License - See LICENSE file
+
+## Built for Kiroween 2026
+
+HauntView showcases Kiro capabilities: spec-driven development, property-based testing, steering, hooks, and MCP integration.
+
+---
+
+**Ready to test?** Start with `npm run dev` and navigate to http://localhost:3000

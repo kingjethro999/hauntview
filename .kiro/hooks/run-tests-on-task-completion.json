@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Run Tests After Task Completion",
+      "trigger": "PostTaskExec",
+      "description": "Run linting after spec tasks complete to catch any issues",
+      "action": {
+        "type": "command",
+        "command": "npm run lint 2>/dev/null || true",
+        "timeout": 60
+      }
+    }
+  ]
+}

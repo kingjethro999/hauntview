@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Format and Lint on Save",
+      "trigger": "PostFileSave",
+      "description": "Automatically format and lint TypeScript, React, and JSON files on save",
+      "matcher": "\\\\.(ts|tsx|js|jsx|json)$",
+      "action": {
+        "type": "command",
+        "command": "npm run lint -- --fix \"$FILE_PATH\" 2>/dev/null || true",
+        "timeout": 30
+      }
+    }
+  ]
+}
