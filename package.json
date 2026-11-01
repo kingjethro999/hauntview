@@ -4,11 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "postinstall": "pnpm exec playwright install",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "format": "npx prettier --write .",
-    "format:check": "npx prettier --check ."
+    "format:check": "npx prettier --check .",
+    "test": "jest --run",
+    "test:watch": "jest",
+    "test:coverage": "jest --coverage --run"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,md,css,yml,yaml}": [
@@ -19,20 +23,26 @@
   },
   "dependencies": {
     "next": "16.4.3",
+    "playwright": "^1.64.1",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@jest/globals": "^30.0.0-alpha.1",
     "@tailwindcss/turbopack": "^4",
+    "@types/jest": "^30.0.0-alpha.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.3",
     "husky": "^9.1.7",
+    "jest": "^30.0.0-alpha.1",
+    "jest-environment-node": "^30.0.0-alpha.1",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
     "tailwindcss": "^4",
+    "ts-jest": "^29.4.15",
     "typescript": "^5"
   }
 }
