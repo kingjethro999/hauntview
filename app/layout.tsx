@@ -23,6 +23,11 @@ export const metadata: Metadata = {
   title: 'HauntView | Local Web Testing Engine',
   description:
     'Comprehensive local testing engine with 16 automated profiles for accessibility, responsiveness, i18n, performance, and resilience.',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

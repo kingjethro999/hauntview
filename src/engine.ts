@@ -3,7 +3,7 @@
  * Coordinates browser pool, profile execution, and result collection
  */
 
-import { webkit, Browser, Page } from 'playwright';
+import { chromium, webkit, firefox, Browser, Page } from 'playwright';
 import { ProfileManager } from './core/profile-manager';
 import { BrowserPool } from './core/browser-pool';
 import { FindingClassifier } from './core/finding-classifier';
@@ -44,7 +44,7 @@ export class HauntViewEngine {
     this.profileManager = new ProfileManager();
     this.browserPool = new BrowserPool({
       maxBrowsers: 3,
-      maxPagesPerBrowser: 5,
+      maxPagesPerBrowser: 10,
       idleTimeout: 30000,
     });
     this.classifier = new FindingClassifier();
@@ -117,14 +117,30 @@ export class HauntViewEngine {
     url: string,
     context: ProfileContext
   ): Promise<ProfileResult> {
-    let browser = this.browsers.get('webkit');
-    if (!browser) {
-      browser = await webkit.launch({ headless: true });
-      this.browsers.set('webkit', browser);
-      this.browserPool.registerBrowser('webkit', browser);
+    let browserType = 'chromium';
+    if (profileId === 'browser-webkit') {
+      browserType = 'webkit';
+    } else if (profileId === 'browser-firefox') {
+      browserType = 'firefox';
     }
 
-    const page = await this.browserPool.acquirePage('webkit', context, browser);
+    let browser = this.browsers.get(browserType);
+    if (!browser || !browser.isConnected()) {
+      if (browserType === 'firefox') {
+        browser = await firefox.launch({ headless: true });
+      } else if (browserType === 'webkit') {
+        browser = await webkit.launch({ headless: true });
+      } else {
+        browser = await chromium.launch({
+          headless: true,
+          args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
+      }
+      this.browsers.set(browserType, browser);
+      this.browserPool.registerBrowser(browserType, browser);
+    }
+
+    const page = await this.browserPool.acquirePage(browserType, context, browser);
 
     try {
       let profile: ExecutableProfile;

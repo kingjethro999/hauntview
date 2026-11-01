@@ -11,6 +11,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   ExclamationCircleIcon,
+  LightBulbIcon,
 } from '@heroicons/react/24/outline';
 
 export interface FindingsTableProps {
@@ -71,6 +72,34 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings }) => {
           </Badge>
         );
     }
+  };
+
+  const getRemediation = (category: string, message: string): string => {
+    const cat = category.toLowerCase();
+    const msg = message.toLowerCase();
+
+    if (cat.includes('touch') || msg.includes('touch')) {
+      return 'Increase element padding, min-width, and min-height to at least 48x48px (or 44x44px for iOS HIG) to comply with WCAG 2.5.5 / 2.5.8 Target Size standards.';
+    }
+    if (cat.includes('contrast') || msg.includes('contrast')) {
+      return 'Adjust foreground or background color to achieve a minimum contrast ratio of 4.5:1 for normal text (3:1 for large text and UI components) per WCAG 1.4.3.';
+    }
+    if (cat.includes('responsive') || cat.includes('scroll') || msg.includes('scroll')) {
+      return 'Remove fixed pixel widths and use fluid layout containers (max-width: 100%, flex-wrap, or CSS grid) to avoid horizontal viewport scrolling.';
+    }
+    if (cat.includes('alt') || cat.includes('image') || msg.includes('alt')) {
+      return 'Provide descriptive alt attributes on all informative images, and empty alt="" on purely decorative images per WCAG 1.1.1.';
+    }
+    if (cat.includes('keyboard') || msg.includes('tabindex') || msg.includes('focus')) {
+      return 'Ensure all interactive elements are reachable via Tab navigation, maintain a logical DOM order, and provide high-contrast visible focus rings.';
+    }
+    if (cat.includes('i18n') || cat.includes('rtl')) {
+      return 'Use CSS logical properties (margin-inline, padding-inline, start/end) instead of physical left/right to ensure proper bidirectional mirroring.';
+    }
+    if (cat.includes('performance') || msg.includes('lcp') || msg.includes('cls')) {
+      return 'Defer non-critical scripts, preconnect to critical origins, size image dimensions explicitly, and compress assets to optimize Core Web Vitals.';
+    }
+    return 'Inspect element markup and ensure full compliance with WCAG AA accessibility standards and cross-browser styling guidelines.';
   };
 
   return (
@@ -179,30 +208,72 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings }) => {
 
                 {/* Expanded Details Drawer */}
                 {isExpanded && (
-                  <div className="px-10 pb-4 pt-1 border-t border-[#6C3CAA]/15 bg-[#373746]/10 text-xs space-y-3">
-                    {finding.location && (
+                  <div className="px-6 sm:px-10 pb-5 pt-3 border-t border-[#6C3CAA]/20 bg-[#0F0F14]/70 text-xs space-y-4">
+                    {/* Remediation Guidance */}
+                    <div className="p-3 rounded-lg bg-[#582696]/20 border border-[#6C3CAA]/30">
+                      <div className="flex items-center gap-1.5 font-semibold text-[#DC6428] mb-1">
+                        <LightBulbIcon className="w-4 h-4" />
+                        <span>Recommended Remediation</span>
+                      </div>
+                      <p className="text-[#F5F5FA] text-xs leading-relaxed">
+                        {getRemediation(finding.category, finding.message)}
+                      </p>
+                    </div>
+
+                    {/* Location Info (Only if selector or file/line exists) */}
+                    {finding.location?.selector && (
                       <div>
                         <span className="text-[#646478] font-semibold block mb-1">
-                          Location Details:
+                          Target DOM Selector:
                         </span>
-                        <pre className="p-2.5 rounded bg-[#0F0F14] border border-[#6C3CAA]/20 font-mono text-[11px] text-[#86efac] overflow-x-auto">
-                          {JSON.stringify(finding.location, null, 2)}
-                        </pre>
+                        <code className="inline-block p-2 rounded bg-[#0F0F14] border border-[#6C3CAA]/30 font-mono text-xs text-[#a855f7]">
+                          {finding.location.selector}
+                        </code>
                       </div>
                     )}
 
+                    {finding.location?.file && (
+                      <div>
+                        <span className="text-[#646478] font-semibold block mb-1">
+                          Source Location:
+                        </span>
+                        <code className="inline-block p-2 rounded bg-[#0F0F14] border border-[#6C3CAA]/30 font-mono text-xs text-[#86efac]">
+                          {finding.location.file}
+                          {finding.location.line ? `:${finding.location.line}` : ''}
+                        </code>
+                      </div>
+                    )}
+
+                    {/* Structured Details if available */}
                     {finding.details && Object.keys(finding.details).length > 0 && (
                       <div>
-                        <span className="text-[#646478] font-semibold block mb-1">
-                          Observation Details:
+                        <span className="text-[#646478] font-semibold block mb-1.5">
+                          Observation Breakdown:
                         </span>
-                        <pre className="p-2.5 rounded bg-[#0F0F14] border border-[#6C3CAA]/20 font-mono text-[11px] text-[#7dd3fc] overflow-x-auto">
-                          {JSON.stringify(finding.details, null, 2)}
-                        </pre>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                          {Object.entries(finding.details).map(([key, val]) => (
+                            <div
+                              key={key}
+                              className="p-2.5 rounded bg-[#373746]/40 border border-[#6C3CAA]/20 flex flex-col justify-between"
+                            >
+                              <span className="text-[10px] text-[#646478] uppercase tracking-wider font-semibold">
+                                {key.replace(/([A-Z])/g, ' $1')}
+                              </span>
+                              <span className="font-mono text-xs text-[#7dd3fc] mt-1 break-all">
+                                {typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between text-[11px] text-[#646478] pt-2 border-t border-[#6C3CAA]/10">
+                    {/* Technical Metadata Footer */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#646478] pt-2 border-t border-[#6C3CAA]/15">
+                      <span>
+                        Profile Engine:{' '}
+                        <strong className="text-[#F5F5FA]">{finding.profileId}</strong>
+                      </span>
                       <span>
                         Unique ID: <code className="font-mono text-[#F5F5FA]">{finding.id}</code>
                       </span>

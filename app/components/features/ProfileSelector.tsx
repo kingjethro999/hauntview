@@ -238,16 +238,22 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({ selectedProfil
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm" variant="outline" onClick={selectAll}>
+          <Button type="button" size="sm" variant="outline" onClick={selectAll}>
             Select All
           </Button>
-          <Button size="sm" variant="ghost" onClick={selectSmokeTest}>
+          <Button type="button" size="sm" variant="ghost" onClick={selectSmokeTest}>
             Smoke Test
           </Button>
-          <Button size="sm" variant="ghost" onClick={selectA11yOnly}>
+          <Button type="button" size="sm" variant="ghost" onClick={selectA11yOnly}>
             A11y Suite
           </Button>
-          <Button size="sm" variant="ghost" onClick={clearAll} className="text-[#fca5a5]">
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={clearAll}
+            className="text-[#fca5a5]"
+          >
             Clear
           </Button>
         </div>

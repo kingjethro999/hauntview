@@ -53,6 +53,7 @@ export default function HomePage() {
     profiles: string[],
     format?: 'html' | 'markdown' | 'json'
   ) => {
+    if (isRunning) return;
     setIsRunning(true);
     setActiveUrl(url);
     setActiveCount(profiles.length);
@@ -71,6 +72,7 @@ export default function HomePage() {
 
       const data = await response.json();
       if (data.success && data.report?.id) {
+        setIsRunning(false);
         // Redirect to dedicated report page
         router.push(`/results/${data.report.id}`);
       } else {

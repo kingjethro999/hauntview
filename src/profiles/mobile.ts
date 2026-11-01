@@ -52,14 +52,34 @@ export class MobileProfile {
         if (box) {
           const size = Math.min(box.width, box.height);
           if (size < this.minTouchTargetSize && (await element.isVisible())) {
+            const tagName = await element
+              .evaluate((el: Element) => el.tagName.toLowerCase())
+              .catch(() => 'element');
+            const elementId = await element.getAttribute('id');
+            const classAttr = await element.getAttribute('class');
+            const textContent = await element
+              .evaluate((el: Element) => (el.textContent || '').trim().slice(0, 30))
+              .catch(() => '');
+
+            const selector = elementId
+              ? `#${elementId}`
+              : classAttr
+                ? `${tagName}.${classAttr.split(/\s+/).filter(Boolean).slice(0, 2).join('.')}`
+                : `${tagName}${textContent ? `[text="${textContent}"]` : ''}`;
+
             findings.push({
               id: `${this.profileId}-small-touch-target`,
               profileId: this.profileId,
               severity: 'warning',
               category: 'touch-targets',
-              message: `Touch target ${size}px is smaller than WCAG recommended ${this.minTouchTargetSize}px`,
+              message: `Touch target ${Math.round(box.width)}x${Math.round(box.height)}px is smaller than WCAG recommended ${this.minTouchTargetSize}px`,
               location: {
-                selector: (await element.getAttribute('id')) || undefined,
+                selector,
+              },
+              details: {
+                actualSize: `${Math.round(box.width)}x${Math.round(box.height)}px`,
+                recommendedSize: `${this.minTouchTargetSize}x${this.minTouchTargetSize}px`,
+                element: `<${tagName}>${textContent ? ` "${textContent}"` : ''}`,
               },
               timestamp: Date.now(),
               isClassified: false,

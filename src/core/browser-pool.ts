@@ -47,65 +47,89 @@ export class BrowserPool {
     profileContext: ProfileContext,
     playwrightBrowser: Browser
   ): Promise<Page> {
-    // Try to find an available page in the pool
-    const availablePage = this.pagePool.find(
-      (p) => !p.inUse && p.profileContext?.profileId === profileContext.profileId
-    );
-
-    if (availablePage) {
-      availablePage.inUse = true;
-      availablePage.profileContext = profileContext;
-      return availablePage.page;
+    let pooledBrowser = this.browsers.get(browserKey);
+    if (!pooledBrowser) {
+      this.registerBrowser(browserKey, playwrightBrowser);
+      pooledBrowser = this.browsers.get(browserKey)!;
     }
 
-    // Create new page if under limit
-    const pooledBrowser = this.browsers.get(browserKey);
-    if (pooledBrowser && pooledBrowser.pages.length < this.config.maxPagesPerBrowser) {
-      const context = await playwrightBrowser.newContext({
-        viewport: {
-          width: profileContext.viewport.width,
-          height: profileContext.viewport.height,
-        },
-        isMobile: profileContext.viewport.isMobile,
-        hasTouch: profileContext.viewport.hasTouch,
-        userAgent: profileContext.userAgent,
-        locale: profileContext.locale,
-        timezoneId: profileContext.timezone,
-      });
-
-      const page = await context.newPage();
-      const pooledPage: PooledPage = {
-        page,
-        context,
-        profileContext,
-        inUse: true,
-      };
-
-      pooledBrowser.pages.push(page);
-      pooledBrowser.activePages.add(page);
-      this.pagePool.push(pooledPage);
-
-      // Listen for page close to clean up
-      page.on('close', () => {
-        pooledBrowser.activePages.delete(page);
-      });
-
-      return page;
+    // Clean up closed pages
+    pooledBrowser.pages = pooledBrowser.pages.filter((p) => !p.isClosed());
+    for (const p of pooledBrowser.activePages) {
+      if (p.isClosed()) {
+        pooledBrowser.activePages.delete(p);
+      }
     }
 
-    throw new Error(
-      `Browser pool exhausted: ${this.config.maxPagesPerBrowser} pages per browser reached`
-    );
+    // If active pages count exceeds limit, clean up idle pages
+    if (pooledBrowser.pages.length >= this.config.maxPagesPerBrowser) {
+      const idlePages = this.pagePool.filter((p) => !p.inUse);
+      for (const idle of idlePages) {
+        try {
+          if (!idle.page.isClosed()) {
+            await idle.page.close();
+          }
+          await idle.context.close();
+        } catch {
+          // Already closed
+        }
+        this.pagePool = this.pagePool.filter((p) => p !== idle);
+        pooledBrowser.pages = pooledBrowser.pages.filter((p) => p !== idle.page);
+        pooledBrowser.activePages.delete(idle.page);
+      }
+    }
+
+    const context = await playwrightBrowser.newContext({
+      viewport: {
+        width: profileContext.viewport.width,
+        height: profileContext.viewport.height,
+      },
+      isMobile: profileContext.viewport.isMobile,
+      hasTouch: profileContext.viewport.hasTouch,
+      userAgent: profileContext.userAgent,
+      locale: profileContext.locale,
+      timezoneId: profileContext.timezone,
+    });
+
+    const page = await context.newPage();
+    const pooledPage: PooledPage = {
+      page,
+      context,
+      profileContext,
+      inUse: true,
+      lastUsed: Date.now(),
+    };
+
+    pooledBrowser.pages.push(page);
+    pooledBrowser.activePages.add(page);
+    this.pagePool.push(pooledPage);
+
+    page.on('close', () => {
+      pooledBrowser?.activePages.delete(page);
+    });
+
+    return page;
   }
 
   /**
    * Release a page back to the pool
    */
   releasePage(page: Page): void {
-    const pooledPage = this.pagePool.find((p) => p.page === page);
-    if (pooledPage) {
+    const pooledPageIndex = this.pagePool.findIndex((p) => p.page === page);
+    if (pooledPageIndex !== -1) {
+      const [pooledPage] = this.pagePool.splice(pooledPageIndex, 1);
       pooledPage.inUse = false;
-      pooledPage.lastUsed = Date.now();
+
+      // Close page and context asynchronously to free browser memory
+      Promise.all([
+        !page.isClosed() ? page.close().catch(() => {}) : Promise.resolve(),
+        pooledPage.context.close().catch(() => {}),
+      ]).finally(() => {
+        for (const pooledBrowser of this.browsers.values()) {
+          pooledBrowser.pages = pooledBrowser.pages.filter((p) => p !== page);
+          pooledBrowser.activePages.delete(page);
+        }
+      });
     }
   }
 
@@ -113,6 +137,13 @@ export class BrowserPool {
    * Register a browser instance
    */
   registerBrowser(key: string, browser: Browser): void {
+    if (this.browsers.has(key)) {
+      const existing = this.browsers.get(key)!;
+      existing.browser = browser;
+      existing.lastUsed = Date.now();
+      return;
+    }
+
     if (this.browsers.size >= this.config.maxBrowsers) {
       throw new Error(`Browser pool full: max ${this.config.maxBrowsers} browsers reached`);
     }

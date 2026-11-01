@@ -15,6 +15,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       variant = 'primary',
       size = 'md',
+      type = 'button',
       loading = false,
       icon,
       children,
@@ -49,6 +50,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
+        type={type}
         disabled={disabled || loading}
         className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
         {...props}

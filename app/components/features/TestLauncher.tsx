@@ -33,6 +33,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({ onStartTest, isRunni
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isRunning) return;
     setError(null);
 
     const trimmed = url.trim();
