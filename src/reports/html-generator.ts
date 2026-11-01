@@ -3,7 +3,25 @@
  */
 
 import { TestReport, Finding } from '../types';
-import { ReportGenerator, ReportOptions, GeneratedReport, FindingGroup } from './types';
+import { ReportGenerator, ReportOptions, GeneratedReport } from './types';
+
+interface HTMLReportStatistics {
+  totalProfiles: number;
+  successfulProfiles: number;
+  errorCount: number;
+  totalFindings: number;
+}
+
+interface HTMLReportTheme {
+  primary: string;
+  secondary: string;
+  accent: string;
+  bg: string;
+  bgAlt: string;
+  text: string;
+  textMuted: string;
+  border: string;
+}
 
 export class HTMLReportGenerator implements ReportGenerator {
   async generate(report: TestReport, options: ReportOptions): Promise<GeneratedReport> {
@@ -48,7 +66,7 @@ export class HTMLReportGenerator implements ReportGenerator {
 </html>`;
   }
 
-  private renderHeader(report: TestReport, statistics: any): string {
+  private renderHeader(report: TestReport, statistics: HTMLReportStatistics): string {
     const passRate = ((statistics.successfulProfiles / statistics.totalProfiles) * 100).toFixed(1);
     const statusColor = statistics.errorCount === 0 ? '#4CAF50' : '#f44336';
 
@@ -88,7 +106,7 @@ export class HTMLReportGenerator implements ReportGenerator {
     </nav>`;
   }
 
-  private renderExecutiveSummary(report: TestReport, statistics: any): string {
+  private renderExecutiveSummary(report: TestReport, statistics: HTMLReportStatistics): string {
     return `
     <section id="summary" class="section">
       <h2>Executive Summary</h2>
@@ -209,7 +227,9 @@ export class HTMLReportGenerator implements ReportGenerator {
           </div>
         </div>
         <div class="profile-findings">
-          ${profile.findings.length > 0 ? `
+          ${
+            profile.findings.length > 0
+              ? `
             <table class="findings-table">
               <thead>
                 <tr>
@@ -222,7 +242,9 @@ export class HTMLReportGenerator implements ReportGenerator {
                 ${profile.findings.map((f) => this.renderFindingRow(f)).join('')}
               </tbody>
             </table>
-          ` : '<p class="no-findings">No findings</p>'}
+          `
+              : '<p class="no-findings">No findings</p>'
+          }
         </div>
       </div>`;
     }
@@ -278,7 +300,7 @@ export class HTMLReportGenerator implements ReportGenerator {
     </footer>`;
   }
 
-  private getStyles(theme: any): string {
+  private getStyles(theme: HTMLReportTheme): string {
     return `
       :root {
         --primary: ${theme.primary};

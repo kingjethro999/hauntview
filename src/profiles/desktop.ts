@@ -23,7 +23,7 @@ export class DesktopProfile {
   /**
    * Execute desktop testing profile
    */
-  async execute(page: Page, url: string, _context: ProfileContext): Promise<ProfileResult> {
+  async execute(page: Page, url: string, context: ProfileContext): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
 
@@ -38,9 +38,9 @@ export class DesktopProfile {
           let cls = 0;
           const observer = new PerformanceObserver((entryList) => {
             for (const entry of entryList.getEntries()) {
-              const anyEntry = entry as Record<string, unknown>;
+              const anyEntry = entry as unknown as PerformanceEntryWithHadRecentInput;
               if (anyEntry.hadRecentInput) continue;
-              cls += (anyEntry.value as number) || 0;
+              cls += anyEntry.value || 0;
             }
           });
 

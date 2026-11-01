@@ -4,7 +4,7 @@
  */
 
 import { Page } from 'playwright';
-import { Finding, ProfileResult, ProfileContext } from '../types';
+import { Finding, ProfileResult } from '../types';
 
 interface ConsoleMessage {
   type: 'log' | 'warn' | 'error' | 'info' | 'debug';
@@ -25,7 +25,7 @@ export class ConsoleErrorsProfile {
   /**
    * Execute console errors testing profile
    */
-  async execute(page: Page, url: string, _context: ProfileContext): Promise<ProfileResult> {
+  async execute(page: Page, url: string): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
     this.messages = [];

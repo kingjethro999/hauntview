@@ -4,6 +4,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { HauntViewEngine } from '@/src/engine';
+import { TestReport } from '@/src/types';
+
+interface TestApiResponse {
+  success: boolean;
+  report: TestReport;
+  reportContent?: string;
+  reportFilename?: string;
+  mimeType?: string;
+}
 
 /**
  * POST /api/test
@@ -35,7 +44,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Generate report if format specified
-    let result: any = { success: true, report };
+    const result: TestApiResponse = { success: true, report };
 
     if (format) {
       try {
@@ -62,7 +71,7 @@ export async function POST(request: NextRequest) {
       {
         error: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -88,7 +97,7 @@ export async function GET() {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

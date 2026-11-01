@@ -4,7 +4,7 @@
  */
 
 import { Page } from 'playwright';
-import { Finding, ProfileResult, ProfileContext } from '../types';
+import { Finding, ProfileResult } from '../types';
 
 export class AccessibilityKeyboardProfile {
   private profileId: string;
@@ -15,7 +15,7 @@ export class AccessibilityKeyboardProfile {
     this.profileName = profileName;
   }
 
-  async execute(page: Page, url: string, _context: ProfileContext): Promise<ProfileResult> {
+  async execute(page: Page, url: string): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
 
@@ -170,10 +170,13 @@ export class AccessibilityKeyboardProfile {
       if (overlays.length > 0) {
         const hasEscapeHandler = await overlays[0].evaluate(() => {
           const el = document.querySelector('[role="dialog"], .modal, .popover') as HTMLElement;
-          const listeners = (window as any).getEventListeners?.(el);
-          return (
-            listeners?.keydown?.some((l: any) => l.listener.toString().includes('Escape')) ?? false
-          );
+          interface ChromeWindow extends Window {
+            getEventListeners?: (target: EventTarget) => {
+              keydown?: Array<{ listener: { toString(): string } }>;
+            };
+          }
+          const listeners = (window as ChromeWindow).getEventListeners?.(el);
+          return listeners?.keydown?.some((l) => l.listener.toString().includes('Escape')) ?? false;
         });
 
         if (!hasEscapeHandler) {

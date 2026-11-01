@@ -2,7 +2,7 @@
  * Report Factory - Creates report generators based on format
  */
 
-import { ReportGenerator, ReportOptions } from './types';
+import { ReportGenerator } from './types';
 import { HTMLReportGenerator } from './html-generator';
 import { MarkdownReportGenerator } from './markdown-generator';
 

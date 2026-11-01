@@ -2,7 +2,7 @@
  * Type definitions for test results and report generation
  */
 
-import { Finding, ProfileResult, TestReport } from './profiles';
+import { Finding, TestReport } from './profiles';
 
 /**
  * Aggregated finding across multiple profiles

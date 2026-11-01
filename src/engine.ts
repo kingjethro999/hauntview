@@ -3,12 +3,18 @@
  * Coordinates browser pool, profile execution, and result collection
  */
 
-import { webkit, Browser } from 'playwright';
+import { webkit, Browser, Page } from 'playwright';
 import { ProfileManager } from './core/profile-manager';
 import { BrowserPool } from './core/browser-pool';
 import { FindingClassifier } from './core/finding-classifier';
 import { ScreenshotManager } from './core/screenshot-manager';
-import { TestExecutionOptions, TestReport, ProfileResult, ReportGenerationOptions } from './types';
+import {
+  TestExecutionOptions,
+  TestReport,
+  ProfileResult,
+  ReportGenerationOptions,
+  ProfileContext,
+} from './types';
 import { ReportFactory } from './reports/factory';
 import { MobileProfile } from './profiles/mobile';
 import { DesktopProfile } from './profiles/desktop';
@@ -22,6 +28,10 @@ import { AccessibilityCognitiveProfile } from './profiles/accessibility-cognitiv
 import { I18nRTLProfile } from './profiles/i18n-rtl';
 import { I18nCJKProfile } from './profiles/i18n-cjk';
 import { I18nMixedProfile } from './profiles/i18n-mixed';
+
+interface ExecutableProfile {
+  execute(page: Page, url: string, context?: ProfileContext): Promise<ProfileResult>;
+}
 
 export class HauntViewEngine {
   private profileManager: ProfileManager;
@@ -56,13 +66,10 @@ export class HauntViewEngine {
     const startTime = Date.now();
 
     // Determine which profiles to run
-    let profilesToRun = this.profileManager.getEnabledProfiles();
+    let executionOrder = this.profileManager.getOptimalExecutionOrder();
     if (options.profiles && options.profiles.length > 0) {
-      profilesToRun = profilesToRun.filter((p) => options.profiles!.includes(p.id));
+      executionOrder = executionOrder.filter((p) => options.profiles!.includes(p.id));
     }
-
-    // Get optimal execution order for parallelization
-    const executionOrder = this.profileManager.getOptimalExecutionOrder();
 
     const profileResults: ProfileResult[] = [];
 
@@ -108,7 +115,7 @@ export class HauntViewEngine {
   private async executeProfile(
     profileId: string,
     url: string,
-    context: Record<string, unknown>
+    context: ProfileContext
   ): Promise<ProfileResult> {
     let browser = this.browsers.get('webkit');
     if (!browser) {
@@ -120,7 +127,7 @@ export class HauntViewEngine {
     const page = await this.browserPool.acquirePage('webkit', context, browser);
 
     try {
-      let profile: any;
+      let profile: ExecutableProfile;
 
       // Device profiles
       if (profileId === 'mobile-iphone15' || profileId === 'mobile-android') {
@@ -232,10 +239,7 @@ export class HauntViewEngine {
   /**
    * Generate report from test results
    */
-  async generateReport(
-    report: TestReport,
-    options: ReportGenerationOptions,
-  ) {
+  async generateReport(report: TestReport, options: ReportGenerationOptions) {
     const generator = ReportFactory.createGenerator(options.format);
     return generator.generate(report, {
       format: options.format as 'html' | 'markdown' | 'json',

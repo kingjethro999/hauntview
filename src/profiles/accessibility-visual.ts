@@ -4,7 +4,7 @@
  */
 
 import { Page } from 'playwright';
-import { Finding, ProfileResult, ProfileContext } from '../types';
+import { Finding, ProfileResult } from '../types';
 
 export class AccessibilityVisualProfile {
   private profileId: string;
@@ -15,7 +15,7 @@ export class AccessibilityVisualProfile {
     this.profileName = profileName;
   }
 
-  async execute(page: Page, url: string, _context: ProfileContext): Promise<ProfileResult> {
+  async execute(page: Page, url: string): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
 
@@ -130,14 +130,6 @@ export class AccessibilityVisualProfile {
           isClassified: false,
         });
       }
-
-      // Check for focus indicator color
-      const focusColor = await page.evaluate(() => {
-        const styles = getComputedStyle(document.body);
-        const outlineColor = styles.outlineColor;
-        const backgroundColor = styles.backgroundColor;
-        return { outlineColor, backgroundColor };
-      });
 
       // Check for high contrast mode support
       const highContrastSupport = await page.evaluate(() => {

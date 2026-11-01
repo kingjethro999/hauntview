@@ -4,7 +4,7 @@
  */
 
 import { Page } from 'playwright';
-import { Finding, ProfileResult, ProfileContext } from '../types';
+import { Finding, ProfileResult } from '../types';
 
 export class AccessibilityCognitiveProfile {
   private profileId: string;
@@ -15,7 +15,7 @@ export class AccessibilityCognitiveProfile {
     this.profileName = profileName;
   }
 
-  async execute(page: Page, url: string, _context: ProfileContext): Promise<ProfileResult> {
+  async execute(page: Page, url: string): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
 
@@ -210,7 +210,7 @@ export class AccessibilityCognitiveProfile {
 
       // Check for paragraph length
       const paragraphs = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll('p')).filter((p: any) => {
+        return Array.from(document.querySelectorAll('p')).filter((p: Element) => {
           const words = p.textContent?.split(/\s+/).length || 0;
           return words > 100;
         }).length;

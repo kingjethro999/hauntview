@@ -4,7 +4,7 @@
  */
 
 import { Page } from 'playwright';
-import { Finding, ProfileResult, ProfileContext } from '../types';
+import { Finding, ProfileResult } from '../types';
 
 export class PerformanceProfile {
   private profileId: string;
@@ -15,7 +15,7 @@ export class PerformanceProfile {
     this.profileName = profileName;
   }
 
-  async execute(page: Page, url: string, _context: ProfileContext): Promise<ProfileResult> {
+  async execute(page: Page, url: string): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
 
@@ -54,7 +54,7 @@ export class PerformanceProfile {
           const lcpObserver = new PerformanceObserver((entryList) => {
             for (const entry of entryList.getEntries()) {
               const lcpEntry = entry as PerformanceEntryWithRenderTime;
-              vitalsData.lcp = lcpEntry.renderTime || lcpEntry.loadTime;
+              vitalsData.lcp = lcpEntry.renderTime || lcpEntry.loadTime || null;
             }
           });
           try {
@@ -173,7 +173,7 @@ export class PerformanceProfile {
       // Check for unminified JavaScript
       const unminified = await page.evaluate(() => {
         const scripts = Array.from(document.querySelectorAll('script[src]'));
-        return scripts.filter((s: any) => {
+        return scripts.filter((s: Element) => {
           const src = s.getAttribute('src') || '';
           return src.includes('/src/') || (src.endsWith('.js') && !src.includes('.min.'));
         }).length;

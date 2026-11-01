@@ -4,7 +4,7 @@
  */
 
 import { Page } from 'playwright';
-import { Finding, ProfileResult, ProfileContext } from '../types';
+import { Finding, ProfileResult } from '../types';
 
 export class I18nRTLProfile {
   private profileId: string;
@@ -15,7 +15,7 @@ export class I18nRTLProfile {
     this.profileName = profileName;
   }
 
-  async execute(page: Page, url: string, _context: ProfileContext): Promise<ProfileResult> {
+  async execute(page: Page, url: string): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
 
@@ -140,7 +140,7 @@ export class I18nRTLProfile {
         const elements = document.querySelectorAll('[style*="flex-direction"]');
 
         for (const el of elements) {
-          const dir = (el as any).getAttribute('style');
+          const dir = el.getAttribute('style');
           if (dir?.includes('flex-direction: row')) {
             hasExplicitDir = true;
             break;

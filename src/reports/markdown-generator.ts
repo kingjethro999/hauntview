@@ -5,6 +5,15 @@
 import { TestReport, Finding } from '../types';
 import { ReportGenerator, ReportOptions, GeneratedReport } from './types';
 
+interface MarkdownStatistics {
+  totalProfiles: number;
+  successfulProfiles: number;
+  errorCount: number;
+  warningCount: number;
+  infoCount: number;
+  totalFindings: number;
+}
+
 export class MarkdownReportGenerator implements ReportGenerator {
   async generate(report: TestReport, options: ReportOptions): Promise<GeneratedReport> {
     const content = this.generateMarkdownContent(report, options);
@@ -40,7 +49,7 @@ export class MarkdownReportGenerator implements ReportGenerator {
     return markdown;
   }
 
-  private renderHeader(report: TestReport, statistics: any): string {
+  private renderHeader(report: TestReport, statistics: MarkdownStatistics): string {
     const passRate = ((statistics.successfulProfiles / statistics.totalProfiles) * 100).toFixed(1);
     const status = statistics.errorCount === 0 ? '✅ PASS' : '❌ ISSUES FOUND';
 
@@ -82,7 +91,7 @@ export class MarkdownReportGenerator implements ReportGenerator {
 `;
   }
 
-  private renderExecutiveSummary(report: TestReport, statistics: any): string {
+  private renderExecutiveSummary(report: TestReport, statistics: MarkdownStatistics): string {
     let markdown = `## Executive Summary
 
 ### Overview
@@ -198,7 +207,8 @@ No findings.
       markdown += `|---------|----------|\n`;
 
       for (const finding of items) {
-        const severityIcon = finding.severity === 'error' ? '🔴' : finding.severity === 'warning' ? '🟡' : 'ℹ️';
+        const severityIcon =
+          finding.severity === 'error' ? '🔴' : finding.severity === 'warning' ? '🟡' : 'ℹ️';
         markdown += `| ${severityIcon} ${finding.profileId} | ${finding.message} |\n`;
       }
 
@@ -234,7 +244,8 @@ No findings.
         markdown += `|----------|----------|----------|\n`;
 
         for (const finding of profile.findings) {
-          const severityIcon = finding.severity === 'error' ? '🔴' : finding.severity === 'warning' ? '🟡' : 'ℹ️';
+          const severityIcon =
+            finding.severity === 'error' ? '🔴' : finding.severity === 'warning' ? '🟡' : 'ℹ️';
           markdown += `| ${severityIcon} | ${finding.category} | ${finding.message} |\n`;
         }
 
