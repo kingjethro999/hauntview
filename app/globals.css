@@ -1,26 +1,86 @@
 @import 'tailwindcss';
+@import './components/design-tokens.css';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  color-scheme: dark;
+  --background: var(--color-midnight-black, #0f0f14);
+  --foreground: var(--color-ghostly-white, #f5f5fa);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter, var(--font-sans));
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-space-grotesk, var(--font-display));
+  letter-spacing: -0.02em;
+}
+
+/* Atmospheric Glows & Shadows */
+.glow-purple {
+  box-shadow: 0 0 16px rgba(88, 38, 150, 0.45);
+}
+
+.glow-orange {
+  box-shadow: 0 0 16px rgba(220, 100, 40, 0.45);
+}
+
+/* Subtle Gothic grid background */
+.bg-gothic-grid {
+  background-image:
+    linear-gradient(to right, rgba(108, 60, 170, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(108, 60, 170, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f0f14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #373746;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #582696;
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(55, 55, 70, 0.3) 0%,
+    rgba(108, 60, 170, 0.2) 50%,
+    rgba(55, 55, 70, 0.3) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

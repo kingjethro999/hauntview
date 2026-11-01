@@ -18,6 +18,7 @@ interface PooledPage {
   context: BrowserContext;
   profileContext?: ProfileContext;
   inUse: boolean;
+  lastUsed?: number;
 }
 
 export class BrowserPool {
@@ -28,10 +29,10 @@ export class BrowserPool {
 
   constructor(config: BrowserPoolConfig) {
     this.config = {
-      maxBrowsers: 3,
-      maxPagesPerBrowser: 5,
-      idleTimeout: 30000, // 30 seconds
-      ...config,
+      maxBrowsers: config.maxBrowsers ?? 3,
+      maxPagesPerBrowser: config.maxPagesPerBrowser ?? 5,
+      idleTimeout: config.idleTimeout ?? 30000,
+      launchOptions: config.launchOptions,
     };
 
     // Start cleanup interval

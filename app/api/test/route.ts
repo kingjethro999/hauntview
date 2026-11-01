@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { HauntViewEngine } from '@/src/engine';
 import { TestReport } from '@/src/types';
+import { ReportStore } from '@/src/core/report-store';
 
 interface TestApiResponse {
   success: boolean;
@@ -42,6 +43,9 @@ export async function POST(request: NextRequest) {
       profiles,
       includeScreenshots: true,
     });
+
+    // Save report to store
+    await ReportStore.saveReport(report);
 
     // Generate report if format specified
     const result: TestApiResponse = { success: true, report };
