@@ -8,7 +8,8 @@ import { ProfileManager } from './core/profile-manager';
 import { BrowserPool } from './core/browser-pool';
 import { FindingClassifier } from './core/finding-classifier';
 import { ScreenshotManager } from './core/screenshot-manager';
-import { TestExecutionOptions, TestReport, ProfileResult } from './types';
+import { TestExecutionOptions, TestReport, ProfileResult, ReportGenerationOptions } from './types';
+import { ReportFactory } from './reports/factory';
 import { MobileProfile } from './profiles/mobile';
 import { DesktopProfile } from './profiles/desktop';
 import { ConsoleErrorsProfile } from './profiles/console-errors';
@@ -226,6 +227,20 @@ export class HauntViewEngine {
     }
 
     this.browsers.clear();
+  }
+
+  /**
+   * Generate report from test results
+   */
+  async generateReport(
+    report: TestReport,
+    options: ReportGenerationOptions,
+  ) {
+    const generator = ReportFactory.createGenerator(options.format);
+    return generator.generate(report, {
+      format: options.format as 'html' | 'markdown' | 'json',
+      includeScreenshots: options.includeScreenshots ?? true,
+    });
   }
 
   /**
