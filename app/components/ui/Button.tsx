@@ -1,89 +1,54 @@
-'use client';
-
 import React from 'react';
+import { Loader2Icon } from '@heroicons/react/24/outline';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'candle';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   icon?: React.ReactNode;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      variant = 'primary',
-      size = 'md',
-      type = 'button',
-      loading = false,
-      icon,
-      children,
-      disabled,
-      className = '',
-      ...props
-    },
-    ref
-  ) => {
-    const baseStyles =
-      'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#ff791f] focus-visible:outline-offset-2 disabled:cursor-not-allowed';
+export const Button: React.FC<ButtonProps> = ({
+  variant = 'primary',
+  size = 'md',
+  loading = false,
+  icon,
+  children,
+  disabled,
+  className = '',
+  ...props
+}) => {
+  const baseStyles =
+    'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all duration-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50';
 
-    const sizeStyles = {
-      sm: 'px-3 py-1.5 text-xs gap-1.5',
-      md: 'px-5 py-2.5 text-sm gap-2',
-      lg: 'px-6 py-3.5 text-base gap-2.5',
-    };
+  const variantStyles = {
+    primary:
+      'bg-[var(--candle-primary)] text-[#1a0c06] hover:bg-[#ff8a35] shadow-[0_4px_16px_rgba(255,121,31,0.4)] hover:shadow-[0_6px_24px_rgba(255,121,31,0.5)]',
+    secondary:
+      'bg-[#3b82f6] text-white hover:bg-[#60a5fa] shadow-[0_4px_16px_rgba(59,130,246,0.3)]',
+    ghost:
+      'bg-transparent text-[var(--ghost-white)] hover:bg-[rgba(255,121,31,0.1)] hover:text-[var(--candle-primary)]',
+    outline:
+      'bg-transparent border border-[rgba(255,121,31,0.3)] text-[var(--ghost-white)] hover:border-[var(--candle-primary)] hover:bg-[rgba(255,121,31,0.08)]',
+    candle: 'btn-candle',
+  };
 
-    const variantStyles = {
-      primary:
-        'bg-[#4a2b8a] text-[#fff1dc] border border-[#6C3CAA] shadow-[0_4px_12px_rgba(74,43,138,0.25)] hover:bg-[#6C3CAA] hover:shadow-[0_6px_20px_rgba(74,43,138,0.35)] hover:-translate-y-0.5 active:bg-[#441C78] active:translate-y-0 disabled:bg-[#4B5563] disabled:text-[#646478] disabled:border-transparent disabled:shadow-none disabled:transform-none',
-      secondary:
-        'bg-[#ff791f] text-[#fff1dc] border border-[#B43C14] shadow-[0_4px_12px_rgba(255,121,31,0.25)] hover:bg-[#B43C14] hover:shadow-[0_6px_20px_rgba(255,121,31,0.35)] hover:-translate-y-0.5 active:bg-[#8B2E0F] active:translate-y-0 disabled:bg-[#4B5563] disabled:text-[#646478] disabled:border-transparent disabled:shadow-none disabled:transform-none',
-      ghost:
-        'bg-transparent text-[#fff1dc] border border-transparent hover:bg-[rgba(74,43,138,0.15)] hover:border-[#6C3CAA] hover:text-[#ff791f] active:bg-[rgba(74,43,138,0.25)] disabled:text-[#646478] disabled:bg-transparent',
-      outline:
-        'bg-transparent text-[#fff1dc] border border-[#6C3CAA] hover:bg-[rgba(74,43,138,0.1)] hover:border-[#ff791f] hover:text-[#ff791f] active:bg-[rgba(74,43,138,0.2)] disabled:border-[#4B5563] disabled:text-[#646478]',
-      danger:
-        'bg-[#dc2626] text-[#fff1dc] border border-[#b91c1c] shadow-[0_4px_12px_rgba(220,38,38,0.25)] hover:bg-[#b91c1c] hover:shadow-[0_6px_20px_rgba(220,38,38,0.35)] hover:-translate-y-0.5 active:bg-[#991b1b] active:translate-y-0 disabled:bg-[#4B5563] disabled:text-[#646478]',
-    };
+  const sizeStyles = {
+    sm: 'px-3 py-1.5 text-xs',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base',
+  };
 
-    return (
-      <button
-        ref={ref}
-        type={type}
-        disabled={disabled || loading}
-        className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
-        {...props}
-      >
-        {loading ? (
-          <svg
-            className="animate-spin h-4 w-4 text-current"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-        ) : (
-          icon
-        )}
-        {children}
-      </button>
-    );
-  }
-);
-
-Button.displayName = 'Button';
+  return (
+    <button
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+      disabled={disabled || loading}
+      {...props}
+    >
+      {loading && <Loader2Icon className="w-4 h-4 animate-spin" />}
+      {!loading && icon}
+      {children}
+    </button>
+  );
+};

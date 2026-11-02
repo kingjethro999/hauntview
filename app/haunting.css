@@ -1,0 +1,155 @@
+/* 
+   Haunting Effects Layer
+   App-wide atmospheric effects that enhance the séance atmosphere
+   Never receives pointer input, respects reduced motion
+*/
+
+.haunting-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 45;
+  overflow: hidden;
+}
+
+/* Corridor fog - subtle drift */
+.corridor-fog {
+  position: absolute;
+  bottom: -80px;
+  width: 55vw;
+  height: 220px;
+  opacity: 0.5;
+  background: radial-gradient(ellipse, rgba(184, 83, 196, 0.17), transparent 65%);
+  filter: blur(22px);
+  animation: corridor-drift 17s ease-in-out infinite alternate;
+}
+
+.fog-left {
+  left: -14%;
+}
+
+.fog-right {
+  right: -14%;
+  background: radial-gradient(ellipse, rgba(247, 123, 28, 0.12), transparent 65%);
+  animation-delay: -8s;
+}
+
+@keyframes corridor-drift {
+  to {
+    transform: translate3d(22vw, -22px, 0);
+    opacity: 0.8;
+  }
+}
+
+/* Spirit apparitions */
+.apparition-burst svg {
+  position: absolute;
+  width: var(--size, 44px);
+  height: calc(var(--size, 44px) * 1.32);
+  color: var(--ghost-white, #f5f0e8);
+  filter: drop-shadow(0 0 12px rgba(193, 139, 255, 0.5));
+  left: var(--ghost-left, calc(3% + var(--i) * 12% + var(--dx, 0px)));
+  bottom: -80px;
+  opacity: 0;
+  animation: archive-spirit var(--duration, 3.8s) ease-out both;
+  animation-delay: var(--delay, calc(var(--i) * 0.12s));
+}
+
+@keyframes archive-spirit {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--ghost-rot0, -15deg)) scale(var(--ghost-scale, 1));
+  }
+  16% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--ghost-drift, var(--ghost-x2, 20px)), var(--ghost-top, -85vh), 0)
+      rotate(var(--ghost-rot2, 12deg)) scale(calc(var(--ghost-scale, 1) * 0.88));
+  }
+}
+
+/* Ceiling spark */
+.haunt-ceiling {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(233, 118, 43, 0.2),
+    transparent,
+    rgba(193, 139, 255, 0.2),
+    transparent
+  );
+}
+
+.haunt-ceiling span {
+  position: absolute;
+  left: 20%;
+  top: -9px;
+  color: rgba(247, 123, 28, 0.5);
+  font-size: 17px;
+  animation: cursed-star 8s ease-in-out infinite;
+}
+
+.haunt-ceiling span:nth-child(2) {
+  left: 66%;
+  animation-delay: -3s;
+  color: rgba(193, 139, 255, 0.5);
+}
+
+.haunt-ceiling span:nth-child(3) {
+  left: 91%;
+  animation-delay: -5s;
+}
+
+@keyframes cursed-star {
+  50% {
+    transform: rotate(65deg);
+    opacity: 0.3;
+  }
+}
+
+/* Cursor ember (follows clicks) */
+.cursor-ember {
+  position: absolute;
+  color: #ffac56;
+  font:
+    13px 'Georgia',
+    serif;
+  transform: translate(-50%, -50%);
+  animation: ember-dissolve 0.95s ease-out both;
+  text-shadow: 0 0 8px rgba(255, 109, 40, 0.56);
+  pointer-events: none;
+}
+
+@keyframes ember-dissolve {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -40px) rotate(90deg) scale(0.2);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .haunting-layer * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .apparition-burst svg {
+    opacity: 0.8;
+    transform: translateY(-130px);
+  }
+
+  .corridor-fog {
+    display: none;
+  }
+}

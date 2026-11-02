@@ -2,10 +2,13 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Space_Grotesk, Inter } from 'next/font/google';
 import './globals.css';
+import './haunting.css';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { Toaster } from 'sonner';
 import { AtmosphereLayer } from './components/features/AtmosphereLayer';
+import { HauntingEffects } from './components/features/HauntingEffects';
+import { SparklesIcon } from '@heroicons/react/24/outline';
 
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
@@ -40,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         style={{ background: '#100d13', color: '#fff1dc' }}
       >
         <AtmosphereLayer />
+        <HauntingEffects />
         <Suspense fallback={<div className="h-16 bg-[#0a0711]" />}>
           <Navbar />
         </Suspense>

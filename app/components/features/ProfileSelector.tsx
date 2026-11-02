@@ -1,199 +1,184 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Card } from '../ui/Card';
-import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
+import React from 'react';
 import {
+  CheckIcon,
   DevicePhoneMobileIcon,
+  ComputerDesktopIcon,
   EyeIcon,
   GlobeAltIcon,
-  CpuChipIcon,
-  BoltIcon,
-  CheckIcon,
+  BeakerIcon,
 } from '@heroicons/react/24/outline';
 
-export interface ProfileMeta {
+export interface ProfileInfo {
   id: string;
   name: string;
-  category: 'device' | 'accessibility' | 'i18n' | 'browser' | 'performance';
   description: string;
-  badge: string;
+  category: 'device' | 'accessibility' | 'i18n' | 'browser' | 'performance';
 }
 
-export const AVAILABLE_PROFILES: ProfileMeta[] = [
-  // Device
+export const AVAILABLE_PROFILES: ProfileInfo[] = [
+  // Device profiles
   {
     id: 'mobile-iphone15',
     name: 'Mobile - iPhone 15',
+    description: '390×844 touch viewport',
     category: 'device',
-    description: 'Apple iPhone 15 Pro (390x844, 3x DPR)',
-    badge: 'Mobile',
   },
   {
     id: 'mobile-android',
     name: 'Mobile - Android',
+    description: '360×800 touch viewport',
     category: 'device',
-    description: 'Samsung Galaxy S23 (360x800, 2x DPR)',
-    badge: 'Mobile',
   },
   {
     id: 'tablet-ipad',
     name: 'Tablet - iPad Pro',
+    description: '1024×1366 touch viewport',
     category: 'device',
-    description: 'iPad Pro 12.9" (1024x1366, Touch)',
-    badge: 'Tablet',
   },
   {
     id: 'desktop-1080p',
     name: 'Desktop - 1080p',
+    description: '1920×1080 standard viewport',
     category: 'device',
-    description: 'Full HD viewport (1920x1080)',
-    badge: 'Desktop',
   },
   {
     id: 'desktop-4k',
     name: 'Desktop - 4K',
+    description: '3840×2160 high-resolution',
     category: 'device',
-    description: 'Ultra High Definition (3840x2160)',
-    badge: 'Desktop',
   },
 
-  // Accessibility
+  // Accessibility profiles
   {
     id: 'a11y-screenreader',
-    name: 'Screen Reader & ARIA',
+    name: 'Screen Reader',
+    description: 'ARIA and semantic HTML',
     category: 'accessibility',
-    description: 'ARIA landmarks, semantic HTML, roles and screen-reader tree',
-    badge: 'WCAG AA',
   },
   {
     id: 'a11y-keyboard',
     name: 'Keyboard Navigation',
+    description: 'Tab order and focus management',
     category: 'accessibility',
-    description: 'Focus indicators, Tab navigation flow, modal traps',
-    badge: 'WCAG AA',
   },
   {
     id: 'a11y-visual',
     name: 'Visual Impairment',
+    description: 'High contrast and color independence',
     category: 'accessibility',
-    description: 'High contrast mode, color dependency, text readability',
-    badge: 'WCAG AA',
   },
   {
     id: 'a11y-cognitive',
     name: 'Cognitive Load',
+    description: 'Complexity and clarity checks',
     category: 'accessibility',
-    description: 'DOM complexity, long paragraphs, animation distraction',
-    badge: 'WCAG AA',
   },
 
   // Internationalization
   {
     id: 'i18n-rtl',
-    name: 'I18N - RTL (Arabic)',
+    name: 'RTL Language',
+    description: 'Arabic right-to-left layout',
     category: 'i18n',
-    description: 'Right-to-Left bidirectional layout, mirrored flex direction',
-    badge: 'RTL',
   },
   {
     id: 'i18n-cjk',
-    name: 'I18N - CJK (Japanese)',
+    name: 'CJK Language',
+    description: 'Japanese East Asian script',
     category: 'i18n',
-    description: 'CJK typography, line-break rules, font glyph fallback',
-    badge: 'CJK',
   },
   {
     id: 'i18n-mixed',
-    name: 'I18N - Mixed Scripts',
+    name: 'Mixed Scripts',
+    description: 'Hindi complex script rendering',
     category: 'i18n',
-    description: 'Devanagari and mixed Unicode script font pairing',
-    badge: 'Unicode',
   },
 
-  // Browsers
+  // Browser compatibility
   {
     id: 'browser-webkit',
-    name: 'Browser - WebKit',
+    name: 'WebKit',
+    description: 'Safari/Chrome engine',
     category: 'browser',
-    description: 'Safari & WebKit rendering and CSS prefix compliance',
-    badge: 'WebKit',
   },
-  {
-    id: 'browser-firefox',
-    name: 'Browser - Firefox',
-    category: 'browser',
-    description: 'Gecko engine behavior, scrollbar, backdrop filters',
-    badge: 'Gecko',
-  },
-  {
-    id: 'browser-edge',
-    name: 'Browser - Edge',
-    category: 'browser',
-    description: 'Chromium Edge integration and compatibility quirks',
-    badge: 'Edge',
-  },
+  { id: 'browser-firefox', name: 'Firefox', description: 'Gecko engine', category: 'browser' },
+  { id: 'browser-edge', name: 'Edge', description: 'Chromium variant', category: 'browser' },
   {
     id: 'browser-legacy',
-    name: 'Browser - Legacy CSS',
+    name: 'Legacy',
+    description: 'IE 11 fallback detection',
     category: 'browser',
-    description: 'Flexbox, CSS grid, and modern JS fallback resilience',
-    badge: 'Compatibility',
   },
 
   // Performance
   {
     id: 'performance',
-    name: 'Performance & Web Vitals',
+    name: 'Performance',
+    description: 'Core Web Vitals and CLS',
     category: 'performance',
-    description: 'LCP, FCP, CLS metrics, heavy assets, unminified JS',
-    badge: 'Vitals',
   },
 ];
 
-export interface ProfileSelectorProps {
+interface ProfileSelectorProps {
   selectedProfiles: string[];
   onChange: (profiles: string[]) => void;
+  viewMode?: 'grid' | 'list';
+  onSelectAll?: () => void;
 }
 
-export const ProfileSelector: React.FC<ProfileSelectorProps> = ({ selectedProfiles, onChange }) => {
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+const getCategoryIcon = (category: ProfileInfo['category']) => {
+  switch (category) {
+    case 'device':
+      return <DevicePhoneMobileIcon className="w-4 h-4" />;
+    case 'accessibility':
+      return <EyeIcon className="w-4 h-4" />;
+    case 'i18n':
+      return <GlobeAltIcon className="w-4 h-4" />;
+    case 'browser':
+      return <ComputerDesktopIcon className="w-4 h-4" />;
+    case 'performance':
+      return <BeakerIcon className="w-4 h-4" />;
+  }
+};
 
-  const categories = [
-    { id: 'all', label: 'All Profiles (17)', icon: null },
-    {
-      id: 'device',
-      label: 'Devices (5)',
-      icon: <DevicePhoneMobileIcon className="w-4 h-4" />,
-    },
-    {
-      id: 'accessibility',
-      label: 'Accessibility (4)',
-      icon: <EyeIcon className="w-4 h-4" />,
-    },
-    {
-      id: 'i18n',
-      label: 'Internationalization (3)',
-      icon: <GlobeAltIcon className="w-4 h-4" />,
-    },
-    {
-      id: 'browser',
-      label: 'Browsers (4)',
-      icon: <CpuChipIcon className="w-4 h-4" />,
-    },
-    {
-      id: 'performance',
-      label: 'Performance (1)',
-      icon: <BoltIcon className="w-4 h-4" />,
-    },
-  ];
+const getCategoryColor = (category: ProfileInfo['category']) => {
+  switch (category) {
+    case 'device':
+      return 'rgba(59, 130, 246, 0.15)';
+    case 'accessibility':
+      return 'rgba(154, 255, 154, 0.15)';
+    case 'i18n':
+      return 'rgba(249, 115, 22, 0.15)';
+    case 'browser':
+      return 'rgba(168, 85, 247, 0.15)';
+    case 'performance':
+      return 'rgba(234, 88, 12, 0.15)';
+  }
+};
 
-  const filteredProfiles =
-    activeCategory === 'all'
-      ? AVAILABLE_PROFILES
-      : AVAILABLE_PROFILES.filter((p) => p.category === activeCategory);
+const getCategoryBorderColor = (category: ProfileInfo['category']) => {
+  switch (category) {
+    case 'device':
+      return 'rgba(59, 130, 246, 0.3)';
+    case 'accessibility':
+      return 'rgba(154, 255, 154, 0.3)';
+    case 'i18n':
+      return 'rgba(249, 115, 22, 0.3)';
+    case 'browser':
+      return 'rgba(168, 85, 247, 0.3)';
+    case 'performance':
+      return 'rgba(234, 88, 12, 0.3)';
+  }
+};
 
+export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
+  selectedProfiles,
+  onChange,
+  viewMode = 'grid',
+  onSelectAll,
+}) => {
   const toggleProfile = (id: string) => {
     if (selectedProfiles.includes(id)) {
       onChange(selectedProfiles.filter((p) => p !== id));
@@ -202,137 +187,119 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({ selectedProfil
     }
   };
 
-  const selectAll = () => {
-    onChange(AVAILABLE_PROFILES.map((p) => p.id));
-  };
+  const groupedProfiles = AVAILABLE_PROFILES.reduce(
+    (acc, profile) => {
+      if (!acc[profile.category]) {
+        acc[profile.category] = [];
+      }
+      acc[profile.category].push(profile);
+      return acc;
+    },
+    {} as Record<ProfileInfo['category'], ProfileInfo[]>
+  );
 
-  const clearAll = () => {
-    onChange([]);
-  };
-
-  const selectQuickScare = () => {
-    onChange(['mobile-iphone15', 'a11y-keyboard', 'console-errors', 'a11y-visual']);
-  };
-
-  const selectBeforeLaunch = () => {
-    onChange(AVAILABLE_PROFILES.filter((p) => p.id !== 'performance').map((p) => p.id));
-  };
-
-  const selectResilience = () => {
-    onChange(['mobile-iphone15', 'desktop-1080p', 'i18n-rtl', 'browser-webkit', 'performance']);
-  };
-
-  return (
-    <div className="space-y-4">
-      {/* Action Header & Presets */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#46334b]">
-        <div>
-          <h4 className="font-display font-bold text-base text-[#fff1dc]">
-            Rites & Testing Profiles ({selectedProfiles.length}/{AVAILABLE_PROFILES.length}{' '}
-            selected)
-          </h4>
-          <p className="text-xs text-[#d9d3e0]">
-            Select individual rites or choose a quick preset suite
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-1.5">
-          <Button type="button" size="sm" variant="outline" onClick={selectAll}>
-            Full Test
-          </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={selectQuickScare}>
-            Quick Scare
-          </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={selectBeforeLaunch}>
-            Before Launch
-          </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={selectResilience}>
-            Resilience
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={clearAll}
-            className="text-[#F28B77]"
-          >
-            Clear
-          </Button>
-        </div>
-      </div>
-
-      {/* Category Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            type="button"
-            onClick={() => setActiveCategory(cat.id)}
-            className={`
-              flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer
-              ${
-                activeCategory === cat.id
-                  ? 'bg-[#4a2b8a] text-[#fff1dc] shadow-[0_2px_8px_rgba(74,43,138,0.4)]'
-                  : 'bg-[#2d1a4a]/40 text-[#646478] hover:text-[#fff1dc] hover:bg-[#2d1a4a]/70'
-              }
-            `}
-          >
-            {cat.icon}
-            <span>{cat.label}</span>
-          </button>
+  if (viewMode === 'list') {
+    return (
+      <div className="space-y-3">
+        {Object.entries(groupedProfiles).map(([category, profiles]) => (
+          <div key={category}>
+            <div
+              className="text-xs font-semibold uppercase tracking-wider mb-2"
+              style={{ color: 'var(--phantom-gray)' }}
+            >
+              {category}
+            </div>
+            <div className="space-y-2">
+              {profiles.map((profile) => (
+                <label
+                  key={profile.id}
+                  className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all hover:border-[var(--candle-primary)]"
+                  style={{
+                    background: selectedProfiles.includes(profile.id)
+                      ? getCategoryColor(category)
+                      : 'rgba(28, 21, 35, 0.3)',
+                    borderColor: selectedProfiles.includes(profile.id)
+                      ? getCategoryBorderColor(category)
+                      : 'rgba(255, 121, 31, 0.1)',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedProfiles.includes(profile.id)}
+                    onChange={() => toggleProfile(profile.id)}
+                    className="accent-[var(--candle-primary)] w-4 h-4"
+                  />
+                  <div className="flex items-center gap-2" style={{ color: 'var(--ghost-white)' }}>
+                    {getCategoryIcon(category)}
+                    <span className="text-sm font-medium">{profile.name}</span>
+                  </div>
+                  <span className="text-xs ml-auto" style={{ color: 'var(--phantom-gray)' }}>
+                    {profile.description}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
+    );
+  }
 
-      {/* Profile Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {filteredProfiles.map((profile) => {
-          const isSelected = selectedProfiles.includes(profile.id);
-
-          return (
-            <Card
-              key={profile.id}
-              onClick={() => toggleProfile(profile.id)}
-              className={`
-                p-4 cursor-pointer transition-all duration-200 select-none
-                ${
-                  isSelected
-                    ? 'border-[#ff791f] bg-[#4a2b8a]/15 shadow-[0_4px_16px_rgba(255,121,31,0.15)] ring-1 ring-[#ff791f]/40'
-                    : 'border-[#6C3CAA]/30 bg-[#2d1a4a]/40 hover:border-[#6C3CAA]/70 hover:bg-[#2d1a4a]/60'
-                }
-              `}
+  // Grid view
+  return (
+    <div className="space-y-6">
+      {Object.entries(groupedProfiles).map(([category, profiles]) => (
+        <div key={category}>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-1.5 rounded" style={{ background: getCategoryColor(category) }}>
+              {getCategoryIcon(category)}
+            </div>
+            <div
+              className="text-xs font-semibold uppercase tracking-wider"
+              style={{ color: 'var(--phantom-gray)' }}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-sm text-[#fff1dc] truncate">
-                      {profile.name}
-                    </span>
-                    <Badge variant={isSelected ? 'warning' : 'outline'} size="sm">
-                      {profile.badge}
-                    </Badge>
+              {category}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {profiles.map((profile) => (
+              <button
+                key={profile.id}
+                type="button"
+                onClick={() => toggleProfile(profile.id)}
+                className="relative p-4 rounded-lg border text-left transition-all hover:border-[var(--candle-primary)] group"
+                style={{
+                  background: selectedProfiles.includes(profile.id)
+                    ? getCategoryColor(category)
+                    : 'rgba(28, 21, 35, 0.3)',
+                  borderColor: selectedProfiles.includes(profile.id)
+                    ? getCategoryBorderColor(category)
+                    : 'rgba(255, 121, 31, 0.1)',
+                }}
+              >
+                {selectedProfiles.includes(profile.id) && (
+                  <div
+                    className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                    style={{ background: getCategoryBorderColor(category) }}
+                  >
+                    <CheckIcon className="w-3 h-3" style={{ color: 'var(--ghost-white)' }} />
                   </div>
-                  <p className="text-xs text-[#646478] line-clamp-2 leading-relaxed">
-                    {profile.description}
-                  </p>
-                </div>
-
+                )}
                 <div
-                  className={`
-                    w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors
-                    ${
-                      isSelected
-                        ? 'bg-[#ff791f] text-white'
-                        : 'border border-[#6C3CAA]/50 bg-[#0a0711]/50'
-                    }
-                  `}
+                  className="flex items-center gap-2 mb-2"
+                  style={{ color: 'var(--ghost-white)' }}
                 >
-                  {isSelected && <CheckIcon className="w-3.5 h-3.5 stroke-[3]" />}
+                  {getCategoryIcon(category)}
+                  <span className="text-sm font-medium">{profile.name}</span>
                 </div>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+                <p className="text-xs leading-snug" style={{ color: 'var(--phantom-gray)' }}>
+                  {profile.description}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

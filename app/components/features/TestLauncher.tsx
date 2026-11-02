@@ -5,8 +5,12 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
 import { ProfileSelector, AVAILABLE_PROFILES } from './ProfileSelector';
-import { HauntedHouse, HOUSE_WINDOWS } from './HauntedHouse';
-import { RocketLaunchIcon, HomeModernIcon, ListBulletIcon } from '@heroicons/react/24/outline';
+import {
+  RocketLaunchIcon,
+  HomeModernIcon,
+  ListBulletIcon,
+  GlobeAltIcon,
+} from '@heroicons/react/24/outline';
 
 export interface TestLauncherProps {
   onStartTest: (
@@ -29,7 +33,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>(
     AVAILABLE_PROFILES.map((p) => p.id)
   );
-  const [viewMode, setViewMode] = useState<'house' | 'list'>('house');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [format, setFormat] = useState<'zip' | 'html' | 'markdown' | 'json'>('zip');
   const [error, setError] = useState<string | null>(null);
 
@@ -63,7 +67,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
     );
   };
 
-  const selectAllHouseProfiles = () => {
+  const selectAllProfiles = () => {
     const allIds = AVAILABLE_PROFILES.map((p) => p.id);
     if (selectedProfiles.length === allIds.length) {
       setSelectedProfiles([]);
@@ -91,7 +95,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
     }
 
     if (selectedProfiles.length === 0) {
-      setError('Please select at least one testing profile in the Haunted House to summon.');
+      setError('Please select at least one testing profile.');
       return;
     }
 
@@ -105,20 +109,28 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
   return (
     <Card
       variant="ghostly"
-      className="p-6 md:p-8 space-y-8 border-[#46334b] bg-[#0a0711]/90 backdrop-blur-md"
+      className="p-8 space-y-8"
+      style={{
+        borderColor: 'rgba(255, 121, 31, 0.15)',
+        background: 'rgba(28, 21, 35, 0.6)',
+      }}
     >
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Séance Slate URL Input Section */}
+        {/* URL Input Section */}
         <div>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
             <label
-              htmlFor="target-url-slate"
-              className="text-sm font-serif font-bold text-[#fff1dc] flex items-center gap-2"
+              htmlFor="target-url"
+              className="text-sm font-semibold flex items-center gap-2"
+              style={{ color: 'var(--ghost-white)' }}
             >
-              <span>Which House Shall We Haunt?</span>
-              <span className="text-[#ff791f] font-normal text-xs">(Target URL)</span>
+              <GlobeAltIcon className="w-4 h-4" style={{ color: 'var(--candle-primary)' }} />
+              Target URL
             </label>
-            <div className="flex items-center gap-1.5 text-xs text-[#d9d3e0]">
+            <div
+              className="flex items-center gap-2 text-xs"
+              style={{ color: 'var(--phantom-gray)' }}
+            >
               <span>Quick pick:</span>
               {presets.map((preset) => (
                 <button
@@ -129,7 +141,12 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
                     const valid = checkUrlValid(preset.url);
                     onUrlChange?.(preset.url, valid);
                   }}
-                  className="px-2.5 py-0.5 rounded-[4px] bg-[#1c1629] border border-[#46334b] hover:text-[#ff791f] hover:border-[#ff791f] transition-colors cursor-pointer text-[11px]"
+                  className="px-3 py-1 rounded border hover:border-[var(--candle-primary)] transition-colors"
+                  style={{
+                    background: 'rgba(28, 21, 35, 0.5)',
+                    borderColor: 'rgba(255, 121, 31, 0.15)',
+                    color: 'var(--phantom-gray)',
+                  }}
                 >
                   {preset.label}
                 </button>
@@ -137,32 +154,17 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
             </div>
           </div>
 
-          {/* Séance Slate Styled Input Container */}
+          {/* Styled URL Input */}
           <div
-            className={`relative flex items-center rounded-[6px] bg-[#0a0711] border-2 transition-all duration-300 ${
+            className={`relative flex items-center rounded-lg border-2 transition-all duration-200 ${
               isUrlValid
-                ? 'border-[#ff791f] shadow-[0_0_18px_rgba(255,121,31,0.25)]'
-                : 'border-[#46334b] focus-within:border-[#ff791f]'
+                ? 'border-[var(--candle-primary)] shadow-[0_0_20px_rgba(255,121,31,0.2)]'
+                : 'border-[rgba(255,121,31,0.15)] focus-within:border-[var(--candle-primary)]'
             }`}
+            style={{ background: 'rgba(10, 7, 17, 0.8)' }}
           >
-            {/* Candle Status Flame Icon */}
-            <div className="pl-3.5 pr-2 flex items-center justify-center text-lg select-none">
-              {isUrlValid ? (
-                <span title="Lantern & Candle Lit! Target URL valid" className="animate-bounce">
-                  🕯️
-                </span>
-              ) : (
-                <span
-                  title="Unlit wick. Enter valid http:// or https:// address"
-                  className="opacity-40"
-                >
-                  🕯️
-                </span>
-              )}
-            </div>
-
             <input
-              id="target-url-slate"
+              id="target-url"
               type="text"
               value={url}
               onChange={handleUrlInputChange}
@@ -171,100 +173,121 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               placeholder="http://localhost:3000 or https://your-site.com"
               disabled={isRunning}
               required
-              className="w-full py-3.5 pr-4 bg-transparent text-[#fff1dc] font-mono text-sm placeholder:text-[#b9acbf] placeholder:font-serif focus:outline-none"
+              className="w-full py-3.5 px-4 bg-transparent text-sm font-mono focus:outline-none"
+              style={{ color: 'var(--ghost-white)' }}
             />
 
-            {/* Validation Indicator Badge */}
-            <div className="pr-3.5 flex items-center">
+            {/* Validation indicator */}
+            <div className="pr-4 flex items-center">
               {isUrlValid ? (
-                <span className="text-[11px] font-serif font-semibold text-[#9aff9a] bg-[#1c1629] px-2 py-0.5 rounded border border-[#9aff9a]/40">
-                  Porch Lantern Lit ✓
-                </span>
+                <div
+                  className="flex items-center gap-1.5 text-xs font-medium"
+                  style={{ color: '#9aff9a' }}
+                >
+                  <div className="w-2 h-2 rounded-full bg-[#9aff9a] ember-pulse" />
+                  <span>Valid</span>
+                </div>
               ) : (
-                <span className="text-[11px] text-[#d9d3e0] italic">Awaiting address...</span>
+                <span className="text-xs italic" style={{ color: 'var(--phantom-gray)' }}>
+                  Waiting...
+                </span>
               )}
             </div>
           </div>
         </div>
 
-        {/* View Mode Toggle: The Haunted House vs Plain Rites List */}
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#46334b] gap-3">
+        {/* Profile Selection */}
+        <div className="space-y-5">
+          <div
+            className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 gap-3"
+            style={{ borderBottom: '1px solid rgba(255, 121, 31, 0.1)' }}
+          >
             <div>
-              <h3 className="font-serif font-bold text-lg text-[#fff1dc] flex items-center gap-2">
-                <span>The Haunted House & Rites</span>
-                <span className="text-xs font-mono font-normal text-[#ff791f] px-2 py-0.5 rounded bg-[#1c1629] border border-[#46334b]">
-                  {selectedProfiles.length} / {HOUSE_WINDOWS.length} Rites Summoned
+              <h3 className="font-semibold text-lg" style={{ color: 'var(--ghost-white)' }}>
+                Testing Rites
+                <span
+                  className="ml-3 text-xs font-normal px-2 py-0.5 rounded"
+                  style={{
+                    color: 'var(--candle-primary)',
+                    background: 'rgba(255, 121, 31, 0.08)',
+                    border: '1px solid rgba(255, 121, 31, 0.2)',
+                  }}
+                >
+                  {selectedProfiles.length} / {AVAILABLE_PROFILES.length} selected
                 </span>
               </h3>
-              <p className="text-xs text-[#d9d3e0]">
-                Each window of the house represents a failure-mode test profile.
+              <p style={{ fontSize: 13, color: 'var(--phantom-gray)', marginTop: 2 }}>
+                Choose which failure conditions to test
               </p>
             </div>
 
-            {/* Mode Switcher */}
-            <div className="inline-flex rounded-[6px] bg-[#1c1629] p-0.5 border border-[#46334b]">
+            {/* View mode toggle */}
+            <div
+              className="inline-flex rounded-lg p-1"
+              style={{
+                background: 'rgba(28, 21, 35, 0.5)',
+                border: '1px solid rgba(255, 121, 31, 0.15)',
+              }}
+            >
               <button
                 type="button"
-                onClick={() => setViewMode('house')}
-                className={`px-3 py-1 rounded-[4px] text-xs font-serif flex items-center gap-1.5 transition-colors cursor-pointer ${
-                  viewMode === 'house'
-                    ? 'bg-[#ff791f] text-[#0a0711] font-bold shadow-[0_0_8px_rgba(255,121,31,0.3)]'
-                    : 'text-[#d9d3e0] hover:text-[#fff1dc]'
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-2 transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
+                    : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)]'
                 }`}
-                aria-pressed={viewMode === 'house'}
               >
                 <HomeModernIcon className="w-3.5 h-3.5" />
-                <span>Haunted House</span>
+                <span>Grid</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1 rounded-[4px] text-xs font-serif flex items-center gap-1.5 transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-2 transition-colors ${
                   viewMode === 'list'
-                    ? 'bg-[#ff791f] text-[#0a0711] font-bold shadow-[0_0_8px_rgba(255,121,31,0.3)]'
-                    : 'text-[#d9d3e0] hover:text-[#fff1dc]'
+                    ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
+                    : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)]'
                 }`}
-                aria-pressed={viewMode === 'list'}
               >
                 <ListBulletIcon className="w-3.5 h-3.5" />
-                <span>List View</span>
+                <span>List</span>
               </button>
             </div>
           </div>
 
-          {/* Interactive Haunted House or List Selector */}
-          {viewMode === 'house' ? (
-            <div className="p-4 rounded-[6px] bg-[#1c1629]/90 border border-[#46334b] flex flex-col items-center">
-              <HauntedHouse
-                selectedProfiles={selectedProfiles}
-                onToggleProfile={toggleSingleProfile}
-                onSelectAll={selectAllHouseProfiles}
-                isUrlValid={isUrlValid}
-              />
-            </div>
-          ) : (
-            <ProfileSelector selectedProfiles={selectedProfiles} onChange={setSelectedProfiles} />
-          )}
+          {/* Profile selector */}
+          <ProfileSelector
+            selectedProfiles={selectedProfiles}
+            onChange={setSelectedProfiles}
+            viewMode={viewMode}
+            onSelectAll={selectAllProfiles}
+          />
         </div>
 
-        {/* Format Selection & Submit Button */}
-        <div className="pt-4 border-t border-[#46334b] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs font-serif text-[#d9d3e0]">Grimoire Export:</span>
+        {/* Format selection and submit */}
+        <div
+          className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-6"
+          style={{ borderTop: '1px solid rgba(255, 121, 31, 0.1)' }}
+        >
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="text-sm" style={{ color: 'var(--phantom-gray)' }}>
+              Export format:
+            </span>
             {(['zip', 'html', 'markdown', 'json'] as const).map((fmt) => (
               <label
                 key={fmt}
-                className="flex items-center gap-1.5 text-xs text-[#fff1dc] cursor-pointer font-mono"
+                className="flex items-center gap-2 text-sm cursor-pointer"
+                style={{ color: 'var(--ghost-white)' }}
               >
                 <input
                   type="radio"
                   name="format"
                   checked={format === fmt}
                   onChange={() => setFormat(fmt)}
-                  className="accent-[#ff791f] cursor-pointer"
+                  className="accent-[var(--candle-primary)]"
                 />
-                <span className="uppercase">{fmt === 'zip' ? 'ZIP (Screenshots)' : fmt}</span>
+                <span className="font-mono text-xs uppercase">{fmt}</span>
               </label>
             ))}
           </div>
@@ -272,21 +295,19 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
           <Button
             type="submit"
             size="lg"
-            variant="secondary"
+            variant="candle"
             loading={isRunning}
             disabled={isRunning}
-            icon={<RocketLaunchIcon className="w-5 h-5 text-[#0a0711]" />}
-            className="w-full sm:w-auto font-serif font-bold text-[#0a0711] bg-[#ff791f] hover:bg-[#ff791f]/90 shadow-[0_0_20px_rgba(255,121,31,0.35)] cursor-pointer"
+            icon={<RocketLaunchIcon className="w-5 h-5" />}
+            className="w-full sm:w-auto font-semibold"
           >
-            {isRunning
-              ? 'Séance in Progress...'
-              : `Haunt House with ${selectedProfiles.length} Rites`}
+            {isRunning ? 'Conducting Séance...' : `Haunt with ${selectedProfiles.length} Rites`}
           </Button>
         </div>
 
-        {/* Error Alert */}
+        {/* Error alert */}
         {error && (
-          <Alert type="error" title="Validation or Launch Error" onClose={() => setError(null)}>
+          <Alert type="error" title="Launch Error" onClose={() => setError(null)}>
             {error}
           </Alert>
         )}

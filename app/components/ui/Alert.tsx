@@ -1,72 +1,79 @@
 import React from 'react';
 import {
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
+  XMarkIcon,
   ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 
-export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
-  type?: 'success' | 'warning' | 'error' | 'info';
+interface AlertProps {
+  type: 'error' | 'warning' | 'success' | 'info';
   title?: string;
+  children: React.ReactNode;
   onClose?: () => void;
 }
 
-export const Alert: React.FC<AlertProps> = ({
-  type = 'info',
-  title,
-  children,
-  onClose,
-  className = '',
-  ...props
-}) => {
+export const Alert: React.FC<AlertProps> = ({ type, title, children, onClose }) => {
   const config = {
-    success: {
-      bg: 'bg-[#16a34a]/10',
-      border: 'border-l-4 border-l-[#16a34a] border-y border-r border-[#16a34a]/20',
-      text: 'text-[#86efac]',
-      icon: <CheckCircleIcon className="w-5 h-5 text-[#22c55e] flex-shrink-0" />,
+    error: {
+      icon: ExclamationCircleIcon,
+      bg: 'rgba(220, 38, 38, 0.1)',
+      border: 'rgba(220, 38, 38, 0.3)',
+      iconColor: '#dc2626',
+      textColor: '#fca5a5',
     },
     warning: {
-      bg: 'bg-[#ea580c]/10',
-      border: 'border-l-4 border-l-[#ea580c] border-y border-r border-[#ea580c]/20',
-      text: 'text-[#fed7aa]',
-      icon: <ExclamationTriangleIcon className="w-5 h-5 text-[#f97316] flex-shrink-0" />,
+      icon: ExclamationTriangleIcon,
+      bg: 'rgba(234, 88, 12, 0.1)',
+      border: 'rgba(234, 88, 12, 0.3)',
+      iconColor: '#ea580c',
+      textColor: '#fed7aa',
     },
-    error: {
-      bg: 'bg-[#dc2626]/10',
-      border: 'border-l-4 border-l-[#dc2626] border-y border-r border-[#dc2626]/20',
-      text: 'text-[#fca5a5]',
-      icon: <ExclamationCircleIcon className="w-5 h-5 text-[#ef4444] flex-shrink-0" />,
+    success: {
+      icon: CheckCircleIcon,
+      bg: 'rgba(22, 163, 74, 0.1)',
+      border: 'rgba(22, 163, 74, 0.3)',
+      iconColor: '#16a34a',
+      textColor: '#86efac',
     },
     info: {
-      bg: 'bg-[#0284c7]/10',
-      border: 'border-l-4 border-l-[#0284c7] border-y border-r border-[#0284c7]/20',
-      text: 'text-[#7dd3fc]',
-      icon: <InformationCircleIcon className="w-5 h-5 text-[#38bdf8] flex-shrink-0" />,
+      icon: InformationCircleIcon,
+      bg: 'rgba(59, 130, 246, 0.1)',
+      border: 'rgba(59, 130, 246, 0.3)',
+      iconColor: '#3b82f6',
+      textColor: '#93c5fd',
     },
   };
 
-  const current = config[type];
+  const { icon: Icon, bg, border, iconColor, textColor } = config[type];
 
   return (
     <div
-      role="alert"
-      className={`flex items-start gap-3 p-4 rounded-lg ${current.bg} ${current.border} ${current.text} ${className}`}
-      {...props}
+      className="rounded-lg p-4 flex items-start gap-3"
+      style={{
+        background: bg,
+        border: `1px solid ${border}`,
+      }}
     >
-      <div className="mt-0.5">{current.icon}</div>
-      <div className="flex-1 text-sm">
-        {title && <h5 className="font-semibold mb-1 text-[#fff1dc]">{title}</h5>}
-        <div className="leading-relaxed">{children}</div>
+      <Icon className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: iconColor }} />
+      <div className="flex-1 min-w-0">
+        {title && (
+          <h4 className="font-semibold text-sm mb-1" style={{ color: textColor }}>
+            {title}
+          </h4>
+        )}
+        <div className="text-sm" style={{ color: textColor }}>
+          {children}
+        </div>
       </div>
       {onClose && (
         <button
           onClick={onClose}
-          aria-label="Dismiss alert"
-          className="text-current opacity-60 hover:opacity-100 transition-opacity p-1"
+          className="flex-shrink-0 p-1 rounded hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+          style={{ color: textColor }}
         >
-          ✕
+          <XMarkIcon className="w-4 h-4" />
         </button>
       )}
     </div>

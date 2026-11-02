@@ -1,40 +1,38 @@
 import React from 'react';
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'primary' | 'success' | 'warning' | 'error' | 'info' | 'outline' | 'neutral';
+interface BadgeProps {
+  variant?: 'primary' | 'success' | 'warning' | 'error' | 'outline';
   size?: 'sm' | 'md';
-  icon?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export const Badge: React.FC<BadgeProps> = ({
   variant = 'primary',
   size = 'md',
-  icon,
   children,
   className = '',
-  ...props
 }) => {
-  const sizeStyles = {
-    sm: 'text-[11px] px-2 py-0.5 gap-1',
-    md: 'text-xs px-2.5 py-1 gap-1.5',
-  };
+  const baseStyles = 'inline-flex items-center font-medium rounded-md';
 
   const variantStyles = {
-    primary: 'bg-[#4a2b8a]/20 text-[#c084fc] border border-[#4a2b8a]/60',
-    success: 'bg-[#16a34a]/15 text-[#86efac] border border-[#16a34a]/40',
-    warning: 'bg-[#ea580c]/15 text-[#fed7aa] border border-[#ea580c]/40',
-    error: 'bg-[#dc2626]/15 text-[#fca5a5] border border-[#dc2626]/40',
-    info: 'bg-[#0284c7]/15 text-[#7dd3fc] border border-[#0284c7]/40',
-    outline: 'bg-transparent text-[#fff1dc] border border-[#6C3CAA]',
-    neutral: 'bg-[#2d1a4a]/60 text-[#646478] border border-[#646478]/30',
+    primary: 'bg-[var(--candle-primary)] text-[#1a0c06]',
+    success: 'bg-[#9aff9a] text-[#0a0711]',
+    warning: 'bg-[#f59e0b] text-[#1a0c06]',
+    error: 'bg-[#dc2626] text-white',
+    outline: 'border text-[var(--ghost-white)]',
   };
+
+  const sizeStyles = {
+    sm: 'px-2.5 py-1 text-xs',
+    md: 'px-3 py-1.5 text-sm',
+  };
+
+  const borderStyles = variant === 'outline' ? 'border-[rgba(255,121,31,0.3)]' : '';
 
   return (
     <span
-      className={`inline-flex items-center font-semibold rounded-full select-none ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
-      {...props}
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${borderStyles} ${className}`}
     >
-      {icon}
       {children}
     </span>
   );

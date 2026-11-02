@@ -8,21 +8,17 @@ import { Card } from './components/ui/Card';
 import { Badge } from './components/ui/Badge';
 import { Button } from './components/ui/Button';
 import { TestLauncher } from './components/features/TestLauncher';
-import { PlanchetteProgress } from './components/features/PlanchetteProgress';
 import { TheVeil } from './components/features/TheVeil';
-import { SpiritBoardBackdrop } from './components/features/SpiritBoardBackdrop';
-import { WispGhost, WispState } from './components/features/WispGhost';
-import HalloweenStage from './components/features/HalloweenStage';
 import { TestReportSummary } from '@/src/core/report-store';
-import { ArrowRightIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { 
+  ArrowRightIcon, 
+  ClockIcon,
+  DocumentTextIcon
+} from '@heroicons/react/24/outline';
 
 export default function HomePage() {
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
-  const [activeUrl, setActiveUrl] = useState('');
-  const [activeCount, setActiveCount] = useState(15);
-  const [isUrlValid, setIsUrlValid] = useState(true);
-  const [isInputFocused, setIsInputFocused] = useState(false);
   const [recentRuns, setRecentRuns] = useState<TestReportSummary[]>([]);
   const [isLoadingRuns, setIsLoadingRuns] = useState(true);
 
@@ -31,7 +27,9 @@ export default function HomePage() {
     fetch('/api/results')
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (mounted && d?.success && Array.isArray(d.reports)) setRecentRuns(d.reports.slice(0, 6));
+        if (mounted && d?.success && Array.isArray(d.reports)) {
+          setRecentRuns(d.reports.slice(0, 6));
+        }
       })
       .catch(() => {})
       .finally(() => {
@@ -49,8 +47,6 @@ export default function HomePage() {
   ) => {
     if (isRunning) return;
     setIsRunning(true);
-    setActiveUrl(url);
-    setActiveCount(profiles.length);
     try {
       const res = await fetch('/api/test', {
         method: 'POST',
@@ -74,295 +70,157 @@ export default function HomePage() {
     }
   };
 
-  const wispState: WispState = isRunning
-    ? 'conjuring'
-    : isInputFocused
-      ? 'curious'
-      : isUrlValid
-        ? 'pleased'
-        : 'idle';
-
   return (
-    <div className="relative overflow-hidden">
-      {/* ═══════════════════════════════════════════
+    <div className="relative">
+      {/* ═════════════════════════════════════════
           HERO LANDING BAY
-          Full atmospheric stage with ghost / pumpkins
-          / skeleton / moon / bats — all interactive
-      ═══════════════════════════════════════════ */}
-      <section
-        className="landing-bay relative"
-        style={{ minHeight: 560, borderLeft: 'none', borderRight: 'none', borderTop: 'none' }}
-      >
-        {/* Spirit Board backdrop (subtle arc lettering) */}
-        <SpiritBoardBackdrop />
-
-        {/* THE STAR OF THE SHOW — interactive Halloween stage */}
-        <HalloweenStage isRunning={isRunning} />
-
-        {/* Hero copy — sits in front of the stage */}
-        <div className="relative" style={{ paddingTop: 52, paddingBottom: 96, zIndex: 4 }}>
+          Spirit photography aesthetic with The Veil preview
+      ═════════════════════════════════════════ */}
+      <section className="landing-bay relative" style={{ minHeight: 680 }}>
+        <div className="relative z-10" style={{ paddingTop: 100, paddingBottom: 120 }}>
           <Container size="lg">
-            <div style={{ maxWidth: 480 }}>
-              {/* eyebrow specimen label */}
-              <div className="specimen-label" style={{ marginBottom: 16 }}>
-                <span style={{ color: '#ff8d3c', fontSize: 14 }}>✦</span>
+            <div style={{ maxWidth: 520 }}>
+              {/* Specimen label */}
+              <div className="specimen-label" style={{ marginBottom: 28 }}>
+                <span>✦</span>
                 Kiroween 2026 · Spirit Photography Web Testing Engine
               </div>
 
-              {/* headline */}
+              {/* Headline */}
               <h1
                 style={{
-                  fontSize: 'clamp(2.4rem, 5vw, 3.8rem)',
-                  fontWeight: 700,
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.03em',
-                  color: '#fff3e2',
-                  textShadow: '0 0 40px rgba(255,90,16,0.2)',
-                  fontFamily: 'var(--font-space-grotesk, Space Grotesk, sans-serif)',
+                  fontSize: 'clamp(3rem, 7vw, 4.5rem)',
+                  fontWeight: 600,
+                  lineHeight: 1.02,
+                  letterSpacing: '-0.04em',
+                  color: 'var(--ghost-white)',
                   marginBottom: 16,
                 }}
               >
-                Which house
+                Photograph your
                 <br />
-                shall we{' '}
-                <em
-                  style={{
-                    fontStyle: 'normal',
-                    color: '#ff8628',
-                    textShadow: '0 0 35px rgba(255,90,16,0.3)',
-                  }}
-                >
-                  haunt?
+                website
+                <em style={{ 
+                  fontStyle: 'normal', 
+                  color: 'var(--candle-primary)',
+                  textShadow: '0 0 40px rgba(255,121,31,0.3)'
+                }}>
+                  twice
                 </em>
               </h1>
 
               <p
                 style={{
-                  color: '#d3bfd5',
-                  fontSize: 13,
-                  maxWidth: 420,
-                  lineHeight: 1.65,
-                  marginBottom: 20,
+                  fontSize: 15,
+                  color: 'var(--phantom-gray)',
+                  lineHeight: 1.8,
+                  marginBottom: 36,
+                  maxWidth: 440,
                 }}
               >
-                HauntView photographs your website twice: once as you built it, and once as your
-                users sometimes get it — under 16 failure conditions with screenshots, diffs, and
-                evidence-backed findings.
+                HauntView captures the living page as you built it, and the apparition 
+                as your users sometimes get it — under 16 failure conditions with 
+                visual diffs and evidence-backed findings.
               </p>
 
-              {/* badges */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
-                <Badge variant="warning" size="sm">
+              {/* Feature badges */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 44 }}>
+                <Badge variant="outline" size="md">
                   16 Rites
                 </Badge>
-                <Badge variant="info" size="sm">
+                <Badge variant="outline" size="md">
                   Deterministic Faults
                 </Badge>
-                <Badge variant="outline" size="sm">
+                <Badge variant="outline" size="md">
                   WCAG Audits
                 </Badge>
-                <Badge variant="success" size="sm">
+                <Badge variant="outline" size="md">
                   MCP Agent-Native
                 </Badge>
               </div>
-
-              {/* Wisp greeting */}
-              <WispGhost
-                state={wispState}
-                size="md"
-                showSpeechBubble
-                message={
-                  isRunning
-                    ? 'Conjuring rites across the windows…'
-                    : isInputFocused
-                      ? 'Tell me which house to haunt!'
-                      : isUrlValid
-                        ? 'Porch lantern is lit. Ready to haunt.'
-                        : 'Welcome to the Parlour!'
-                }
-              />
             </div>
           </Container>
         </div>
 
-        {/* Bay bottom status bar */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 10,
-            left: 0,
-            right: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 24px',
-            zIndex: 5,
-            fontSize: 10,
-            fontFamily: 'monospace',
-            color: '#a296aa',
-            pointerEvents: 'none',
-          }}
-        >
-          <span>
-            BAY{' '}
-            <span
-              style={{
-                background: '#ff8b30',
-                color: '#190b07',
-                fontWeight: 700,
-                padding: '1px 4px',
-                fontSize: 9,
-              }}
-            >
-              01
-            </span>{' '}
-            · THE PARLOUR
-          </span>
-          <span style={{ color: '#5a4a64' }}>
-            {isRunning ? `haunting ${activeUrl}…` : 'awaiting séance'}
-          </span>
-          <span>EST. 2026 → RUNNING TODAY</span>
+        {/* The Veil preview - signature component */}
+        <div className="relative z-10 px-4 pb-20">
+          <Container size="lg">
+            <div className="victorian-panel p-6 md:p-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4" style={{ borderBottom: '1px solid rgba(255, 121, 31, 0.15)' }}>
+                <div>
+                  <div className="flex items-center gap-3 mb-1">
+                    <DocumentTextIcon className="w-5 h-5" style={{ color: 'var(--candle-primary)' }} />
+                    <h3 className="font-semibold text-lg" style={{ color: 'var(--ghost-white)' }}>
+                      The Veil
+                    </h3>
+                  </div>
+                  <p style={{ fontSize: 13, color: 'var(--phantom-gray)' }}>
+                    Part the curtain between living page and apparition
+                  </p>
+                </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                    padding: '6px 12px',
+                    borderRadius: 4,
+                    color: '#9aff9a',
+                    background: 'rgba(154, 255, 154, 0.08)',
+                    border: '1px solid rgba(154, 255, 154, 0.25)',
+                  }}
+                >
+                  Interactive Preview
+                </div>
+              </div>
+
+              <TheVeil
+                livingLabel="Living Page (Baseline)"
+                apparitionLabel="Apparition (Images Blocked)"
+                pins={[
+                  {
+                    id: '1',
+                    title: 'Broken image — no alt text',
+                    severity: 'serious',
+                    xPercent: 22,
+                    yPercent: 42,
+                  },
+                  {
+                    id: '2',
+                    title: 'Touch target smaller than 24px',
+                    severity: 'warning',
+                    xPercent: 82,
+                    yPercent: 65,
+                  },
+                ]}
+              />
+            </div>
+          </Container>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════
+      {/* ═════════════════════════════════════════
           MAIN CONTENT
-      ═══════════════════════════════════════════ */}
-      <Container size="lg" className="relative z-10 py-10 space-y-10">
-        {/* Live Séance Progress */}
-        {isRunning && (
-          <div className="max-w-4xl mx-auto">
-            <PlanchetteProgress
-              progressPercent={65}
-              statusMessage={`Haunting ${activeUrl} across ${activeCount} configured rites…`}
-              totalRites={activeCount}
-              completedRites={Math.round(activeCount * 0.65)}
-            />
-          </div>
-        )}
-
+      ═════════════════════════════════════════ */}
+      <Container size="lg" className="relative z-10 py-20 space-y-20">
         {/* Test Launcher */}
-        <div className="max-w-4xl mx-auto">
+        <div>
           <TestLauncher
             onStartTest={handleStartTest}
             isRunning={isRunning}
-            onUrlChange={(_url, valid) => setIsUrlValid(valid)}
-            onFocusChange={setIsInputFocused}
           />
         </div>
 
-        {/* The Veil — spirit photography double-exposure */}
-        <div className="max-w-4xl mx-auto">
-          <div
-            className="relative rounded-[4px] p-6 space-y-4"
-            style={{
-              background: 'linear-gradient(160deg, #1c1523 0%, #140e1a 100%)',
-              border: '1px solid #46334b',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
-            }}
-          >
-            {/* Victorian corner brackets */}
-            {(['tl', 'tr', 'bl', 'br'] as const).map((c) => (
-              <div
-                key={c}
-                style={{
-                  position: 'absolute',
-                  width: 14,
-                  height: 14,
-                  top: c[0] === 't' ? 6 : undefined,
-                  bottom: c[0] === 'b' ? 6 : undefined,
-                  left: c[1] === 'l' ? 6 : undefined,
-                  right: c[1] === 'r' ? 6 : undefined,
-                  borderTop: c[0] === 't' ? '2px solid rgba(255,121,31,0.45)' : undefined,
-                  borderBottom: c[0] === 'b' ? '2px solid rgba(255,121,31,0.45)' : undefined,
-                  borderLeft: c[1] === 'l' ? '2px solid rgba(255,121,31,0.45)' : undefined,
-                  borderRight: c[1] === 'r' ? '2px solid rgba(255,121,31,0.45)' : undefined,
-                  pointerEvents: 'none',
-                }}
-              />
-            ))}
-
-            <div
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3"
-              style={{ borderBottom: '1px solid #46334b' }}
-            >
-              <div>
-                <div className="flex items-center gap-2">
-                  <span
-                    style={{
-                      fontSize: 10,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.15em',
-                      fontFamily: 'monospace',
-                      color: '#ff791f',
-                    }}
-                  >
-                    Spirit Photography
-                  </span>
-                  <span style={{ color: '#5a4a64' }}>·</span>
-                  <h3 className="font-bold text-lg" style={{ color: '#fff1dc' }}>
-                    The Veil
-                  </h3>
-                </div>
-                <p style={{ fontSize: 11, color: '#b9acbf', marginTop: 2 }}>
-                  Part the curtain between living page and apparition to see what breaks.
-                </p>
-              </div>
-              <span
-                style={{
-                  fontSize: 10,
-                  fontFamily: 'monospace',
-                  padding: '4px 10px',
-                  borderRadius: 3,
-                  color: '#9aff9a',
-                  background: '#100e13',
-                  border: '1px solid rgba(154,255,154,0.3)',
-                  boxShadow: '0 0 8px rgba(154,255,154,0.15)',
-                  flexShrink: 0,
-                  alignSelf: 'flex-start',
-                }}
-              >
-                Live Preview
-              </span>
-            </div>
-
-            <TheVeil
-              livingLabel="Living Page (Standard Baseline)"
-              apparitionLabel="Apparition (Images Blocked)"
-              pins={[
-                {
-                  id: '1',
-                  title: 'Broken image — no alt text',
-                  severity: 'serious',
-                  xPercent: 22,
-                  yPercent: 42,
-                },
-                {
-                  id: '2',
-                  title: 'Touch target smaller than 24px',
-                  severity: 'warning',
-                  xPercent: 82,
-                  yPercent: 65,
-                },
-              ]}
-            />
-          </div>
-        </div>
-
-        {/* The Crypt — recent séances */}
-        <div className="max-w-4xl mx-auto space-y-4">
+        {/* Recent Séances */}
+        <div className="space-y-8">
           <div className="flex items-center justify-between">
             <div>
-              <h2
-                className="font-bold text-xl"
-                style={{ color: '#fff1dc', fontFamily: 'var(--font-space-grotesk, sans-serif)' }}
-              >
+              <h2 className="font-semibold text-2xl" style={{ color: 'var(--ghost-white)' }}>
                 The Crypt
-                <span style={{ fontWeight: 400, fontSize: 14, color: '#b9acbf', marginLeft: 8 }}>
+                <span style={{ fontWeight: 400, fontSize: 15, color: 'var(--phantom-gray)', marginLeft: 12 }}>
                   · Recent Séances
                 </span>
               </h2>
-              <p style={{ fontSize: 11, color: '#b9acbf', marginTop: 2 }}>
+              <p style={{ fontSize: 13, color: 'var(--phantom-gray)', marginTop: 4 }}>
                 Audit history and comparative reports
               </p>
             </div>
@@ -377,27 +235,29 @@ export default function HomePage() {
 
           {isLoadingRuns ? (
             <div
-              className="p-8 text-center text-xs font-mono rounded-[3px]"
+              className="p-12 text-center"
               style={{
-                color: '#b9acbf',
-                background: 'rgba(28,22,41,0.4)',
-                border: '1px solid #46334b',
+                color: 'var(--phantom-gray)',
+                background: 'rgba(28, 21, 35, 0.5)',
+                border: '1px solid rgba(255, 121, 31, 0.15)',
+                borderRadius: 8,
               }}
             >
-              Consulting the archives…
+              <ClockIcon className="w-8 h-8 mx-auto mb-3 ember-pulse" style={{ color: 'var(--candle-primary)' }} />
+              <p style={{ fontSize: 13, fontFamily: 'monospace' }}>Consulting the archives…</p>
             </div>
           ) : recentRuns.length === 0 ? (
-            <Card variant="default" className="text-center py-10 px-4 flex flex-col items-center">
-              <WispGhost state="napping" size="md" className="mb-2" />
-              <h4 className="font-bold text-sm mb-1" style={{ color: '#fff1dc' }}>
+            <Card variant="default" className="text-center py-16 px-6">
+              <DocumentTextIcon className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--phantom-gray)' }} />
+              <h4 className="font-semibold text-base mb-2" style={{ color: 'var(--ghost-white)' }}>
                 The Crypt Is Peaceful
               </h4>
-              <p className="text-xs max-w-sm mx-auto" style={{ color: '#b9acbf' }}>
-                No past runs yet. Wisp is resting until you haunt your first house.
+              <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--phantom-gray)' }}>
+                No past séances yet. Run your first test to begin building your gallery of apparitions.
               </p>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {recentRuns.map((run) => {
                 const isPass = run.errorCount === 0;
                 return (
@@ -405,44 +265,40 @@ export default function HomePage() {
                     key={run.id}
                     hoverable
                     variant="default"
-                    className="p-4 flex flex-col justify-between"
-                    style={{ borderColor: '#46334b', background: 'rgba(28,22,41,0.7)' }}
+                    className="p-5 flex flex-col justify-between"
+                    style={{ borderColor: 'rgba(255, 121, 31, 0.15)' }}
                   >
                     <div>
-                      <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-start justify-between gap-2 mb-3">
                         <Badge variant={isPass ? 'success' : 'error'} size="sm">
-                          {isPass ? 'NO OMENS' : `${run.errorCount} SCREAMS`}
+                          {isPass ? 'No Omens' : `${run.errorCount} Screams`}
                         </Badge>
-                        <div
-                          className="flex items-center gap-1"
-                          style={{ fontSize: 11, color: '#b9acbf' }}
-                        >
-                          <ClockIcon className="w-3.5 h-3.5" style={{ color: '#ff791f' }} />
+                        <div className="flex items-center gap-1.5" style={{ fontSize: 12, color: 'var(--phantom-gray)' }}>
+                          <ClockIcon className="w-4 h-4" style={{ color: 'var(--candle-primary)' }} />
                           <span>{(run.duration / 1000).toFixed(1)}s</span>
                         </div>
                       </div>
                       <h4
-                        className="font-semibold text-sm truncate mb-1"
-                        style={{ color: '#fff1dc' }}
+                        className="font-medium text-sm truncate mb-2"
+                        style={{ color: 'var(--ghost-white)' }}
                         title={run.url}
                       >
                         {run.url}
                       </h4>
-                      <p style={{ fontSize: 11, color: '#b9acbf' }}>
-                        {run.successfulProfiles}/{run.totalProfiles} rites · {run.totalFindings}{' '}
-                        omens
+                      <p style={{ fontSize: 12, color: 'var(--phantom-gray)' }}>
+                        {run.successfulProfiles}/{run.totalProfiles} rites · {run.totalFindings} omens
                       </p>
                     </div>
 
                     <div
-                      className="mt-4 pt-3 flex items-center justify-between"
-                      style={{ borderTop: '1px solid #46334b' }}
+                      className="mt-4 pt-4 flex items-center justify-between"
+                      style={{ borderTop: '1px solid rgba(255, 121, 31, 0.1)' }}
                     >
-                      <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#5a4a64' }}>
+                      <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'var(--phantom-gray)' }}>
                         {new Date(run.startTime).toLocaleDateString()}
                       </span>
                       <Link href={`/results/${run.id}`}>
-                        <Button size="sm" variant="outline" className="text-xs py-1 px-2.5">
+                        <Button size="sm" variant="outline" className="text-xs py-1.5 px-3">
                           Grimoire →
                         </Button>
                       </Link>

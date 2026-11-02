@@ -1,5 +1,6 @@
 /**
- * HTML Report Generator - Creates professional HTML reports with Halloween theme
+ * HTML Report Generator - Victorian Spirit Photography Grimoire
+ * Professional haunted aesthetic without emojis
  */
 
 import { TestReport, Finding } from '../types';
@@ -26,7 +27,7 @@ interface HTMLReportTheme {
 export class HTMLReportGenerator implements ReportGenerator {
   async generate(report: TestReport, options: ReportOptions): Promise<GeneratedReport> {
     const content = this.generateHTMLContent(report, options);
-    const filename = `hauntview-report-${new Date().getTime()}.html`;
+    const filename = `hauntview-grimoire-${new Date().getTime()}.html`;
 
     return {
       format: 'html',
@@ -37,7 +38,7 @@ export class HTMLReportGenerator implements ReportGenerator {
   }
 
   private generateHTMLContent(report: TestReport, options: ReportOptions): string {
-    const theme = options.theme === 'light' ? this.lightTheme() : this.darkTheme();
+    const theme = this.darkTheme();
     const findings = this.getAllFindings(report);
     const statistics = this.calculateStatistics(report);
 
@@ -46,13 +47,13 @@ export class HTMLReportGenerator implements ReportGenerator {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HauntView Testing Report</title>
+  <title>HauntView Grimoire - Séance Report</title>
   <style>
     ${this.getStyles(theme)}
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="parchment">
     ${this.renderHeader(report, statistics)}
     ${this.renderTOC()}
     ${this.renderExecutiveSummary(report, statistics)}
@@ -68,24 +69,41 @@ export class HTMLReportGenerator implements ReportGenerator {
 
   private renderHeader(report: TestReport, statistics: HTMLReportStatistics): string {
     const passRate = ((statistics.successfulProfiles / statistics.totalProfiles) * 100).toFixed(1);
-    const statusColor = statistics.errorCount === 0 ? '#4CAF50' : '#f44336';
+    const hasErrors = statistics.errorCount > 0;
 
     return `
-    <header class="header">
+    <header class="grimoire-header">
+      <div class="wax-seal">
+        <svg viewBox="0 0 100 100" class="seal-svg">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="${theme.secondary}" stroke-width="2"/>
+          <path d="M50 20 L50 35 M50 65 L50 80 M20 50 L35 50 M65 50 L80 50" stroke="${theme.accent}" stroke-width="2"/>
+          <circle cx="50" cy="50" r="15" fill="${theme.accent}" opacity="0.3"/>
+        </svg>
+      </div>
       <div class="header-content">
-        <h1>👻 HauntView Testing Report</h1>
-        <p class="subtitle">Comprehensive Web Testing Analysis</p>
-        <div class="meta">
-          <span>📍 URL: <code>${this.escapeHtml(report.url)}</code></span>
-          <span>⏱️ Duration: ${(report.duration / 1000).toFixed(2)}s</span>
-          <span>📅 Generated: ${new Date(report.startTime).toLocaleString()}</span>
-        </div>
-        <div class="status" style="border-color: ${statusColor};">
-          <div class="status-badge" style="background-color: ${statusColor};">
-            ${statistics.errorCount === 0 ? '✓ PASS' : '✗ ISSUES'}
+        <div class="specimen-label">SPIRIT PHOTOGRAPHY GRIMOIRE</div>
+        <h1>HauntView Séance Report</h1>
+        <p class="subtitle">Web Resilience Audit • Kiroween 2026</p>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">House</span>
+            <code class="meta-value">${this.escapeHtml(report.url)}</code>
           </div>
-          <div class="status-stats">
-            <span>${passRate}% profiles passed</span>
+          <div class="meta-item">
+            <span class="meta-label">Duration</span>
+            <span class="meta-value">${(report.duration / 1000).toFixed(2)}s</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Generated</span>
+            <span class="meta-value">${new Date(report.startTime).toLocaleString()}</span>
+          </div>
+        </div>
+        <div class="status-banner ${hasErrors ? 'has-errors' : 'no-errors'}">
+          <div class="status-badge">
+            ${hasErrors ? 'OMENS DETECTED' : 'NO OMENS'}
+          </div>
+          <div class="status-metrics">
+            <span>${passRate}% rites passed</span>
             <span>${statistics.totalFindings} findings</span>
           </div>
         </div>
@@ -95,13 +113,14 @@ export class HTMLReportGenerator implements ReportGenerator {
 
   private renderTOC(): string {
     return `
-    <nav class="toc">
-      <h2>Table of Contents</h2>
+    <nav class="table-of-contents">
+      <h2>Contents</h2>
       <ul>
         <li><a href="#summary">Executive Summary</a></li>
-        <li><a href="#severity">Findings by Severity</a></li>
-        <li><a href="#category">Findings by Category</a></li>
-        <li><a href="#profiles">Profile Details</a></li>
+        <li><a href="#severity">Omens by Severity</a></li>
+        <li><a href="#category">Omens by Category</a></li>
+        <li><a href="#profiles">Rite Details</a></li>
+        ${this.hasScreenshots ? '<li><a href="#apparitions">Gallery of Apparitions</a></li>' : ''}
       </ul>
     </nav>`;
   }
@@ -109,40 +128,43 @@ export class HTMLReportGenerator implements ReportGenerator {
   private renderExecutiveSummary(report: TestReport, statistics: HTMLReportStatistics): string {
     return `
     <section id="summary" class="section">
-      <h2>Executive Summary</h2>
-      <div class="summary-grid">
-        <div class="summary-card">
-          <div class="summary-value">${statistics.totalProfiles}</div>
-          <div class="summary-label">Profiles Run</div>
+      <div class="section-header">
+        <h2>Executive Summary</h2>
+        <div class="section-decorator"></div>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value">${statistics.totalProfiles}</div>
+          <div class="metric-label">Rites Conducted</div>
         </div>
-        <div class="summary-card">
-          <div class="summary-value" style="color: #4CAF50;">${statistics.successfulProfiles}</div>
-          <div class="summary-label">Passed</div>
+        <div class="metric-card">
+          <div class="metric-value success">${statistics.successfulProfiles}</div>
+          <div class="metric-label">Passed</div>
         </div>
-        <div class="summary-card">
-          <div class="summary-value" style="color: #f44336;">${statistics.errorCount}</div>
-          <div class="summary-label">Errors</div>
+        <div class="metric-card">
+          <div class="metric-value ${statistics.errorCount > 0 ? 'error' : 'success'}">${statistics.errorCount}</div>
+          <div class="metric-label">Screams</div>
         </div>
-        <div class="summary-card">
-          <div class="summary-value">${statistics.totalFindings}</div>
-          <div class="summary-label">Total Findings</div>
+        <div class="metric-card">
+          <div class="metric-value">${statistics.totalFindings}</div>
+          <div class="metric-label">Total Omens</div>
         </div>
       </div>
-      <div class="findings-breakdown">
-        <h3>Findings Breakdown</h3>
-        <table class="breakdown-table">
+      <div class="breakdown-panel">
+        <h3>Omen Distribution</h3>
+        <table class="distribution-table">
           <tbody>
             <tr>
-              <td>Errors</td>
-              <td><span class="badge error">${report.summary.findingsBySeverity.error}</span></td>
+              <td class="severity-label serious">Screams</td>
+              <td><span class="count-badge serious">${report.summary.findingsBySeverity.error}</span></td>
             </tr>
             <tr>
-              <td>Warnings</td>
-              <td><span class="badge warning">${report.summary.findingsBySeverity.warning}</span></td>
+              <td class="severity-label warning">Chills</td>
+              <td><span class="count-badge warning">${report.summary.findingsBySeverity.warning}</span></td>
             </tr>
             <tr>
-              <td>Info</td>
-              <td><span class="badge info">${report.summary.findingsBySeverity.info}</span></td>
+              <td class="severity-label whisper">Whispers</td>
+              <td><span class="count-badge whisper">${report.summary.findingsBySeverity.info}</span></td>
             </tr>
           </tbody>
         </table>
@@ -154,27 +176,41 @@ export class HTMLReportGenerator implements ReportGenerator {
     const bySeverity = this.groupBySeverity(findings);
     const severities: Array<'error' | 'warning' | 'info'> = ['error', 'warning', 'info'];
 
-    let html = `<section id="severity" class="section"><h2>Findings by Severity</h2>`;
+    let html = `<section id="severity" class="section">
+      <div class="section-header">
+        <h2>Omens by Severity</h2>
+        <div class="section-decorator"></div>
+      </div>`;
 
     for (const severity of severities) {
       const items = bySeverity[severity] || [];
+      const severityName =
+        severity === 'error' ? 'Screams' : severity === 'warning' ? 'Chills' : 'Whispers';
+
       html += `
-      <div class="finding-group">
+      <div class="omen-group">
         <h3 class="severity-${severity}">
-          ${severity === 'error' ? '🔴' : severity === 'warning' ? '🟡' : '🔵'} ${severity.charAt(0).toUpperCase() + severity.slice(1)} (${items.length})
+          <span class="severity-icon"></span>
+          ${severityName} (${items.length})
         </h3>
-        <table class="findings-table">
+        ${
+          items.length > 0
+            ? `
+        <table class="omen-table">
           <thead>
             <tr>
-              <th>Profile</th>
+              <th>Rite</th>
               <th>Category</th>
-              <th>Message</th>
+              <th>Omen</th>
             </tr>
           </thead>
           <tbody>
             ${items.map((f) => this.renderFindingRow(f)).join('')}
           </tbody>
         </table>
+        `
+            : '<p class="no-omens">No omens of this severity</p>'
+        }
       </div>`;
     }
 
@@ -185,24 +221,37 @@ export class HTMLReportGenerator implements ReportGenerator {
   private renderFindingsByCategory(findings: Finding[]): string {
     const byCategory = this.groupByCategory(findings);
 
-    let html = `<section id="category" class="section"><h2>Findings by Category</h2>`;
+    let html = `<section id="category" class="section">
+      <div class="section-header">
+        <h2>Omens by Category</h2>
+        <div class="section-decorator"></div>
+      </div>`;
 
     for (const [category, items] of Object.entries(byCategory)) {
       html += `
-      <div class="finding-group">
-        <h3>📂 ${category} (${items.length})</h3>
-        <table class="findings-table">
+      <div class="omen-group">
+        <h3>
+          <span class="category-icon"></span>
+          ${category} (${items.length})
+        </h3>
+        ${
+          items.length > 0
+            ? `
+        <table class="omen-table">
           <thead>
             <tr>
               <th>Severity</th>
-              <th>Profile</th>
-              <th>Message</th>
+              <th>Rite</th>
+              <th>Omen</th>
             </tr>
           </thead>
           <tbody>
             ${items.map((f) => this.renderFindingRow(f)).join('')}
           </tbody>
         </table>
+        `
+            : '<p class="no-omens">No omens in this category</p>'
+        }
       </div>`;
     }
 
@@ -211,31 +260,37 @@ export class HTMLReportGenerator implements ReportGenerator {
   }
 
   private renderProfileDetails(report: TestReport): string {
-    let html = `<section id="profiles" class="section"><h2>Profile Details</h2>`;
+    let html = `<section id="profiles" class="section">
+      <div class="section-header">
+        <h2>Rite Details</h2>
+        <div class="section-decorator"></div>
+      </div>`;
 
     for (const profile of report.profileResults) {
       const statusIcon = profile.success ? '✓' : '✗';
-      const statusColor = profile.success ? '#4CAF50' : '#f44336';
 
       html += `
-      <div class="profile-card">
-        <div class="profile-header" style="border-left-color: ${statusColor};">
-          <h3>${statusIcon} ${profile.profileName}</h3>
-          <div class="profile-meta">
-            <span>Duration: ${profile.duration}ms</span>
-            <span>Findings: ${profile.findings.length}</span>
+      <div class="rite-card">
+        <div class="rite-header ${profile.success ? 'passed' : 'failed'}">
+          <div class="rite-status">${statusIcon}</div>
+          <div class="rite-info">
+            <h3>${profile.profileName}</h3>
+            <div class="rite-meta">
+              <span>Duration: ${profile.duration}ms</span>
+              <span>Findings: ${profile.findings.length}</span>
+            </div>
           </div>
         </div>
-        <div class="profile-findings">
+        <div class="rite-findings">
           ${
             profile.findings.length > 0
               ? `
-            <table class="findings-table">
+            <table class="omen-table">
               <thead>
                 <tr>
                   <th>Severity</th>
                   <th>Category</th>
-                  <th>Message</th>
+                  <th>Omen</th>
                 </tr>
               </thead>
               <tbody>
@@ -243,7 +298,7 @@ export class HTMLReportGenerator implements ReportGenerator {
               </tbody>
             </table>
           `
-              : '<p class="no-findings">No findings</p>'
+              : '<p class="no-omens">No omens detected</p>'
           }
         </div>
       </div>`;
@@ -262,7 +317,12 @@ export class HTMLReportGenerator implements ReportGenerator {
       return '';
     }
 
-    let html = `<section class="section"><h2>Spirit Photography Apparition Plates</h2><div class="screenshots-grid">`;
+    let html = `<section id="apparitions" class="section">
+      <div class="section-header">
+        <h2>Gallery of Apparitions</h2>
+        <div class="section-decorator"></div>
+      </div>
+      <div class="apparition-grid">`;
 
     for (const screenshot of allScreenshots) {
       const src =
@@ -273,10 +333,14 @@ export class HTMLReportGenerator implements ReportGenerator {
           : `screenshots/${screenshot.fileName}`;
 
       html += `
-      <div class="screenshot-item">
-        <div class="screenshot-header">${screenshot.profile}</div>
-        <img src="${src}" alt="Screenshot from ${screenshot.profile}">
-        <div class="screenshot-meta">${new Date(screenshot.timestamp).toLocaleTimeString()}</div>
+      <div class="apparition-plate">
+        <div class="plate-header">
+          <span class="plate-label">${screenshot.profile}</span>
+          <span class="plate-time">${new Date(screenshot.timestamp).toLocaleTimeString()}</span>
+        </div>
+        <div class="plate-frame">
+          <img src="${src}" alt="Apparition from ${screenshot.profile}">
+        </div>
       </div>`;
     }
 
@@ -285,12 +349,6 @@ export class HTMLReportGenerator implements ReportGenerator {
   }
 
   private renderFindingRow(finding: Finding): string {
-    const severityColor = {
-      error: '#f44336',
-      warning: '#ff9800',
-      info: '#2196F3',
-    };
-
     const screenshotRef = finding.details?.screenshot as string | undefined;
     const screenshotSrc = screenshotRef
       ? screenshotRef.startsWith('screenshots/') ||
@@ -302,13 +360,13 @@ export class HTMLReportGenerator implements ReportGenerator {
 
     return `
     <tr>
-      <td><span class="severity-badge" style="background-color: ${severityColor[finding.severity]};">${finding.severity.toUpperCase()}</span></td>
+      <td><span class="severity-mark severity-${finding.severity}">${finding.severity.toUpperCase()}</span></td>
       <td>${this.escapeHtml(finding.category)}</td>
       <td>
-        ${this.escapeHtml(finding.message)}
+        <span class="omen-text">${this.escapeHtml(finding.message)}</span>
         ${
           screenshotSrc
-            ? `<div style="margin-top: 5px;"><a href="${screenshotSrc}" target="_blank" style="color: var(--accent); font-size: 0.85em; text-decoration: underline;">📷 View Apparition Plate</a></div>`
+            ? `<div class="screenshot-link"><a href="${screenshotSrc}" target="_blank">View Apparition Plate</a></div>`
             : ''
         }
       </td>
@@ -317,9 +375,20 @@ export class HTMLReportGenerator implements ReportGenerator {
 
   private renderFooter(): string {
     return `
-    <footer class="footer">
-      <p>Generated by <strong>HauntView v0.1.0</strong> | ${new Date().toLocaleString()}</p>
-      <p>For Kiroween 2026 Hackathon</p>
+    <footer class="grimoire-footer">
+      <div class="footer-seal">
+        <svg viewBox="0 0 60 60" class="footer-ghost">
+          <path d="M30 10 C20 10, 15 20, 15 30 C15 40, 20 50, 30 50 C40 50, 45 40, 45 30 C45 20, 40 10, 30 10" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="25" cy="25" r="2" fill="currentColor"/>
+          <circle cx="35" cy="25" r="2" fill="currentColor"/>
+          <path d="M30 35 L25 45 L35 45 Z" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="footer-content">
+        <p>Generated by <strong>HauntView v0.1.0</strong></p>
+        <p>Kiroween 2026 Hackathon Submission</p>
+        <p class="footer-motto">See what breaks before your users do</p>
+      </div>
     </footer>`;
   }
 
@@ -343,330 +412,622 @@ export class HTMLReportGenerator implements ReportGenerator {
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        font-family: 'Georgia', 'Times New Roman', serif;
         background-color: var(--bg);
         color: var(--text);
-        line-height: 1.6;
+        line-height: 1.7;
+        background-image: 
+          radial-gradient(#8a829518 0.5px, transparent 0.5px),
+          radial-gradient(ellipse at 85% 15%, rgba(45, 31, 61, 0.4), transparent 50%),
+          radial-gradient(ellipse at 20% 85%, rgba(255, 121, 31, 0.12), transparent 45%);
+        background-size: 20px 20px, 100% 100%, 100% 100%;
+        background-attachment: fixed;
       }
 
-      .container {
-        max-width: 1200px;
+      .parchment {
+        max-width: 1000px;
         margin: 0 auto;
-        padding: 20px;
-      }
-
-      .header {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        color: white;
-        padding: 40px;
+        padding: 60px 40px;
+        background: linear-gradient(160deg, rgba(28, 21, 35, 0.9) 0%, rgba(15, 11, 21, 0.95) 100%);
+        border: 1px solid rgba(255, 121, 31, 0.2);
         border-radius: 8px;
-        margin-bottom: 40px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 157, 77, 0.08);
       }
 
-      .header h1 {
-        font-size: 2.5em;
-        margin-bottom: 10px;
+      .grimoire-header {
+        text-align: center;
+        padding: 40px 0 50px;
+        border-bottom: 2px solid var(--border);
+        margin-bottom: 50px;
+        position: relative;
+      }
+
+      .wax-seal {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        position: relative;
+      }
+
+      .seal-svg {
+        width: 100%;
+        height: 100%;
+        filter: drop-shadow(0 0 12px rgba(255, 121, 31, 0.4));
+      }
+
+      .specimen-label {
+        font-family: 'Courier New', monospace;
+        font-size: 9px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: rgba(255, 121, 31, 0.08);
+        border: 1px solid rgba(255, 121, 31, 0.3);
+        padding: 6px 12px;
+        border-radius: 3px;
+        display: inline-block;
+        margin-bottom: 16px;
+      }
+
+      .header-content h1 {
+        font-size: 2.8rem;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        margin-bottom: 8px;
+        color: var(--text);
       }
 
       .subtitle {
-        font-size: 1.1em;
-        opacity: 0.9;
+        font-size: 1rem;
+        color: var(--text-muted);
+        margin-bottom: 30px;
+        font-style: italic;
       }
 
-      .meta {
-        display: flex;
-        gap: 20px;
-        margin: 20px 0;
-        font-size: 0.9em;
-        opacity: 0.9;
-      }
-
-      .meta code {
-        background: rgba(0, 0, 0, 0.2);
-        padding: 2px 6px;
-        border-radius: 3px;
-        font-family: monospace;
-      }
-
-      .status {
-        display: flex;
-        gap: 20px;
-        align-items: center;
-        border-left: 4px solid;
-        padding-left: 20px;
-        margin-top: 20px;
-      }
-
-      .status-badge {
-        color: white;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-weight: bold;
-        min-width: 100px;
-        text-align: center;
-      }
-
-      .toc {
-        background: var(--bg-alt);
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 40px;
-        border-left: 4px solid var(--accent);
-      }
-
-      .toc h2 {
-        margin-bottom: 15px;
-      }
-
-      .toc ul {
-        list-style: none;
-      }
-
-      .toc li {
-        margin: 8px 0;
-      }
-
-      .toc a {
-        color: var(--accent);
-        text-decoration: none;
-      }
-
-      .toc a:hover {
-        text-decoration: underline;
-      }
-
-      .section {
-        margin-bottom: 40px;
-      }
-
-      .section h2 {
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid var(--border);
-      }
-
-      .summary-grid {
+      .meta-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 20px;
         margin-bottom: 30px;
       }
 
-      .summary-card {
-        background: var(--bg-alt);
-        padding: 20px;
-        border-radius: 8px;
+      .meta-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12px;
+        background: rgba(28, 21, 35, 0.5);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+      }
+
+      .meta-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+
+      .meta-value {
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        color: var(--text);
+      }
+
+      .status-banner {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        border-radius: 4px;
+        margin-top: 20px;
+      }
+
+      .status-banner.no-errors {
+        background: rgba(22, 163, 74, 0.1);
+        border: 1px solid rgba(22, 163, 74, 0.3);
+      }
+
+      .status-banner.has-errors {
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+      }
+
+      .status-badge {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .status-banner.no-errors .status-badge {
+        background: rgba(22, 163, 74, 0.2);
+        color: #86efac;
+      }
+
+      .status-banner.has-errors .status-badge {
+        background: rgba(220, 38, 38, 0.2);
+        color: #fca5a5;
+      }
+
+      .status-metrics {
+        display: flex;
+        gap: 20px;
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      .table-of-contents {
+        background: rgba(28, 21, 35, 0.5);
+        padding: 24px;
+        border-radius: 6px;
+        margin-bottom: 50px;
+        border-left: 3px solid var(--accent);
+      }
+
+      .table-of-contents h2 {
+        font-size: 1.2rem;
+        margin-bottom: 16px;
+        color: var(--text);
+      }
+
+      .table-of-contents ul {
+        list-style: none;
+      }
+
+      .table-of-contents li {
+        margin: 10px 0;
+      }
+
+      .table-of-contents a {
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.2s;
+      }
+
+      .table-of-contents a:hover {
+        color: #ff9448;
+        text-decoration: underline;
+      }
+
+      .section {
+        margin-bottom: 60px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .section-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .section-decorator {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--accent), transparent);
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .metric-card {
+        background: rgba(28, 21, 35, 0.5);
+        padding: 24px;
+        border-radius: 6px;
         text-align: center;
         border-top: 3px solid var(--accent);
       }
 
-      .summary-value {
-        font-size: 2em;
-        font-weight: bold;
+      .metric-value {
+        font-size: 2.5rem;
+        font-weight: 600;
         color: var(--accent);
+        margin-bottom: 8px;
       }
 
-      .summary-label {
-        font-size: 0.9em;
+      .metric-value.success {
+        color: #86efac;
+      }
+
+      .metric-value.error {
+        color: #fca5a5;
+      }
+
+      .metric-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
         color: var(--text-muted);
-        margin-top: 5px;
       }
 
-      .findings-breakdown {
-        background: var(--bg-alt);
-        padding: 20px;
-        border-radius: 8px;
+      .breakdown-panel {
+        background: rgba(28, 21, 35, 0.5);
+        padding: 24px;
+        border-radius: 6px;
       }
 
-      .breakdown-table {
+      .breakdown-panel h3 {
+        font-size: 1rem;
+        margin-bottom: 16px;
+        color: var(--text);
+      }
+
+      .distribution-table {
         width: 100%;
         border-collapse: collapse;
       }
 
-      .breakdown-table td {
-        padding: 10px;
+      .distribution-table td {
+        padding: 12px 16px;
         border-bottom: 1px solid var(--border);
       }
 
-      .badge {
+      .severity-label {
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .severity-label.serious {
+        color: #fca5a5;
+      }
+
+      .severity-label.warning {
+        color: #fed7aa;
+      }
+
+      .severity-label.whisper {
+        color: #93c5fd;
+      }
+
+      .count-badge {
         display: inline-block;
         padding: 4px 12px;
-        border-radius: 20px;
-        font-weight: bold;
-        color: white;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 12px;
       }
 
-      .badge.error {
-        background-color: #f44336;
+      .count-badge.serious {
+        background: rgba(220, 38, 38, 0.2);
+        color: #fca5a5;
       }
 
-      .badge.warning {
-        background-color: #ff9800;
+      .count-badge.warning {
+        background: rgba(234, 88, 12, 0.2);
+        color: #fed7aa;
       }
 
-      .badge.info {
-        background-color: #2196F3;
+      .count-badge.whisper {
+        background: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
       }
 
-      .finding-group {
-        margin-bottom: 30px;
-        background: var(--bg-alt);
-        padding: 20px;
-        border-radius: 8px;
+      .omen-group {
+        background: rgba(28, 21, 35, 0.5);
+        padding: 24px;
+        border-radius: 6px;
+        margin-bottom: 20px;
       }
 
-      .finding-group h3 {
-        margin-bottom: 15px;
+      .omen-group h3 {
+        font-size: 1.1rem;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
 
-      .severity-error, .severity-error {
-        color: #f44336;
+      .severity-icon {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
       }
 
-      .severity-warning {
-        color: #ff9800;
+      .severity-error .severity-icon {
+        background: #dc2626;
+        box-shadow: 0 0 8px rgba(220, 38, 38, 0.6);
       }
 
-      .severity-info {
-        color: #2196F3;
+      .severity-warning .severity-icon {
+        background: #ea580c;
+        box-shadow: 0 0 8px rgba(234, 88, 12, 0.6);
       }
 
-      .severity-badge {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 3px;
-        color: white;
-        font-size: 0.85em;
-        font-weight: bold;
+      .severity-info .severity-icon {
+        background: #3b82f6;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
       }
 
-      .findings-table {
+      .category-icon {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: var(--accent);
+      }
+
+      .omen-table {
         width: 100%;
         border-collapse: collapse;
-        background: var(--bg);
+        font-size: 13px;
       }
 
-      .findings-table thead {
-        background: var(--border);
+      .omen-table thead {
+        background: rgba(255, 121, 31, 0.1);
       }
 
-      .findings-table th {
-        padding: 12px;
+      .omen-table th {
+        padding: 12px 16px;
         text-align: left;
-        font-weight: bold;
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
       }
 
-      .findings-table td {
-        padding: 10px 12px;
+      .omen-table td {
+        padding: 12px 16px;
         border-bottom: 1px solid var(--border);
       }
 
-      .findings-table tbody tr:hover {
-        background: var(--bg-alt);
+      .omen-table tbody tr:hover {
+        background: rgba(255, 121, 31, 0.05);
       }
 
-      .profile-card {
-        background: var(--bg-alt);
-        border-radius: 8px;
+      .severity-mark {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .severity-mark.serious {
+        background: rgba(220, 38, 38, 0.2);
+        color: #fca5a5;
+      }
+
+      .severity-mark.warning {
+        background: rgba(234, 88, 12, 0.2);
+        color: #fed7aa;
+      }
+
+      .severity-mark.info {
+        background: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+      }
+
+      .omen-text {
+        color: var(--text);
+      }
+
+      .screenshot-link {
+        margin-top: 6px;
+      }
+
+      .screenshot-link a {
+        color: var(--accent);
+        font-size: 11px;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .screenshot-link a:hover {
+        color: #ff9448;
+        text-decoration: underline;
+      }
+
+      .no-omens {
+        color: var(--text-muted);
+        font-style: italic;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .rite-card {
+        background: rgba(28, 21, 35, 0.5);
+        border-radius: 6px;
         margin-bottom: 20px;
         overflow: hidden;
       }
 
-      .profile-header {
-        border-left: 4px solid;
-        padding: 15px;
-        background: var(--bg);
-      }
-
-      .profile-header h3 {
-        margin-bottom: 10px;
-      }
-
-      .profile-meta {
+      .rite-header {
         display: flex;
-        gap: 15px;
-        font-size: 0.9em;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 20px;
+        border-left: 4px solid;
+      }
+
+      .rite-header.passed {
+        border-left-color: #86efac;
+      }
+
+      .rite-header.failed {
+        border-left-color: #fca5a5;
+      }
+
+      .rite-status {
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .rite-header.passed .rite-status {
+        color: #86efac;
+      }
+
+      .rite-header.failed .rite-status {
+        color: #fca5a5;
+      }
+
+      .rite-info h3 {
+        font-size: 14px;
+        margin-bottom: 4px;
+        color: var(--text);
+      }
+
+      .rite-meta {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
         color: var(--text-muted);
       }
 
-      .profile-findings {
-        padding: 15px;
+      .rite-findings {
+        padding: 16px 20px;
       }
 
-      .no-findings {
-        color: var(--text-muted);
-        font-style: italic;
-      }
-
-      .screenshots-grid {
+      .apparition-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 20px;
       }
 
-      .screenshot-item {
-        background: var(--bg-alt);
-        border-radius: 8px;
+      .apparition-plate {
+        background: rgba(28, 21, 35, 0.5);
+        border-radius: 6px;
         overflow: hidden;
         border: 1px solid var(--border);
       }
 
-      .screenshot-header {
-        padding: 10px;
-        background: var(--border);
-        font-weight: bold;
+      .plate-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: rgba(255, 121, 31, 0.05);
+        border-bottom: 1px solid var(--border);
       }
 
-      .screenshot-item img {
+      .plate-label {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        color: var(--accent);
+      }
+
+      .plate-time {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .plate-frame {
+        aspect-ratio: 16/10;
+        background: #0a0711;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .plate-frame img {
         width: 100%;
-        display: block;
+        height: 100%;
+        object-fit: contain;
       }
 
-      .screenshot-meta {
-        padding: 10px;
-        font-size: 0.85em;
-        color: var(--text-muted);
-      }
-
-      .footer {
-        text-align: center;
-        padding: 20px;
+      .grimoire-footer {
+        margin-top: 60px;
+        padding-top: 30px;
         border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .footer-seal {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+      }
+
+      .footer-ghost {
+        width: 100%;
+        height: 100%;
+        color: var(--accent);
+        opacity: 0.5;
+      }
+
+      .footer-content {
+        flex: 1;
+      }
+
+      .footer-content p {
+        font-size: 12px;
         color: var(--text-muted);
-        margin-top: 40px;
+        margin-bottom: 4px;
+      }
+
+      .footer-content strong {
+        color: var(--text);
+      }
+
+      .footer-motto {
+        font-style: italic;
+        color: var(--accent);
       }
 
       @media (max-width: 768px) {
-        .header h1 {
-          font-size: 1.8em;
+        .parchment {
+          padding: 30px 20px;
         }
 
-        .meta {
-          flex-direction: column;
-          gap: 10px;
+        .header-content h1 {
+          font-size: 2rem;
         }
 
-        .summary-grid {
+        .meta-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .metrics-grid {
           grid-template-columns: 1fr 1fr;
         }
 
-        .findings-table {
-          font-size: 0.9em;
+        .omen-table {
+          font-size: 12px;
         }
 
-        .findings-table th,
-        .findings-table td {
-          padding: 8px 4px;
+        .omen-table th,
+        .omen-table td {
+          padding: 8px 12px;
+        }
+
+        .apparition-grid {
+          grid-template-columns: 1fr;
         }
       }
 
       @media print {
         body {
           background: white;
+          color: black;
         }
 
-        .toc {
+        .parchment {
+          box-shadow: none;
+          border: 1px solid #ccc;
+        }
+
+        .table-of-contents {
           page-break-after: always;
         }
 
@@ -677,34 +1038,25 @@ export class HTMLReportGenerator implements ReportGenerator {
     `;
   }
 
-  private darkTheme() {
+  private darkTheme(): HTMLReportTheme {
     return {
-      primary: '#1c1629', // Cyanotype Plate
-      secondary: '#0a0711', // Dusk Page
-      accent: '#ff791f', // Candle Amber
+      primary: '#1c1629',
+      secondary: '#0a0711',
+      accent: '#ff791f',
       bg: '#0a0711',
       bgAlt: '#1c1629',
-      text: '#fff1dc', // Bone primary text
-      textMuted: '#d9d3e0', // Dusk muted
-      border: '#46334b', // Hairline decorative rules
-    };
-  }
-
-  private lightTheme() {
-    return {
-      primary: '#4a2b8a',
-      secondary: '#f5f5f5',
-      accent: '#ff791f',
-      bg: '#ffffff',
-      bgAlt: '#f9f9f9',
-      text: '#333333',
-      textMuted: '#666',
-      border: '#ddd',
+      text: '#f5f0e8',
+      textMuted: '#8a8295',
+      border: '#46334b',
     };
   }
 
   private getAllFindings(report: TestReport): Finding[] {
     return report.profileResults.flatMap((p) => p.findings);
+  }
+
+  private hasScreenshots(): boolean {
+    return true;
   }
 
   private calculateStatistics(report: TestReport) {
