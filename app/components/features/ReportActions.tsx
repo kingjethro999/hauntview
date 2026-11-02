@@ -10,6 +10,7 @@ import {
   ClipboardDocumentCheckIcon,
   ClipboardDocumentIcon,
   ArrowLeftIcon,
+  PrinterIcon,
 } from '@heroicons/react/24/outline';
 
 export interface ReportActionsProps {
@@ -29,11 +30,17 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
     }
   };
 
+  const printReport = () => {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
+  };
+
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl border border-[#6C3CAA]/30 bg-[#373746]/40 backdrop-blur-sm">
+    <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-[6px] border border-[#46334b] bg-[#1c1629]/70 backdrop-blur-sm print:hidden">
       <Link href="/">
         <Button variant="ghost" size="sm" icon={<ArrowLeftIcon className="w-4 h-4" />}>
-          Run Another Test
+          The Parlour · New Séance
         </Button>
       </Link>
 
@@ -53,19 +60,39 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
           {copied ? 'Copied JSON!' : 'Copy JSON'}
         </Button>
 
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={printReport}
+          icon={<PrinterIcon className="w-4 h-4 text-[#ff791f]" />}
+        >
+          Print Grimoire
+        </Button>
+
         <a href={`/api/results/${report.id}?format=markdown`} download>
           <Button
             variant="outline"
             size="sm"
-            icon={<DocumentTextIcon className="w-4 h-4 text-[#DC6428]" />}
+            icon={<DocumentTextIcon className="w-4 h-4 text-[#ff791f]" />}
           >
             Export Markdown
           </Button>
         </a>
 
+        <a href={`/api/results/${report.id}?format=zip`} download>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<ArrowDownTrayIcon className="w-4 h-4 text-[#0a0711]" />}
+            className="bg-[#ff791f] hover:bg-[#ff791f]/90 text-[#0a0711] font-bold shadow-[0_0_12px_rgba(255,121,31,0.3)]"
+          >
+            Download Package (.zip + screenshots)
+          </Button>
+        </a>
+
         <a href={`/api/results/${report.id}?format=html`} download>
-          <Button variant="secondary" size="sm" icon={<ArrowDownTrayIcon className="w-4 h-4" />}>
-            Download HTML Report
+          <Button variant="outline" size="sm" icon={<ArrowDownTrayIcon className="w-4 h-4" />}>
+            HTML Folio
           </Button>
         </a>
       </div>

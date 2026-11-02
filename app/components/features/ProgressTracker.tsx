@@ -38,19 +38,19 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
         <div className="flex items-center gap-3">
           <Spinner size="md" />
           <div>
-            <h4 className="font-display font-bold text-base text-[#F5F5FA]">
+            <h4 className="font-display font-bold text-base text-[#fff1dc]">
               HauntView Engine Executing Tests
             </h4>
             <p className="text-xs text-[#646478]">
               Automating Playwright headless instances against{' '}
-              <code className="text-[#DC6428]">{url}</code>
+              <code className="text-[#ff791f]">{url}</code>
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs text-[#F5F5FA] font-mono bg-[#0F0F14]/60 px-3 py-1.5 rounded-lg border border-[#6C3CAA]/30">
-            <ClockIcon className="w-4 h-4 text-[#DC6428]" />
+          <div className="flex items-center gap-1.5 text-xs text-[#fff1dc] font-mono bg-[#0a0711]/60 px-3 py-1.5 rounded-lg border border-[#6C3CAA]/30">
+            <ClockIcon className="w-4 h-4 text-[#ff791f]" />
             <span>{elapsed}s elapsed</span>
           </div>
 

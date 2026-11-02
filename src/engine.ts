@@ -65,6 +65,9 @@ export class HauntViewEngine {
     const reportId = `hauntview-${Date.now()}`;
     const startTime = Date.now();
 
+    // Ensure screenshot directory is ready
+    await this.screenshotManager.initialize();
+
     // Determine which profiles to run
     let executionOrder = this.profileManager.getOptimalExecutionOrder();
     if (options.profiles && options.profiles.length > 0) {
@@ -187,7 +190,29 @@ export class HauntViewEngine {
         profile = new ConsoleErrorsProfile(profileId, profileId);
       }
 
-      return await profile.execute(page, url, context);
+      const result = await profile.execute(page, url, context);
+
+      // Capture actual apparition screenshot plate
+      try {
+        const screenshotMeta = await this.screenshotManager.captureScreenshot(
+          page,
+          profileId,
+          url,
+          context.viewport,
+          { fullPage: false }
+        );
+        result.screenshots = [screenshotMeta];
+
+        // Attach visual evidence to findings
+        for (const finding of result.findings) {
+          if (!finding.details) finding.details = {};
+          finding.details.screenshot = screenshotMeta.fileName;
+        }
+      } catch (screenshotErr) {
+        console.warn(`Could not capture screenshot for profile ${profileId}:`, screenshotErr);
+      }
+
+      return result;
     } finally {
       this.browserPool.releasePage(page);
     }

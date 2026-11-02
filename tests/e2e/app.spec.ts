@@ -12,9 +12,34 @@ test.describe('HauntView Dashboard & Navigation', () => {
     const urlInput = page.getByPlaceholder(/http:\/\/localhost:3000 or https:\/\/your-site\.com/i);
     await expect(urlInput).toBeVisible();
 
-    // Check Run Rites or Start button exists
-    const launchButton = page.getByRole('button', { name: /run .* test profiles/i });
+    // Check Haunt House launch button exists
+    const launchButton = page.getByRole('button', { name: /haunt house with .* rites/i });
     await expect(launchButton).toBeVisible();
+  });
+
+  test('interacts with Haunted House windows and Porch Lantern', async ({ page }) => {
+    await page.goto('/');
+
+    // Check Haunted House SVG exists
+    await expect(
+      page.getByText(
+        /Click windows to summon rites • Click (?:heavy )?front door to haunt with all/i
+      )
+    ).toBeVisible();
+
+    // Find and click a window
+    const windowBtn = page.getByRole('button', { name: /Console Errors/i }).first();
+    await expect(windowBtn).toBeVisible();
+    await windowBtn.click();
+
+    // Click quick pick preset to ignite porch lantern and candle
+    const localhostPreset = page.getByRole('button', { name: /localhost:3000/i });
+    await expect(localhostPreset).toBeVisible();
+    await localhostPreset.click();
+
+    // URL input should now have the preset URL
+    const urlInput = page.getByPlaceholder(/http:\/\/localhost:3000 or https:\/\/your-site\.com/i);
+    await expect(urlInput).toHaveValue('http://localhost:3000');
   });
 
   test('navigates to The Crypt run history', async ({ page }) => {

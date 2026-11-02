@@ -4,7 +4,7 @@
 
 import { TestReport } from '../types';
 
-export type ReportFormat = 'html' | 'markdown' | 'json';
+export type ReportFormat = 'html' | 'markdown' | 'json' | 'zip';
 
 export interface ReportOptions {
   format: ReportFormat;
@@ -18,7 +18,7 @@ export interface ReportOptions {
 
 export interface GeneratedReport {
   format: ReportFormat;
-  content: string;
+  content: string | Buffer;
   filename: string;
   mimeType: string;
 }

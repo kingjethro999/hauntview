@@ -165,7 +165,28 @@ export function saveTestReportToDb(
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
+    const insertScreenshot = database.prepare(`
+      INSERT OR REPLACE INTO screenshots (
+        id, run_id, profile_id, file_name, hash, viewport_width, viewport_height, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
     for (const profileResult of report.profileResults) {
+      if (profileResult.screenshots) {
+        for (const s of profileResult.screenshots) {
+          insertScreenshot.run(
+            `${report.id}-${s.fileName}`,
+            report.id,
+            s.profileId,
+            s.fileName,
+            s.hash,
+            s.viewport.width,
+            s.viewport.height,
+            s.timestamp
+          );
+        }
+      }
+
       for (const finding of profileResult.findings) {
         insertFinding.run(
           finding.id,

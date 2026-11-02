@@ -17,14 +17,22 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format');
 
-    if (format && (format === 'html' || format === 'markdown')) {
+    if (
+      format &&
+      (format === 'html' || format === 'markdown' || format === 'zip' || format === 'bundle')
+    ) {
       const generator = ReportFactory.createGenerator(format);
       const generated = await generator.generate(report, {
-        format,
+        format: format === 'bundle' ? 'zip' : (format as 'html' | 'markdown' | 'zip'),
         includeScreenshots: true,
       });
 
-      return new NextResponse(generated.content, {
+      const body =
+        typeof generated.content === 'string'
+          ? generated.content
+          : new Uint8Array(generated.content);
+
+      return new NextResponse(body, {
         headers: {
           'Content-Type': generated.mimeType,
           'Content-Disposition': `attachment; filename="${generated.filename}"`,

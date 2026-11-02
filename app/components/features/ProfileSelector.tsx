@@ -225,13 +225,13 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({ selectedProfil
   return (
     <div className="space-y-4">
       {/* Action Header & Presets */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#2C4B68]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#46334b]">
         <div>
-          <h4 className="font-display font-bold text-base text-[#ECE6D3]">
+          <h4 className="font-display font-bold text-base text-[#fff1dc]">
             Rites & Testing Profiles ({selectedProfiles.length}/{AVAILABLE_PROFILES.length}{' '}
             selected)
           </h4>
-          <p className="text-xs text-[#B4BFC8]">
+          <p className="text-xs text-[#d9d3e0]">
             Select individual rites or choose a quick preset suite
           </p>
         </div>
@@ -272,8 +272,8 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({ selectedProfil
               flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer
               ${
                 activeCategory === cat.id
-                  ? 'bg-[#582696] text-[#F5F5FA] shadow-[0_2px_8px_rgba(88,38,150,0.4)]'
-                  : 'bg-[#373746]/40 text-[#646478] hover:text-[#F5F5FA] hover:bg-[#373746]/70'
+                  ? 'bg-[#4a2b8a] text-[#fff1dc] shadow-[0_2px_8px_rgba(74,43,138,0.4)]'
+                  : 'bg-[#2d1a4a]/40 text-[#646478] hover:text-[#fff1dc] hover:bg-[#2d1a4a]/70'
               }
             `}
           >
@@ -296,15 +296,15 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({ selectedProfil
                 p-4 cursor-pointer transition-all duration-200 select-none
                 ${
                   isSelected
-                    ? 'border-[#DC6428] bg-[#582696]/15 shadow-[0_4px_16px_rgba(220,100,40,0.15)] ring-1 ring-[#DC6428]/40'
-                    : 'border-[#6C3CAA]/30 bg-[#373746]/40 hover:border-[#6C3CAA]/70 hover:bg-[#373746]/60'
+                    ? 'border-[#ff791f] bg-[#4a2b8a]/15 shadow-[0_4px_16px_rgba(255,121,31,0.15)] ring-1 ring-[#ff791f]/40'
+                    : 'border-[#6C3CAA]/30 bg-[#2d1a4a]/40 hover:border-[#6C3CAA]/70 hover:bg-[#2d1a4a]/60'
                 }
               `}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-sm text-[#F5F5FA] truncate">
+                    <span className="font-semibold text-sm text-[#fff1dc] truncate">
                       {profile.name}
                     </span>
                     <Badge variant={isSelected ? 'warning' : 'outline'} size="sm">
@@ -321,8 +321,8 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({ selectedProfil
                     w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors
                     ${
                       isSelected
-                        ? 'bg-[#DC6428] text-white'
-                        : 'border border-[#6C3CAA]/50 bg-[#0F0F14]/50'
+                        ? 'bg-[#ff791f] text-white'
+                        : 'border border-[#6C3CAA]/50 bg-[#0a0711]/50'
                     }
                   `}
                 >

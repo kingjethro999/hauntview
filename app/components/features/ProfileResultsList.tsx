@@ -10,13 +10,18 @@ export interface ProfileResultsListProps {
 
 export const ProfileResultsList: React.FC<ProfileResultsListProps> = ({ profileResults }) => {
   return (
-    <Card variant="default" className="p-6 space-y-4">
+    <Card variant="default" className="p-6 space-y-4 bg-[#1c1629] border-[#46334b]">
       <div>
-        <h3 className="font-display font-bold text-lg text-[#F5F5FA]">
-          Profile Execution Breakdown ({profileResults.length})
-        </h3>
-        <p className="text-xs text-[#646478]">
-          Individual result status, execution duration, and detected findings per profile
+        <div className="flex items-center gap-2">
+          <h3 className="font-display font-bold text-lg text-[#fff1dc]">
+            Rite Execution Breakdown ({profileResults.length})
+          </h3>
+          <Badge variant="outline" size="sm">
+            Profiles
+          </Badge>
+        </div>
+        <p className="text-xs text-[#d9d3e0] mt-0.5">
+          Individual result status, execution duration, and detected omens per test profile
         </p>
       </div>
 
@@ -28,41 +33,41 @@ export const ProfileResultsList: React.FC<ProfileResultsListProps> = ({ profileR
           return (
             <div
               key={result.profileId}
-              className="p-4 rounded-xl border border-[#6C3CAA]/25 bg-[#0F0F14]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#6C3CAA]/50 transition-colors"
+              className="p-4 rounded-[4px] border border-[#46334b] bg-[#0a0711]/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#b9acbf] transition-colors"
             >
               <div className="flex items-start gap-3">
                 <div className="mt-0.5">
                   {result.success ? (
                     <CheckCircleIcon className="w-5 h-5 text-[#22c55e]" />
                   ) : (
-                    <XCircleIcon className="w-5 h-5 text-[#ef4444]" />
+                    <XCircleIcon className="w-5 h-5 text-[#F28B77]" />
                   )}
                 </div>
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-[#F5F5FA]">
+                    <span className="font-semibold text-sm text-[#fff1dc]">
                       {result.profileName}
                     </span>
                     <Badge variant={result.success ? 'success' : 'error'} size="sm">
                       {result.success ? 'PASSED' : 'FAILED'}
                     </Badge>
                   </div>
-                  <p className="text-xs font-mono text-[#646478] mt-0.5">{result.profileId}</p>
+                  <p className="text-xs font-mono text-[#d9d3e0] mt-0.5">{result.profileId}</p>
                 </div>
               </div>
 
               {/* Stats & Metadata */}
-              <div className="flex flex-wrap items-center gap-3 text-xs text-[#646478] pl-8 sm:pl-0">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-[#d9d3e0] pl-8 sm:pl-0">
                 <div className="flex items-center gap-1 font-mono">
-                  <ClockIcon className="w-3.5 h-3.5 text-[#DC6428]" />
+                  <ClockIcon className="w-3.5 h-3.5 text-[#ff791f]" />
                   <span>{(result.duration / 1000).toFixed(2)}s</span>
                 </div>
 
                 {result.screenshots && result.screenshots.length > 0 && (
                   <div className="flex items-center gap-1">
-                    <PhotoIcon className="w-3.5 h-3.5 text-[#c084fc]" />
-                    <span>{result.screenshots.length} captured</span>
+                    <PhotoIcon className="w-3.5 h-3.5 text-[#9aff9a]" />
+                    <span>{result.screenshots.length} plates</span>
                   </div>
                 )}
 
@@ -79,7 +84,7 @@ export const ProfileResultsList: React.FC<ProfileResultsListProps> = ({ profileR
                   )}
                   {result.findings.length === 0 && (
                     <Badge variant="success" size="sm">
-                      0 findings
+                      0 omens
                     </Badge>
                   )}
                 </div>

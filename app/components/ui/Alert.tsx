@@ -57,7 +57,7 @@ export const Alert: React.FC<AlertProps> = ({
     >
       <div className="mt-0.5">{current.icon}</div>
       <div className="flex-1 text-sm">
-        {title && <h5 className="font-semibold mb-1 text-[#F5F5FA]">{title}</h5>}
+        {title && <h5 className="font-semibold mb-1 text-[#fff1dc]">{title}</h5>}
         <div className="leading-relaxed">{children}</div>
       </div>
       {onClose && (

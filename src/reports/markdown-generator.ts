@@ -246,7 +246,10 @@ No findings.
         for (const finding of profile.findings) {
           const severityIcon =
             finding.severity === 'error' ? '🔴' : finding.severity === 'warning' ? '🟡' : 'ℹ️';
-          markdown += `| ${severityIcon} | ${finding.category} | ${finding.message} |\n`;
+          const plateRef = finding.details?.screenshot
+            ? ` ([View Plate](screenshots/${finding.details.screenshot}))`
+            : '';
+          markdown += `| ${severityIcon} | ${finding.category} | ${finding.message}${plateRef} |\n`;
         }
 
         markdown += '\n';
@@ -268,15 +271,22 @@ No findings.
       return '';
     }
 
-    let markdown = `## Screenshots
+    let markdown = `## Spirit Photography Apparition Plates
 
 `;
 
     for (const screenshot of allScreenshots) {
+      const src =
+        screenshot.fileName.startsWith('screenshots/') ||
+        screenshot.fileName.startsWith('http') ||
+        screenshot.fileName.startsWith('/')
+          ? screenshot.fileName
+          : `screenshots/${screenshot.fileName}`;
+
       markdown += `### ${screenshot.profile}
 
-![Screenshot](${screenshot.fileName})  
-*${new Date(screenshot.timestamp).toLocaleTimeString()}*
+![Apparition Plate: ${screenshot.profile}](${src})  
+*Captured: ${new Date(screenshot.timestamp).toLocaleTimeString()}*
 
 `;
     }

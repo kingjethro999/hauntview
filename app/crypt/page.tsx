@@ -3,23 +3,24 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Container } from '../components/layout/Container';
-import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { EmptyState } from '../components/ui/EmptyState';
+import { TombstoneCard } from '../components/features/TombstoneCard';
+import { WispGhost } from '../components/features/WispGhost';
 import { TestReportSummary } from '@/src/core/report-store';
 import {
   ArchiveBoxIcon,
   ArrowLeftIcon,
-  ClockIcon,
   ArrowPathIcon,
-  DocumentArrowDownIcon,
+  Squares2X2Icon,
+  TableCellsIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 
 export default function CryptPage() {
   const [reports, setReports] = useState<TestReportSummary[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<'all' | 'screams' | 'peaceful'>('all');
+  const [viewStyle, setViewStyle] = useState<'tombstones' | 'table'>('tombstones');
 
   useEffect(() => {
     let isMounted = true;
@@ -90,153 +91,164 @@ export default function CryptPage() {
         </div>
 
         {/* Crypt Header */}
-        <div className="pb-6 border-b border-[#2C4B68] flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="pb-6 border-b border-[#46334b] flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <ArchiveBoxIcon className="w-6 h-6 text-[#F4B860]" />
-              <h1 className="font-display font-extrabold text-2xl md:text-3xl text-[#ECE6D3] tracking-tight">
-                The Crypt · Archive of Séances
+              <ArchiveBoxIcon className="w-6 h-6 text-[#ff791f]" />
+              <h1 className="font-serif font-extrabold text-2xl md:text-3xl text-[#fff1dc] tracking-tight">
+                The Crypt · Graveyard of Séances
               </h1>
             </div>
-            <p className="text-sm text-[#B4BFC8]">
-              Browse previous spirit photography sessions and examine historical apparitions
+            <p className="text-sm font-serif text-[#d9d3e0]">
+              Browse past spirit photography sessions, exhuming previous findings and laid-to-rest
+              apparitions.
             </p>
           </div>
 
           {/* Comparative Status Chips (§3.2 Lexicon) */}
-          <div className="flex flex-wrap items-center gap-1.5 text-xs">
-            <span className="px-2.5 py-1 rounded-full bg-[#153049] border border-[#2C4B68] text-[#ECE6D3]">
-              <strong>{reports.length}</strong> Total Séances
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="px-3 py-1 rounded-full bg-[#1c1629] border border-[#46334b] text-[#fff1dc] font-serif">
+              <strong>{reports.length}</strong> Past Séances
             </span>
-            <span className="px-2.5 py-1 rounded-full bg-[#153049] border border-[#A6F0D6]/30 text-[#A6F0D6]">
+            <span className="px-3 py-1 rounded-full bg-[#1c1629] border border-[#9aff9a]/40 text-[#9aff9a] font-serif">
               Fresh hauntings tracked
             </span>
           </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="flex items-center gap-2">
-          {(['all', 'screams', 'peaceful'] as const).map((mode) => (
+        {/* Filter and View Style Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          {/* Category Filters */}
+          <div className="flex items-center gap-2">
+            {(['all', 'screams', 'peaceful'] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setFilter(mode)}
+                className={`px-3 py-1.5 rounded-[6px] text-xs font-serif capitalize cursor-pointer transition-colors ${
+                  filter === mode
+                    ? 'bg-[#ff791f] text-[#0a0711] font-bold shadow-[0_0_8px_rgba(255,121,31,0.3)]'
+                    : 'bg-[#1c1629] text-[#d9d3e0] hover:text-[#fff1dc] border border-[#46334b]'
+                }`}
+              >
+                {mode === 'all'
+                  ? `All Séances (${reports.length})`
+                  : mode === 'screams'
+                    ? 'With Screams (Errors)'
+                    : 'Peaceful (No Errors)'}
+              </button>
+            ))}
+          </div>
+
+          {/* View Toggle */}
+          <div className="inline-flex rounded-[6px] bg-[#1c1629] p-0.5 border border-[#46334b]">
             <button
-              key={mode}
               type="button"
-              onClick={() => setFilter(mode)}
-              className={`px-3 py-1.5 rounded-[6px] text-xs font-semibold capitalize cursor-pointer transition-colors ${
-                filter === mode
-                  ? 'bg-[#F4B860] text-[#0E2233]'
-                  : 'bg-[#153049] text-[#B4BFC8] hover:text-[#ECE6D3] border border-[#2C4B68]'
+              onClick={() => setViewStyle('tombstones')}
+              className={`px-3 py-1 rounded-[4px] text-xs font-serif flex items-center gap-1.5 transition-colors cursor-pointer ${
+                viewStyle === 'tombstones'
+                  ? 'bg-[#ff791f] text-[#0a0711] font-bold'
+                  : 'text-[#d9d3e0] hover:text-[#fff1dc]'
               }`}
+              title="Graveyard headstones view"
             >
-              {mode === 'all'
-                ? `All Séances (${reports.length})`
-                : mode === 'screams'
-                  ? 'With Screams (Errors)'
-                  : 'Peaceful (No Errors)'}
+              <Squares2X2Icon className="w-3.5 h-3.5" />
+              <span>Graveyard</span>
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={() => setViewStyle('table')}
+              className={`px-3 py-1 rounded-[4px] text-xs font-serif flex items-center gap-1.5 transition-colors cursor-pointer ${
+                viewStyle === 'table'
+                  ? 'bg-[#ff791f] text-[#0a0711] font-bold'
+                  : 'text-[#d9d3e0] hover:text-[#fff1dc]'
+              }`}
+              title="Ledger table view"
+            >
+              <TableCellsIcon className="w-3.5 h-3.5" />
+              <span>Ledger</span>
+            </button>
+          </div>
         </div>
 
-        {/* Reports Table / List */}
+        {/* Reports Content */}
         {isLoading ? (
-          <div className="p-16 text-center text-xs text-[#B4BFC8] bg-[#153049]/40 rounded-[2px] border border-[#2C4B68]">
-            <SparklesIcon className="w-6 h-6 text-[#F4B860] mx-auto mb-2 animate-spin" />
+          <div className="p-16 text-center text-xs text-[#d9d3e0] bg-[#1c1629]/40 rounded-[2px] border border-[#46334b] font-serif">
+            <SparklesIcon className="w-6 h-6 text-[#ff791f] mx-auto mb-2 animate-spin" />
             Reading the crypt stones...
           </div>
         ) : filteredReports.length === 0 ? (
-          <EmptyState
-            icon={<ArchiveBoxIcon className="w-10 h-10 text-[#5B7C99]" />}
-            title="The Crypt is Empty"
-            description="No matching séances recorded. Run a test from The Parlour to add records to the archive."
-            action={
-              <Link href="/">
-                <Button variant="secondary" size="sm">
-                  Haunt a Website Now
-                </Button>
-              </Link>
-            }
-          />
+          <div className="text-center py-16 px-4 bg-[#1c1629]/30 rounded-[4px] border border-[#46334b] flex flex-col items-center">
+            <WispGhost state="napping" size="lg" className="mb-3" />
+            <h3 className="font-serif font-bold text-lg text-[#fff1dc] mb-1">
+              The Crypt is Silent
+            </h3>
+            <p className="text-xs text-[#d9d3e0] max-w-sm mx-auto mb-5 font-serif">
+              No matching séances found in the graveyard. Begin a new run from The Parlour.
+            </p>
+            <Link href="/">
+              <Button variant="secondary" size="md" className="font-serif font-bold">
+                Haunt a Website Now
+              </Button>
+            </Link>
+          </div>
+        ) : viewStyle === 'tombstones' ? (
+          /* Graveyard of Gothic Tombstones */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredReports.map((report) => (
+              <TombstoneCard key={report.id} report={report} />
+            ))}
+          </div>
         ) : (
-          <div className="plate rounded-[2px] bg-[#153049] overflow-hidden border border-[#2C4B68]">
+          /* Traditional Ledger Table */
+          <div className="rounded-[4px] bg-[#1c1629] overflow-hidden border border-[#46334b]">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-[#0E2233] text-[#B4BFC8] border-b border-[#2C4B68] font-mono uppercase text-[10px] tracking-wider">
+              <table className="w-full text-left text-xs font-serif">
+                <thead className="bg-[#0a0711] text-[#d9d3e0] border-b border-[#46334b] font-mono uppercase text-[10px] tracking-wider">
                   <tr>
                     <th className="py-3 px-4">House (Target URL)</th>
                     <th className="py-3 px-4">Status & Omens</th>
                     <th className="py-3 px-4">Rites Completed</th>
                     <th className="py-3 px-4">Duration</th>
-                    <th className="py-3 px-4">Séance Date</th>
+                    <th className="py-3 px-4">Demise Date</th>
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2C4B68] text-[#ECE6D3]">
-                  {filteredReports.map((report) => {
-                    const isPass = report.errorCount === 0;
-
-                    return (
-                      <tr key={report.id} className="hover:bg-[#0E2233]/40 transition-colors">
-                        <td className="py-3.5 px-4 font-medium max-w-xs truncate">
-                          <Link
-                            href={`/results/${report.id}`}
-                            className="hover:text-[#F4B860] transition-colors"
-                          >
-                            {report.url}
-                          </Link>
-                        </td>
-
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-1.5">
-                            <Badge variant={isPass ? 'success' : 'error'} size="sm">
-                              {isPass ? 'NO OMENS' : `${report.errorCount} SCREAMS`}
-                            </Badge>
-                            {report.warningCount > 0 && (
-                              <Badge variant="warning" size="sm">
-                                {report.warningCount} CHILLS
-                              </Badge>
-                            )}
-                          </div>
-                        </td>
-
-                        <td className="py-3.5 px-4 font-mono text-[#B4BFC8]">
-                          {report.successfulProfiles}/{report.totalProfiles} rites
-                        </td>
-
-                        <td className="py-3.5 px-4 font-mono text-[#B4BFC8]">
-                          <div className="flex items-center gap-1">
-                            <ClockIcon className="w-3.5 h-3.5 text-[#F4B860]" />
-                            <span>{(report.duration / 1000).toFixed(1)}s</span>
-                          </div>
-                        </td>
-
-                        <td className="py-3.5 px-4 text-[#B4BFC8]">
-                          {new Date(report.startTime).toLocaleDateString()} at{' '}
-                          {new Date(report.startTime).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </td>
-
-                        <td className="py-3.5 px-4 text-right">
-                          <div className="inline-flex items-center gap-1">
-                            <Link href={`/results/${report.id}`}>
-                              <Button size="sm" variant="outline" className="text-xs py-1 px-2.5">
-                                Grimoire →
-                              </Button>
-                            </Link>
-
-                            <a
-                              href={`/api/results/${report.id}?format=html`}
-                              download
-                              title="Download HTML Grimoire"
-                              className="p-1.5 rounded-[4px] border border-[#2C4B68] text-[#B4BFC8] hover:text-[#ECE6D3] hover:bg-[#0E2233] transition-colors"
-                            >
-                              <DocumentArrowDownIcon className="w-4 h-4 text-[#A6F0D6]" />
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                <tbody className="divide-y divide-[#46334b] text-[#fff1dc]">
+                  {filteredReports.map((report) => (
+                    <tr key={report.id} className="hover:bg-[#0a0711]/40 transition-colors">
+                      <td className="py-3.5 px-4 font-medium max-w-xs truncate">
+                        <Link
+                          href={`/results/${report.id}`}
+                          className="hover:text-[#ff791f] transition-colors"
+                        >
+                          {report.url}
+                        </Link>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="font-mono text-xs">
+                          {report.errorCount > 0 ? `${report.errorCount} Screams` : '0 Screams'} •{' '}
+                          {report.totalFindings} Omens
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-[#d9d3e0]">
+                        {report.successfulProfiles} / {report.totalProfiles}
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-[#d9d3e0]">
+                        {(report.duration / 1000).toFixed(1)}s
+                      </td>
+                      <td className="py-3.5 px-4 text-[#d9d3e0]">
+                        {new Date(report.startTime).toLocaleDateString()}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <Link href={`/results/${report.id}`}>
+                          <Button size="sm" variant="outline" className="text-xs py-1 px-2.5">
+                            Grimoire →
+                          </Button>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

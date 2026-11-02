@@ -26,7 +26,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#DC6428] focus-visible:outline-offset-2 disabled:cursor-not-allowed';
+      'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#ff791f] focus-visible:outline-offset-2 disabled:cursor-not-allowed';
 
     const sizeStyles = {
       sm: 'px-3 py-1.5 text-xs gap-1.5',
@@ -36,15 +36,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        'bg-[#582696] text-[#F5F5FA] border border-[#6C3CAA] shadow-[0_4px_12px_rgba(88,38,150,0.25)] hover:bg-[#6C3CAA] hover:shadow-[0_6px_20px_rgba(88,38,150,0.35)] hover:-translate-y-0.5 active:bg-[#441C78] active:translate-y-0 disabled:bg-[#4B5563] disabled:text-[#646478] disabled:border-transparent disabled:shadow-none disabled:transform-none',
+        'bg-[#4a2b8a] text-[#fff1dc] border border-[#6C3CAA] shadow-[0_4px_12px_rgba(74,43,138,0.25)] hover:bg-[#6C3CAA] hover:shadow-[0_6px_20px_rgba(74,43,138,0.35)] hover:-translate-y-0.5 active:bg-[#441C78] active:translate-y-0 disabled:bg-[#4B5563] disabled:text-[#646478] disabled:border-transparent disabled:shadow-none disabled:transform-none',
       secondary:
-        'bg-[#DC6428] text-[#F5F5FA] border border-[#B43C14] shadow-[0_4px_12px_rgba(220,100,40,0.25)] hover:bg-[#B43C14] hover:shadow-[0_6px_20px_rgba(220,100,40,0.35)] hover:-translate-y-0.5 active:bg-[#8B2E0F] active:translate-y-0 disabled:bg-[#4B5563] disabled:text-[#646478] disabled:border-transparent disabled:shadow-none disabled:transform-none',
+        'bg-[#ff791f] text-[#fff1dc] border border-[#B43C14] shadow-[0_4px_12px_rgba(255,121,31,0.25)] hover:bg-[#B43C14] hover:shadow-[0_6px_20px_rgba(255,121,31,0.35)] hover:-translate-y-0.5 active:bg-[#8B2E0F] active:translate-y-0 disabled:bg-[#4B5563] disabled:text-[#646478] disabled:border-transparent disabled:shadow-none disabled:transform-none',
       ghost:
-        'bg-transparent text-[#F5F5FA] border border-transparent hover:bg-[rgba(88,38,150,0.15)] hover:border-[#6C3CAA] hover:text-[#DC6428] active:bg-[rgba(88,38,150,0.25)] disabled:text-[#646478] disabled:bg-transparent',
+        'bg-transparent text-[#fff1dc] border border-transparent hover:bg-[rgba(74,43,138,0.15)] hover:border-[#6C3CAA] hover:text-[#ff791f] active:bg-[rgba(74,43,138,0.25)] disabled:text-[#646478] disabled:bg-transparent',
       outline:
-        'bg-transparent text-[#F5F5FA] border border-[#6C3CAA] hover:bg-[rgba(88,38,150,0.1)] hover:border-[#DC6428] hover:text-[#DC6428] active:bg-[rgba(88,38,150,0.2)] disabled:border-[#4B5563] disabled:text-[#646478]',
+        'bg-transparent text-[#fff1dc] border border-[#6C3CAA] hover:bg-[rgba(74,43,138,0.1)] hover:border-[#ff791f] hover:text-[#ff791f] active:bg-[rgba(74,43,138,0.2)] disabled:border-[#4B5563] disabled:text-[#646478]',
       danger:
-        'bg-[#dc2626] text-[#F5F5FA] border border-[#b91c1c] shadow-[0_4px_12px_rgba(220,38,38,0.25)] hover:bg-[#b91c1c] hover:shadow-[0_6px_20px_rgba(220,38,38,0.35)] hover:-translate-y-0.5 active:bg-[#991b1b] active:translate-y-0 disabled:bg-[#4B5563] disabled:text-[#646478]',
+        'bg-[#dc2626] text-[#fff1dc] border border-[#b91c1c] shadow-[0_4px_12px_rgba(220,38,38,0.25)] hover:bg-[#b91c1c] hover:shadow-[0_6px_20px_rgba(220,38,38,0.35)] hover:-translate-y-0.5 active:bg-[#991b1b] active:translate-y-0 disabled:bg-[#4B5563] disabled:text-[#646478]',
     };
 
     return (

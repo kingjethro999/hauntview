@@ -56,7 +56,10 @@ export async function POST(request: NextRequest) {
           format,
           outputPath: '',
         });
-        result.reportContent = generatedReport.content;
+        result.reportContent =
+          typeof generatedReport.content === 'string'
+            ? generatedReport.content
+            : generatedReport.content.toString('base64');
         result.reportFilename = generatedReport.filename;
         result.mimeType = generatedReport.mimeType;
       } catch (error) {

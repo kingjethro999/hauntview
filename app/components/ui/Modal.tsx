@@ -63,15 +63,15 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal Container */}
       <div
-        className={`relative w-full ${maxWidthStyles[resolvedWidth]} bg-[#0F0F14] border border-[#6C3CAA] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-10 flex flex-col max-h-[90vh]`}
+        className={`relative w-full ${maxWidthStyles[resolvedWidth]} bg-[#0a0711] border border-[#6C3CAA] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-10 flex flex-col max-h-[90vh]`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#6C3CAA]/30 bg-[#373746]/20">
-          <h3 className="font-display font-bold text-xl text-[#F5F5FA] tracking-tight">{title}</h3>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#6C3CAA]/30 bg-[#2d1a4a]/20">
+          <h3 className="font-display font-bold text-xl text-[#fff1dc] tracking-tight">{title}</h3>
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="p-1 rounded-lg text-[#646478] hover:text-[#DC6428] hover:bg-[#DC6428]/10 transition-colors focus-visible:outline-2 focus-visible:outline-[#DC6428]"
+            className="p-1 rounded-lg text-[#646478] hover:text-[#ff791f] hover:bg-[#ff791f]/10 transition-colors focus-visible:outline-2 focus-visible:outline-[#ff791f]"
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
@@ -82,7 +82,7 @@ export const Modal: React.FC<ModalProps> = ({
 
         {/* Footer */}
         {footer && (
-          <div className="px-6 py-4 border-t border-[#6C3CAA]/30 bg-[#373746]/20">{footer}</div>
+          <div className="px-6 py-4 border-t border-[#6C3CAA]/30 bg-[#2d1a4a]/20">{footer}</div>
         )}
       </div>
     </div>

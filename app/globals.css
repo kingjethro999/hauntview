@@ -1,70 +1,314 @@
 @import 'tailwindcss';
 @import './components/design-tokens.css';
 
+/* ─────────────────────────────────────────────
+   ROOT COLOR ALIASES (mirror the tokens so
+   Tailwind arbitrary values can use them too)
+───────────────────────────────────────────── */
 :root {
   color-scheme: dark;
-  --background: var(--color-midnight-black, #0f0f14);
-  --foreground: var(--color-ghostly-white, #f5f5fa);
+  --background: #100e13;
+  --foreground: #fff1dc;
 }
 
+/* ─────────────────────────────────────────────
+   BODY  — haunted-observatory base layer
+   matches the "Halloween correction" colours
+   in your friend's halloween.css exactly.
+───────────────────────────────────────────── */
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-inter, var(--font-sans));
+  background-color: #100d13;
+  color: #fff1dc;
+  font-family: var(--font-inter, 'Inter', sans-serif);
   min-height: 100vh;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* 1) fine dot grid — gives that observatory / spirit-board texture */
+  /* 2) purple glow top-right  */
+  /* 3) ember glow bottom-left */
+  background-image:
+    radial-gradient(#c69bd522 0.6px, transparent 0.6px),
+    radial-gradient(ellipse at 84% 18%, #74288624, transparent 48%),
+    radial-gradient(ellipse at 25% 80%, #d95a0b0d, transparent 45%);
+  background-size:
+    25px 25px,
+    100% 100%,
+    100% 100%;
+  background-attachment: fixed;
 }
 
+/* ─────────────────────────────────────────────
+   HEADINGS
+───────────────────────────────────────────── */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-space-grotesk, var(--font-display));
+  font-family: var(--font-space-grotesk, 'Space Grotesk', sans-serif);
   letter-spacing: -0.02em;
 }
 
-/* Atmospheric Glows & Shadows */
-.glow-purple {
-  box-shadow: 0 0 16px rgba(88, 38, 150, 0.45);
+/* ─────────────────────────────────────────────
+   SELECTION
+───────────────────────────────────────────── */
+::selection {
+  background: #7b239d;
+  color: #fff;
 }
 
-.glow-orange {
-  box-shadow: 0 0 16px rgba(220, 100, 40, 0.45);
+/* ─────────────────────────────────────────────
+   FOCUS  — jack-o'-lantern outline
+───────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #ff791f;
+  outline-offset: 3px;
 }
 
-/* Subtle Gothic grid background */
-.bg-gothic-grid {
-  background-image:
-    linear-gradient(to right, rgba(108, 60, 170, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(108, 60, 170, 0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
-
-/* Custom Scrollbar */
+/* ─────────────────────────────────────────────
+   SCROLLBAR  — crypt-dark track
+───────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #0f0f14;
+  background: #100d13;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #373746;
+  background: #3a1f50;
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #582696;
+  background: #5c2d8c;
 }
 
-/* Animations */
+/* ─────────────────────────────────────────────
+   UTILITY GLOWS
+───────────────────────────────────────────── */
+.glow-orange {
+  box-shadow: 0 0 20px rgba(255, 121, 31, 0.45);
+}
+.glow-violet {
+  box-shadow: 0 0 20px rgba(193, 139, 255, 0.35);
+}
+.glow-ectopl {
+  box-shadow: 0 0 20px rgba(154, 255, 154, 0.3);
+}
+
+/* ─────────────────────────────────────────────
+   LANDING BAY  — full hero container
+   dot-grid + two radial glows + inset vignette
+───────────────────────────────────────────── */
+.landing-bay {
+  position: relative;
+  isolation: isolate;
+  background-color: #140e1a;
+  background-image:
+    radial-gradient(ellipse at 80% 49%, #7b239d33, transparent 63%),
+    radial-gradient(ellipse at 75% 100%, #f76b0e20, transparent 46%),
+    radial-gradient(#c69bd522 0.6px, transparent 0.6px);
+  background-size:
+    100% 100%,
+    100% 100%,
+    25px 25px;
+  border: 1px solid #603847;
+  overflow: hidden;
+}
+
+.landing-bay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 120px #09070a66;
+  z-index: 0;
+}
+
+/* ─────────────────────────────────────────────
+   VICTORIAN PANEL  — cards / info blocks
+───────────────────────────────────────────── */
+.victorian-panel {
+  background: #1c1523;
+  border: 1px solid #46334b;
+  border-radius: 6px;
+  position: relative;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 157, 77, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.victorian-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 121, 31, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────
+   SPECIMEN LABEL  — the small category badge
+───────────────────────────────────────────── */
+.specimen-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffad56;
+  font-size: 7px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  background: #8e361325;
+  border: 1px solid rgba(156, 80, 47, 0.5);
+  padding: 5px 9px;
+  border-radius: 3px;
+}
+
+/* ─────────────────────────────────────────────
+   PUMPKIN FIRE BUTTON  — primary CTA
+───────────────────────────────────────────── */
+.btn-haunt {
+  background: #ff8128;
+  color: #1a0c06;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow:
+    0 4px 0 #8a330d,
+    0 0 28px rgba(255, 111, 21, 0.15);
+  transition:
+    background 150ms,
+    box-shadow 150ms,
+    transform 100ms;
+}
+.btn-haunt:hover {
+  background: #ffa24d;
+  box-shadow:
+    0 5px 0 #8c4928,
+    0 0 36px rgba(255, 111, 21, 0.25);
+}
+.btn-haunt:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #8a330d;
+}
+
+/* ─────────────────────────────────────────────
+   HAUNTED MOON  — decorative hero element
+───────────────────────────────────────────── */
+.haunted-moon {
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #ffce78, #ec863c);
+  box-shadow:
+    0 0 60px rgba(237, 132, 53, 0.28),
+    inset -24px -10px 0 rgba(167, 71, 40, 0.27);
+  opacity: 0.95;
+}
+
+/* ─────────────────────────────────────────────
+   GRAVEYARD FOG
+───────────────────────────────────────────── */
+.graveyard-fog {
+  background: radial-gradient(ellipse, rgba(184, 83, 196, 0.17), transparent 66%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────
+   SPIRIT TRAIL  — rising ghosts
+───────────────────────────────────────────── */
+@keyframes spirit-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) rotate(-12deg);
+  }
+  15% {
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-290px) rotate(18deg);
+  }
+}
+
+.spirit-trail svg {
+  color: #fff5e8;
+  filter: drop-shadow(0 0 9px #c78dff);
+  animation: spirit-rise 3.5s ease-out both;
+}
+
+/* ─────────────────────────────────────────────
+   ATMOSPHERIC ANIMATIONS
+───────────────────────────────────────────── */
+@keyframes candle-flicker {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  75% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes ghost-hover {
+  50% {
+    transform: translateY(-12px) rotate(6deg);
+  }
+}
+
+@keyframes ghost-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(2px) rotate(-1deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(0.5deg);
+  }
+}
+
+@keyframes spirit-manifest {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes lantern-breathe {
+  50% {
+    opacity: 0.77;
+  }
+}
+@keyframes spider-sway {
+  50% {
+    transform: rotate(7deg);
+  }
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -77,10 +321,33 @@ h6 {
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(55, 55, 70, 0.3) 0%,
-    rgba(108, 60, 170, 0.2) 50%,
-    rgba(55, 55, 70, 0.3) 100%
+    rgba(45, 26, 74, 0.3) 0%,
+    rgba(74, 43, 138, 0.2) 50%,
+    rgba(45, 26, 74, 0.3) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+/* ─────────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   PRINT  (Grimoire export)
+───────────────────────────────────────────── */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
 }

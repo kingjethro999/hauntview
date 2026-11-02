@@ -1,303 +1,363 @@
 /* ============================================================================
-   HauntView Design Tokens - CSS Custom Properties
-   Halloween Theme with Accessibility Focus
+   HAUNTVIEW DESIGN TOKENS - THE HAUNTED VICTORIAN SÉANCE PARLOUR
+   Costume Contest Edition: Polished, unforgettable, spooky design that enhances function
+   Inspired by friend's mind-blowing Kiroween project
    ============================================================================ */
 
 :root {
-  /* ========== VICTORIAN SÉANCE PARLOUR TOKENS (AGENTS.md §11.2) ========== */
-  --surface-page: #0e2233; /* Cyanotype dusk */
-  --surface-plate: #153049; /* Information plate */
-  --hairline: #2c4b68; /* Decorative rules */
-  --boundary: #5b7c99; /* Inputs, handles, frame borders */
-  --text: #ece6d3; /* Bone primary text */
-  --text-dim: #b4bfc8; /* Secondary text */
-  --accent: #f4b860; /* Candle-flame amber */
-  --on-accent: #0e2233;
-  --diff: #a6f0d6; /* Ectoplasm spectral mint */
-  --sev-info: #b9aee0; /* Moth purple */
-  --sev-warning: #f4b860; /* Candle amber */
-  --sev-serious: #f28b77; /* Wax red */
-  --focus: #f4b860;
+  /* ========== THE CORE HAUNTING PALETTE ========== */
 
-  /* Shapes */
-  --radius-plate: 2px;
-  --radius-control: 6px;
-  --radius-pill: 999px;
-  --radius-cameo: 50% / 42%;
+  /* Midnight Veil Colors */
+  --midnight-veil: #0a0711; /* Deepest black-purple, like a moonless night */
+  --ghost-mist: #1c1629; /* Spectral fog that rolls through graveyards */
+  --haunted-purple: #2d1a4a; /* Victorian velvet drapes in a séance parlour */
+  --witchcraft-violet: #4a2b8a; /* Crystal ball reflections, magical and luminous */
+  --ectoplasm-green: #9aff9a; /* Ghostly energy, phosphorescent glow */
 
-  /* Motion */
-  --dur-fast: 120ms;
-  --dur-base: 220ms;
-  --dur-veil: 700ms;
-  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  /* Jack-o'-Lantern Fire Colors */
+  --pumpkin-fire: #ff791f; /* Burning pumpkin, intense Halloween orange */
+  --ember-glow: #ff9d4d; /* Candle flicker, warm inviting glow */
+  --sunken-orange: #e76d11; /* Burnt offering, ritual fire */
 
-  /* ========== MAPPED THEME SYSTEM ========== */
-  --color-midnight-black: var(--surface-page);
-  --color-haunted-purple: #3f1e6d;
-  --color-dark-purple: #23123d;
-  --color-phantom-purple: var(--boundary);
-  --color-crimson-orange: var(--accent);
-  --color-dark-orange: #d99b45;
-  --color-ghostly-white: var(--text);
-  --color-shadow-gray: var(--text-dim);
-  --color-deep-gray: var(--surface-plate);
+  /* Bone & Spirit Colors */
+  --bone-white: #fff1dc; /* Aged parchment, spectral bones */
+  --spirit-smoke: #d9d3e0; /* Translucent ghostly wisps */
+  --grave-dust: #b9acbf; /* Dry earth from freshly dug graves */
 
-  /* ========== SEMANTIC COLORS ========== */
-  --color-success: #16a34a;
-  --color-success-light: #22c55e;
-  --color-warning: #ea580c;
-  --color-warning-light: #f97316;
-  --color-error: #dc2626;
-  --color-error-light: #b91c1c;
-  --color-info: #0284c7;
-  --color-info-light: #0ea5e9;
-  --color-disabled: #4b5563;
+  /* Crypt & Tombstone Colors */
+  --tombstone-gray: #46334b; /* Weathered granite, cold stone */
+  --crypt-shadow: #2c1e35; /* Deep shadows in haunted corridors */
+  --slate-epitaph: #5a4a64; /* Faded inscriptions, forgotten memories */
 
-  /* ========== BACKGROUND COLORS ========== */
-  --color-bg-primary: var(--color-midnight-black);
-  --color-bg-secondary: var(--color-deep-gray);
-  --color-bg-tertiary: var(--color-dark-purple);
-  --color-bg-card: var(--color-deep-gray);
-  --color-bg-hover: rgba(88, 38, 150, 0.08);
-  --color-bg-active: rgba(88, 38, 150, 0.15);
-  --color-bg-disabled: rgba(75, 85, 99, 0.1);
+  /* ========== THE HAUNTED INTERFACE SYSTEM ========== */
 
-  /* ========== TEXT COLORS ========== */
-  --color-text-primary: var(--color-ghostly-white);
-  --color-text-secondary: var(--color-shadow-gray);
-  --color-text-tertiary: rgba(100, 100, 120, 0.7);
-  --color-text-disabled: var(--color-disabled);
-  --color-text-accent: var(--color-crimson-orange);
+  /* Backgrounds - Layered like a Victorian séance */
+  --surface-page: var(--midnight-veil); /* The void from which spirits emerge */
+  --surface-plate: var(--ghost-mist); /* Séance table, where spirits manifest */
+  --surface-card: var(--haunted-purple); /* Tarot cards, spirit photography plates */
+  --surface-panel: rgba(45, 26, 74, 0.85); /* Velvet curtains, dimly lit */
+  --surface-hover: rgba(74, 43, 138, 0.25); /* Ghostly presence hovering */
+  --surface-active: rgba(255, 121, 31, 0.15); /* Candle flame touch */
 
-  /* ========== BORDER COLORS ========== */
-  --color-border-primary: var(--color-phantom-purple);
-  --color-border-secondary: var(--color-shadow-gray);
-  --color-border-tertiary: rgba(108, 60, 170, 0.2);
-  --color-border-hover: var(--color-crimson-orange);
-  --color-border-focus: var(--color-crimson-orange);
+  /* Text - Ethereal and readable */
+  --text-primary: var(--bone-white); /* Séance chant text, primary messages */
+  --text-secondary: var(--spirit-smoke); /* Incantation whispers, secondary text */
+  --text-tertiary: var(--grave-dust); /* Faded inscriptions, hint text */
+  --text-accent: var(--ember-glow); /* Important warnings, glowing runes */
 
-  /* ========== ACTION COLORS ========== */
-  --color-action-primary: var(--color-haunted-purple);
-  --color-action-secondary: var(--color-crimson-orange);
-  --color-action-danger: var(--color-error);
-  --color-action-success: var(--color-success);
-  --color-action-warning: var(--color-warning);
-  --color-action-info: var(--color-info);
+  /* Borders - Victorian architectural details */
+  --border-primary: var(--tombstone-gray); /* Picture frames, window sashes */
+  --border-secondary: var(--slate-epitaph); /* Decorative trim, filigree */
+  --border-accent: var(--pumpkin-fire); /* Focus states, active elements */
+  --border-ghost: rgba(154, 255, 154, 0.4); /* Ectoplasm trails, ghostly outlines */
 
-  /* ========== TYPOGRAPHY ========== */
-  --font-sans:
-    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  --font-display: 'Space Grotesk', 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  /* Status & Severity - Séance intensity */
+  --severity-whisper: rgba(154, 255, 154, 0.6); /* Info - soft spectral glow */
+  --severity-chill: var(--ember-glow); /* Warning - flickering candle warning */
+  --severity-scream: #ff4538; /* Serious - blood-red warning */
+  --severity-critical: #ff0000; /* Critical - hellfire red */
 
-  /* Font sizes */
-  --font-size-display-lg: 48px;
-  --font-size-display-md: 36px;
-  --font-size-display-sm: 28px;
-  --font-size-h1: 24px;
-  --font-size-h2: 20px;
-  --font-size-h3: 16px;
-  --font-size-body-lg: 16px;
-  --font-size-body: 14px;
-  --font-size-body-sm: 12px;
-  --font-size-label: 14px;
-  --font-size-code: 14px;
+  /* Interactive Elements */
+  --button-primary: var(--pumpkin-fire); /* Primary actions - ritual fire */
+  --button-primary-hover: var(--sunken-orange); /* Hover - intensifying flame */
+  --button-secondary: transparent; /* Secondary - ghostly presence */
+  --button-secondary-border: var(--witchcraft-violet); /* Secondary border - magical boundary */
+  --button-secondary-hover: rgba(74, 43, 138, 0.3); /* Hover - séance table activation */
+
+  /* Special Effects Colors */
+  --ectoplasm-diff: var(--ectoplasm-green); /* Visual diff overlay - ghostly energy */
+  --candle-flame: var(--ember-glow); /* Progress indicators - candle light */
+  --lantern-glow: rgba(255, 157, 77, 0.3); /* Focus glow - jack-o'-lantern light */
+  --fog-effect: rgba(28, 22, 41, 0.7); /* Overlay fog - haunting atmosphere */
+
+  /* Success & Status */
+  --success: #4ade80; /* Fresh grave - healthy green */
+  --success-dark: #16a34a; /* Deep forest - established growth */
+  --warning: var(--severity-chill); /* Already defined as candle amber */
+  --error: var(--severity-scream); /* Already defined as blood red */
+  --info: var(--severity-whisper); /* Already defined as spectral glow */
+
+  /* ========== VICTORIAN ARCHITECTURE SHAPES ========== */
+  --radius-gothic: 0px; /* Gothic arches, sharp corners */
+  --radius-victorian: 8px; /* Victorian trim, gentle curves */
+  --radius-portrait: 4px; /* Picture frames, cameo portraits */
+  --radius-pill: 999px; /* Spirit orbs, full moon */
+  --radius-cameo: 50% / 42%; /* Victorian cameo frame */
+
+  /* ========== SPIRITUAL MOTION ========== */
+  --motion-apparition: 700ms cubic-bezier(0.4, 0, 0.2, 1); /* Ghost materialization */
+  --motion-candle: 220ms ease-out; /* Candle flicker */
+  --motion-planchette: 300ms ease-in-out; /* Séance pointer movement */
+  --motion-veil: 900ms cubic-bezier(0.68, -0.55, 0.265, 1.55); /* The Veil parting */
+
+  /* Reduced motion support */
+  --motion-reduced: 0ms;
+
+  /* ========== TYPOGRAPHY - VICTORIAN EPHEMERA ========== */
+  --font-display: 'Cinzel', 'Times New Roman', serif; /* Formal invitations, engraved text */
+  --font-body: 'Crimson Text', Georgia, serif; /* Séance diary, handwritten notes */
+  --font-mono:
+    'JetBrains Mono', 'Courier New', monospace; /* Spirit board letters, occult symbols */
+  --font-decorative: 'UnifrakturMaguntia', cursive; /* Gothic script for headings only */
+
+  /* Font sizes - Victorian print scaling */
+  --font-size-spirit-board: 64px; /* Large spirit board letters */
+  --font-size-headstone: 48px; /* Tombstone inscriptions */
+  --font-size-séance-title: 36px; /* Séance session titles */
+  --font-size-tarot-card: 24px; /* Tarot card labels */
+  --font-size-incantation: 20px; /* Spell text */
+  --font-size-diary: 16px; /* Séance diary entries */
+  --font-size-footnote: 14px; /* Fine print, ritual notes */
+  --font-size-whisper: 12px; /* Ghostly whispers */
 
   /* Font weights */
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  --weight-thin: 100; /* Ghostly wisp */
+  --weight-light: 300; /* Candlelight glow */
+  --weight-regular: 400; /* Diary entry */
+  --weight-medium: 500; /* Formal invitation */
+  --weight-bold: 700; /* Tombstone engraving */
+  --weight-black: 900; /* Séance chant */
 
-  /* Line heights */
-  --line-height-tight: 1.1;
-  --line-height-snug: 1.15;
-  --line-height-normal: 1.25;
-  --line-height-relaxed: 1.3;
-  --line-height-loose: 1.5;
-  --line-height-looser: 1.6;
+  /* ========== SPIRITUAL SPACING ========== */
+  --space-ectoplasm: 2px; /* Ghostly aura */
+  --space-candle: 4px; /* Candle flame flicker */
+  --space-tarot: 8px; /* Tarot card spacing */
+  --space-séance: 12px; /* Séance table spacing */
+  --space-corridor: 16px; /* Haunted hallway */
+  --space-gallery: 24px; /* Spirit photography gallery */
+  --space-crypt: 32px; /* Crypt vault */
+  --space-manor: 48px; /* Haunted manor rooms */
+  --space-estate: 64px; /* Full estate grounds */
 
-  /* Letter spacing */
-  --letter-spacing-tight: -0.02em;
-  --letter-spacing-normal: 0em;
-  --letter-spacing-relaxed: 0.02em;
-  --letter-spacing-loose: 0.05em;
+  /* ========== HAUNTED SHADOWS & GLOWS ========== */
+  --shadow-tombstone: 0 4px 6px -1px rgba(10, 7, 17, 0.5); /* Tombstone relief */
+  --shadow-seance: 0 10px 15px -3px rgba(45, 26, 74, 0.4); /* Séance table depth */
+  --shadow-ghost: 0 20px 25px -5px rgba(154, 255, 154, 0.15); /* Ghostly apparition */
+  --shadow-mansion: 0 25px 50px -12px rgba(10, 7, 17, 0.7); /* Haunted mansion */
 
-  /* ========== SPACING ========== */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
-  --space-20: 80px;
+  --glow-candle: 0 0 10px rgba(255, 157, 77, 0.5); /* Candle flame */
+  --glow-ectoplasm: 0 0 20px rgba(154, 255, 154, 0.3); /* Ghostly energy */
+  --glow-lantern: 0 0 30px rgba(255, 121, 31, 0.4); /* Jack-o'-lantern */
+  --glow-spirit: 0 0 40px rgba(74, 43, 138, 0.3); /* Spirit manifestation */
 
-  /* ========== SIZING ========== */
-  --size-xs: 4px;
-  --size-sm: 8px;
-  --size-md: 12px;
-  --size-lg: 16px;
-  --size-xl: 20px;
-  --size-2xl: 24px;
-  --size-3xl: 32px;
-  --size-4xl: 40px;
-  --size-5xl: 48px;
+  /* ========== SPECIAL EFFECTS ========== */
+  --filter-sepia: sepia(0.3) brightness(0.9) contrast(1.1); /* Aged photograph */
+  --filter-cyanotype: brightness(1.1) contrast(1.2) saturate(0.8); /* Spirit photography */
+  --filter-ghost: blur(1px) brightness(1.2) opacity(0.9); /* Ghostly transparency */
 
-  /* Icon sizes */
-  --icon-xs: 12px;
-  --icon-sm: 16px;
-  --icon-md: 20px;
-  --icon-lg: 24px;
-  --icon-xl: 32px;
-  --icon-2xl: 48px;
-
-  /* ========== BORDER RADIUS ========== */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-full: 9999px;
-
-  /* ========== SHADOWS ========== */
-  --shadow-sm: 0 2px 4px rgba(88, 38, 150, 0.1);
-  --shadow-md: 0 4px 12px rgba(88, 38, 150, 0.15);
-  --shadow-lg: 0 8px 24px rgba(88, 38, 150, 0.2);
-  --shadow-xl: 0 12px 32px rgba(88, 38, 150, 0.25);
-  --shadow-2xl: 0 20px 60px rgba(88, 38, 150, 0.3);
-
-  /* Glow effects */
-  --glow-sm: 0 0 8px rgba(220, 100, 40, 0.4);
-  --glow-md: 0 0 16px rgba(88, 38, 150, 0.4);
-  --glow-lg: 0 0 24px rgba(220, 100, 40, 0.5);
-
-  /* ========== TRANSITIONS & ANIMATIONS ========== */
-  --transition-fast: 150ms ease;
-  --transition-base: 200ms ease;
-  --transition-slow: 300ms ease;
-  --transition-slower: 400ms ease;
-
-  /* ========== BREAKPOINTS ========== */
-  --breakpoint-sm: 375px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 1200px;
-  --breakpoint-xl: 1440px;
-
-  /* ========== Z-INDEX SCALE ========== */
-  --z-index-dropdown: 100;
-  --z-index-sticky: 101;
-  --z-index-fixed: 102;
-  --z-index-modal-backdrop: 999;
-  --z-index-modal: 1000;
-  --z-index-popover: 1001;
-  --z-index-tooltip: 1002;
+  /* ========== Z-INDEX SPIRIT REALM ========== */
+  --z-realm-mortal: 1; /* Physical world */
+  --z-realm-ectoplasm: 10; /* Ghostly traces */
+  --z-realm-apparition: 100; /* Visible spirits */
+  --z-realm-séance: 1000; /* Active ritual */
+  --z-realm-veil: 10000; /* The boundary between worlds */
 }
 
 /* ============================================================================
-   GLOBAL STYLES
+   HAUNTED BACKGROUND PATTERNS
    ============================================================================ */
 
-html {
-  color-scheme: dark;
-  background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
+.haunted-background {
+  background-color: var(--surface-page);
+  background-image:
+    radial-gradient(ellipse at 85% 10%, var(--witchcraft-violet) 10%, transparent 45%),
+    radial-gradient(ellipse at 12% 80%, var(--haunted-purple) 15%, transparent 55%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(45, 26, 74, 0.05) 2px,
+      rgba(45, 26, 74, 0.05) 4px
+    );
+  position: relative;
+  overflow: hidden;
 }
 
-body {
-  background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-looser);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.haunted-background::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, transparent 20%, var(--midnight-veil) 70%),
+    radial-gradient(circle at 80% 70%, rgba(255, 121, 31, 0.03) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 /* ============================================================================
-   TYPOGRAPHY UTILITIES
+   SPIRIT PHOTOGRAPHY EFFECTS
    ============================================================================ */
 
-.text-display-lg {
-  font-size: var(--font-size-display-lg);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-tight);
-  font-family: var(--font-display);
+.spirit-photography {
+  filter: var(--filter-cyanotype);
+  position: relative;
+  border: 1px solid var(--border-primary);
+  box-shadow:
+    inset 0 0 20px rgba(10, 7, 17, 0.5),
+    0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.text-display-md {
-  font-size: var(--font-size-display-md);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-snug);
-  letter-spacing: var(--letter-spacing-tight);
-  font-family: var(--font-display);
-}
-
-.text-h1 {
-  font-size: var(--font-size-h1);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-normal);
-  font-family: var(--font-display);
-}
-
-.text-h2 {
-  font-size: var(--font-size-h2);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-relaxed);
-  font-family: var(--font-display);
-}
-
-.text-h3 {
-  font-size: var(--font-size-h3);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-relaxed);
-}
-
-.text-body-lg {
-  font-size: var(--font-size-body-lg);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-loose);
-}
-
-.text-body {
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-looser);
-}
-
-.text-body-sm {
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-looser);
-  letter-spacing: var(--letter-spacing-relaxed);
-}
-
-.text-label {
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-normal);
-  text-transform: none;
-}
-
-.text-code {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-code);
-  line-height: var(--line-height-loose);
+.spirit-photography::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(45deg, transparent 48%, rgba(154, 255, 154, 0.05) 50%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, rgba(154, 255, 154, 0.05) 50%, transparent 52%);
+  pointer-events: none;
 }
 
 /* ============================================================================
-   FOCUS STYLES (Accessibility)
+   CANDLE FLICKER ANIMATIONS
+   ============================================================================ */
+
+@keyframes candle-flicker {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  75% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes ghost-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(2px) rotate(-1deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(0.5deg);
+  }
+}
+
+@keyframes ectoplasm-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes veil-part {
+  0% {
+    clip-path: inset(0 50% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes spirit-manifest {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* ============================================================================
+   VICTORIAN UI COMPONENTS
+   ============================================================================ */
+
+.victorian-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-victorian);
+  padding: var(--space-séance);
+  position: relative;
+  box-shadow: var(--shadow-seance);
+  transition: all var(--motion-candle);
+}
+
+.victorian-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--border-secondary);
+  border-radius: calc(var(--radius-victorian) + 1px);
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.victorian-card:hover {
+  box-shadow: var(--shadow-seance), var(--glow-candle);
+  transform: translateY(-2px);
+}
+
+.cameo-frame {
+  background: var(--surface-plate);
+  border: 3px solid var(--border-primary);
+  border-radius: var(--radius-cameo);
+  padding: var(--space-ectoplasm);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 10px rgba(10, 7, 17, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.cameo-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 157, 77, 0.3);
+  border-radius: var(--radius-cameo);
+  pointer-events: none;
+}
+
+/* ============================================================================
+   SEVERITY INDICATORS - SÉANCE INTENSITY
+   ============================================================================ */
+
+.severity-whisper {
+  background: rgba(154, 255, 154, 0.1);
+  border: 1px solid var(--severity-whisper);
+  color: var(--severity-whisper);
+  box-shadow: 0 0 8px rgba(154, 255, 154, 0.2);
+}
+
+.severity-chill {
+  background: rgba(255, 157, 77, 0.1);
+  border: 1px solid var(--severity-chill);
+  color: var(--severity-chill);
+  box-shadow: 0 0 8px rgba(255, 157, 77, 0.2);
+  animation: candle-flicker 2s ease-in-out infinite;
+}
+
+.severity-scream {
+  background: rgba(255, 69, 56, 0.1);
+  border: 1px solid var(--severity-scream);
+  color: var(--severity-scream);
+  box-shadow: 0 0 12px rgba(255, 69, 56, 0.3);
+}
+
+/* ============================================================================
+   FOCUS STATES - SPIRITUAL ATTENTION
    ============================================================================ */
 
 :focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: 2px solid var(--border-accent);
+  outline-offset: 3px;
+  box-shadow: var(--glow-lantern);
 }
 
 button:focus-visible,
@@ -305,168 +365,141 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: 2px solid var(--border-accent);
+  outline-offset: 3px;
+  box-shadow: var(--glow-lantern);
+  animation: candle-flicker 1s ease-in-out;
 }
 
 /* ============================================================================
-   ANIMATIONS
+   REDUCED MOTION SUPPORT
    ============================================================================ */
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-  to {
-    opacity: 1;
-  }
-}
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 8px rgba(220, 100, 40, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(220, 100, 40, 0.6);
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
+  .severity-chill {
+    animation: none;
+    opacity: 0.8;
   }
 }
 
 /* ============================================================================
-   UTILITY CLASSES
+   UTILITY CLASSES FOR THE HAUNTED INTERFACE
    ============================================================================ */
 
-.text-primary {
-  color: var(--color-text-primary);
+.text-bone {
+  color: var(--bone-white);
+}
+.text-spirit {
+  color: var(--spirit-smoke);
+}
+.text-grave {
+  color: var(--grave-dust);
+}
+.text-ember {
+  color: var(--ember-glow);
+}
+.text-ectoplasm {
+  color: var(--ectoplasm-green);
 }
 
-.text-secondary {
-  color: var(--color-text-secondary);
+.bg-midnight {
+  background: var(--midnight-veil);
+}
+.bg-ghost {
+  background: var(--ghost-mist);
+}
+.bg-purple {
+  background: var(--haunted-purple);
+}
+.bg-violet {
+  background: var(--witchcraft-violet);
 }
 
-.text-tertiary {
-  color: var(--color-text-tertiary);
+.border-tombstone {
+  border-color: var(--tombstone-gray);
+}
+.border-crypt {
+  border-color: var(--crypt-shadow);
+}
+.border-pumpkin {
+  border-color: var(--pumpkin-fire);
+}
+.border-ectoplasm {
+  border-color: var(--ectoplasm-green);
 }
 
-.text-accent {
-  color: var(--color-text-accent);
+.glow-candle {
+  box-shadow: var(--glow-candle);
+}
+.glow-ectoplasm {
+  box-shadow: var(--glow-ectoplasm);
+}
+.glow-spirit {
+  box-shadow: var(--glow-spirit);
 }
 
-.bg-primary {
-  background-color: var(--color-bg-primary);
+.animate-float {
+  animation: ghost-float 6s ease-in-out infinite;
+}
+.animate-pulse {
+  animation: ectoplasm-pulse 3s ease-in-out infinite;
+}
+.animate-manifest {
+  animation: spirit-manifest var(--motion-apparition) ease-out;
 }
 
-.bg-secondary {
-  background-color: var(--color-bg-secondary);
-}
+/* ============================================================================
+   DAYLIGHT THEME (For readability when needed)
+   ============================================================================ */
 
-.bg-card {
-  background-color: var(--color-bg-card);
-}
-
-.shadow-sm {
-  box-shadow: var(--shadow-sm);
-}
-
-.shadow-md {
-  box-shadow: var(--shadow-md);
-}
-
-.shadow-lg {
-  box-shadow: var(--shadow-lg);
-}
-
-.glow-sm {
-  box-shadow: var(--glow-sm);
-}
-
-.glow-md {
-  box-shadow: var(--glow-md);
-}
-
-.rounded-sm {
-  border-radius: var(--radius-sm);
-}
-
-.rounded-md {
-  border-radius: var(--radius-md);
-}
-
-.rounded-lg {
-  border-radius: var(--radius-lg);
-}
-
-.transition-fast {
-  transition: all var(--transition-fast);
-}
-
-.transition-base {
-  transition: all var(--transition-base);
-}
-
-.transition-slow {
-  transition: all var(--transition-slow);
-}
-
-/* ========== SPIRIT PHOTOGRAPHY STYLING (AGENTS.md §11) ========== */
-.plate {
-  background: var(--surface-plate);
-  border-radius: var(--radius-plate);
-  box-shadow:
-    0 0 0 3px var(--surface-plate),
-    0 0 0 4px var(--hairline);
-}
-
-.cameo-frame {
-  border-radius: var(--radius-cameo);
-  overflow: hidden;
-  box-shadow:
-    0 0 0 2px var(--surface-plate),
-    0 0 0 3px var(--boundary);
-}
-
-/* Daylight / Paper Theme */
 [data-theme='daylight'] {
-  --surface-page: #ede6d6;
-  --surface-plate: #f7f2e6;
-  --hairline: #cfc6b2;
-  --boundary: #7a7466;
-  --text: #17202b;
-  --text-dim: #4a5663;
-  --accent: #1b4b6b;
-  --on-accent: #ede6d6;
-  --diff: #1b4b6b;
-  --sev-info: #5a4c85;
-  --sev-warning: #8a5a12;
-  --sev-serious: #9b2f1f;
-  --focus: #1b4b6b;
+  --midnight-veil: #f5f3f0;
+  --ghost-mist: #e8e4dd;
+  --haunted-purple: #d8d0e3;
+  --witchcraft-violet: #9d88c9;
+  --ectoplasm-green: #2e8b57;
+
+  --pumpkin-fire: #d35400;
+  --ember-glow: #e67e22;
+  --sunken-orange: #ba4a00;
+
+  --bone-white: #2c3e50;
+  --spirit-smoke: #34495e;
+  --grave-dust: #7f8c8d;
+
+  --tombstone-gray: #bdc3c7;
+  --crypt-shadow: #95a5a6;
+  --slate-epitaph: #7f8c8d;
+}
+
+/* ============================================================================
+   PRINT STYLES FOR THE GRIMOIRE
+   ============================================================================ */
+
+@media print {
+  .haunted-background {
+    background: white !important;
+  }
+
+  .spirit-photography {
+    filter: none !important;
+    box-shadow: none !important;
+  }
+
+  .victorian-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+
+  .severity-chill {
+    animation: none !important;
+  }
 }

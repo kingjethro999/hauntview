@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
+import { WaxSeal } from './WaxSeal';
 import { TestReport } from '@/src/types';
 import {
   CheckBadgeIcon,
@@ -22,39 +23,48 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ report }) =>
       ? ((summary.successfulProfiles / summary.totalProfiles) * 100).toFixed(1)
       : '0';
 
-  const isPassing = summary.findingsBySeverity.error === 0;
+  const hasErrors = summary.findingsBySeverity.error > 0;
+  const hasWarnings = summary.findingsBySeverity.warning > 0;
+  const isPassing = !hasErrors;
+
+  const sealStatus = hasErrors ? 'failed' : hasWarnings ? 'warnings' : 'passed';
 
   const cards = [
     {
       title: 'Pass Rate',
+      loreTitle: 'Séance Cleared',
       value: `${passRate}%`,
       subtitle: `${summary.successfulProfiles} of ${summary.totalProfiles} profiles passed`,
       icon: <CheckBadgeIcon className="w-5 h-5 text-[#22c55e]" />,
       valueColor: Number(passRate) >= 80 ? 'text-[#86efac]' : 'text-[#fca5a5]',
     },
     {
-      title: 'Errors Found',
+      title: 'Critical Errors',
+      loreTitle: 'Screams',
       value: summary.findingsBySeverity.error,
-      subtitle: 'Critical issues requiring fixes',
+      subtitle: 'Observed failures requiring fixes',
       icon: <ExclamationCircleIcon className="w-5 h-5 text-[#ef4444]" />,
       valueColor: summary.findingsBySeverity.error === 0 ? 'text-[#86efac]' : 'text-[#fca5a5]',
     },
     {
       title: 'Warnings',
+      loreTitle: 'Chills',
       value: summary.findingsBySeverity.warning,
-      subtitle: 'Non-critical best practice alerts',
-      icon: <ExclamationTriangleIcon className="w-5 h-5 text-[#f97316]" />,
+      subtitle: 'Likely degrades user experience',
+      icon: <ExclamationTriangleIcon className="w-5 h-5 text-[#ff791f]" />,
       valueColor: 'text-[#fed7aa]',
     },
     {
-      title: 'Info Observations',
+      title: 'Info',
+      loreTitle: 'Whispers',
       value: summary.findingsBySeverity.info,
-      subtitle: 'Optimization recommendations',
+      subtitle: 'Passive signals & observations',
       icon: <InformationCircleIcon className="w-5 h-5 text-[#38bdf8]" />,
       valueColor: 'text-[#7dd3fc]',
     },
     {
-      title: 'Total Findings',
+      title: 'Total Omens',
+      loreTitle: 'Findings',
       value: summary.totalFindings,
       subtitle: `${summary.canonicalizedFindings} canonical clusters`,
       icon: <CpuChipIcon className="w-5 h-5 text-[#c084fc]" />,
@@ -62,53 +72,76 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ report }) =>
     },
     {
       title: 'Execution Time',
+      loreTitle: 'Séance Length',
       value: `${(duration / 1000).toFixed(2)}s`,
       subtitle: `Completed at ${new Date(report.endTime).toLocaleTimeString()}`,
-      icon: <ClockIcon className="w-5 h-5 text-[#DC6428]" />,
-      valueColor: 'text-[#F5F5FA]',
+      icon: <ClockIcon className="w-5 h-5 text-[#ff791f]" />,
+      valueColor: 'text-[#fff1dc]',
     },
   ];
 
   return (
     <div className="space-y-4">
-      {/* Status Banner */}
+      {/* Victorian Folio Status Banner with Wax Seal */}
       <div
         className={`
-          flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-xl border
+          relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-5 p-6 rounded-[4px] border
+          bg-gradient-to-r from-[#1c1629] to-[#0a0711]
           ${
-            isPassing
-              ? 'bg-[#16a34a]/10 border-[#16a34a]/40 shadow-[0_4px_20px_rgba(22,163,74,0.15)]'
-              : 'bg-[#dc2626]/10 border-[#dc2626]/40 shadow-[0_4px_20px_rgba(220,38,38,0.15)]'
+            hasErrors
+              ? 'border-[#F28B77]/60 shadow-[0_4px_24px_rgba(242,139,119,0.15)]'
+              : hasWarnings
+                ? 'border-[#ff791f]/50 shadow-[0_4px_24px_rgba(255,121,31,0.15)]'
+                : 'border-[#22c55e]/50 shadow-[0_4px_24px_rgba(34,197,94,0.15)]'
           }
         `}
       >
-        <div className="flex items-center gap-3.5">
-          <div
-            className={`
-              w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold flex-shrink-0
-              ${isPassing ? 'bg-[#16a34a]/20 text-[#22c55e]' : 'bg-[#dc2626]/20 text-[#ef4444]'}
-            `}
-          >
-            {isPassing ? '✓' : '✗'}
-          </div>
+        {/* Decorative corner brackets */}
+        <div className="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2 border-[#b9acbf]/60 pointer-events-none" />
+        <div className="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2 border-[#b9acbf]/60 pointer-events-none" />
+        <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-[#b9acbf]/60 pointer-events-none" />
+        <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-[#b9acbf]/60 pointer-events-none" />
+
+        <div className="flex items-center gap-4">
+          {/* Stamped Wax Seal */}
+          <WaxSeal status={sealStatus} size="md" className="flex-shrink-0" />
+
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-display font-bold text-xl text-[#F5F5FA]">
-                {isPassing ? 'Test Suite Passed' : 'Issues Detected Across Profiles'}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-[#ff791f]">
+                Folio No. {report.id.slice(0, 8)}
+              </span>
+              <span className="text-[#b9acbf]">•</span>
+              <h2 className="font-display font-bold text-xl text-[#fff1dc]">
+                {hasErrors
+                  ? 'Apparitions Breached · Serious Errors Detected'
+                  : hasWarnings
+                    ? 'Chills Linger · Warnings Detected'
+                    : 'The Living House Stands · All Rites Passed'}
               </h2>
-              <Badge variant={isPassing ? 'success' : 'error'}>
-                {isPassing ? 'PASS' : `${summary.findingsBySeverity.error} ERRORS`}
+              <Badge variant={isPassing ? 'success' : 'error'} size="sm">
+                {isPassing ? 'CLEARED' : `${summary.findingsBySeverity.error} CRITICAL`}
               </Badge>
             </div>
-            <p className="text-xs text-[#646478] mt-1">
-              Tested URL: <code className="text-[#DC6428] font-mono">{report.url}</code>
+
+            <p className="text-xs text-[#d9d3e0] mt-1.5 flex flex-wrap items-center gap-2">
+              <span>Target:</span>
+              <code className="text-[#ff791f] font-mono bg-[#0a0711] px-2 py-0.5 rounded border border-[#46334b]">
+                {report.url}
+              </code>
+              <span className="text-[#b9acbf]">•</span>
+              <span>
+                {summary.successfulProfiles} of {summary.totalProfiles} rites passed cleanly
+              </span>
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-[#646478] sm:self-center">
-          <span>Run ID:</span>
-          <span className="font-mono text-[#F5F5FA] bg-[#0F0F14]/60 px-2 py-1 rounded border border-[#6C3CAA]/30">
+        <div className="flex flex-col sm:flex-row md:flex-col items-start md:items-end gap-1.5 text-xs text-[#d9d3e0] flex-shrink-0 border-t md:border-t-0 pt-3 md:pt-0 border-[#46334b]">
+          <span className="text-[11px] uppercase tracking-wider text-[#b9acbf]">
+            Crypt Record ID
+          </span>
+          <span className="font-mono text-xs text-[#fff1dc] bg-[#0a0711] px-2.5 py-1 rounded border border-[#46334b]">
             {report.id}
           </span>
         </div>
@@ -117,15 +150,22 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ report }) =>
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {cards.map((card, idx) => (
-          <Card key={idx} variant="default" className="p-4">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs text-[#646478] font-medium">{card.title}</span>
+          <Card
+            key={idx}
+            variant="default"
+            className="p-4 bg-[#1c1629]/80 border-[#46334b] hover:border-[#b9acbf] transition-colors"
+          >
+            <div className="flex items-center justify-between gap-1.5 mb-1.5">
+              <div>
+                <span className="text-xs font-semibold text-[#fff1dc] block">{card.title}</span>
+                <span className="text-[10px] font-mono text-[#ff791f] block">{card.loreTitle}</span>
+              </div>
               {card.icon}
             </div>
-            <div className={`font-display font-bold text-2xl ${card.valueColor} mb-1`}>
+            <div className={`font-display font-bold text-2xl ${card.valueColor} my-1`}>
               {card.value}
             </div>
-            <div className="text-[11px] text-[#646478] truncate" title={card.subtitle}>
+            <div className="text-[10px] text-[#d9d3e0] truncate" title={card.subtitle}>
               {card.subtitle}
             </div>
           </Card>

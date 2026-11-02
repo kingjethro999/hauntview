@@ -109,7 +109,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
       {/* Search and Filters Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="font-display font-bold text-lg text-[#F5F5FA]">
+          <h3 className="font-display font-bold text-lg text-[#fff1dc]">
             Detected Issues & Findings ({filteredFindings.length})
           </h3>
           <p className="text-xs text-[#646478]">
@@ -128,8 +128,8 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                 px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer flex items-center gap-1.5
                 ${
                   selectedSeverity === sev
-                    ? 'bg-[#582696] text-[#F5F5FA] shadow-[0_2px_8px_rgba(88,38,150,0.4)]'
-                    : 'bg-[#373746]/50 text-[#646478] hover:text-[#F5F5FA] hover:bg-[#373746]'
+                    ? 'bg-[#4a2b8a] text-[#fff1dc] shadow-[0_2px_8px_rgba(74,43,138,0.4)]'
+                    : 'bg-[#2d1a4a]/50 text-[#646478] hover:text-[#fff1dc] hover:bg-[#2d1a4a]'
                 }
               `}
             >
@@ -170,7 +170,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
             return (
               <div
                 key={finding.id}
-                className="rounded-lg border border-[#6C3CAA]/20 bg-[#0F0F14]/50 overflow-hidden transition-colors hover:border-[#6C3CAA]/40"
+                className="rounded-lg border border-[#6C3CAA]/20 bg-[#0a0711]/50 overflow-hidden transition-colors hover:border-[#6C3CAA]/40"
               >
                 <div
                   onClick={() => toggleExpand(finding.id)}
@@ -178,7 +178,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                 >
                   <div className="mt-0.5 text-[#646478]">
                     {isExpanded ? (
-                      <ChevronDownIcon className="w-4 h-4 text-[#DC6428]" />
+                      <ChevronDownIcon className="w-4 h-4 text-[#ff791f]" />
                     ) : (
                       <ChevronRightIcon className="w-4 h-4" />
                     )}
@@ -187,13 +187,13 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                   <div className="flex-shrink-0 mt-0.5">{getSeverityBadge(finding.severity)}</div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#F5F5FA] leading-snug">
+                    <p className="text-sm font-medium text-[#fff1dc] leading-snug">
                       {finding.message}
                     </p>
                     <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-[#646478]">
-                      <span className="font-mono text-[#DC6428]">{finding.profileId}</span>
+                      <span className="font-mono text-[#ff791f]">{finding.profileId}</span>
                       <span>•</span>
-                      <span className="bg-[#373746]/60 px-2 py-0.5 rounded text-[#F5F5FA]">
+                      <span className="bg-[#2d1a4a]/60 px-2 py-0.5 rounded text-[#fff1dc]">
                         {finding.category}
                       </span>
                       {finding.location?.selector && (
@@ -210,14 +210,14 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
 
                 {/* Expanded Details Drawer */}
                 {isExpanded && (
-                  <div className="px-6 sm:px-10 pb-5 pt-3 border-t border-[#6C3CAA]/20 bg-[#0F0F14]/70 text-xs space-y-4">
+                  <div className="px-6 sm:px-10 pb-5 pt-3 border-t border-[#6C3CAA]/20 bg-[#0a0711]/70 text-xs space-y-4">
                     {/* Remediation Guidance */}
-                    <div className="p-3 rounded-lg bg-[#582696]/20 border border-[#6C3CAA]/30">
-                      <div className="flex items-center gap-1.5 font-semibold text-[#DC6428] mb-1">
+                    <div className="p-3 rounded-lg bg-[#4a2b8a]/20 border border-[#6C3CAA]/30">
+                      <div className="flex items-center gap-1.5 font-semibold text-[#ff791f] mb-1">
                         <LightBulbIcon className="w-4 h-4" />
                         <span>Recommended Remediation</span>
                       </div>
-                      <p className="text-[#F5F5FA] text-xs leading-relaxed">
+                      <p className="text-[#fff1dc] text-xs leading-relaxed">
                         {getRemediation(finding.category, finding.message)}
                       </p>
                     </div>
@@ -228,7 +228,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                         <span className="text-[#646478] font-semibold block mb-1">
                           Target DOM Selector:
                         </span>
-                        <code className="inline-block p-2 rounded bg-[#0F0F14] border border-[#6C3CAA]/30 font-mono text-xs text-[#a855f7]">
+                        <code className="inline-block p-2 rounded bg-[#0a0711] border border-[#6C3CAA]/30 font-mono text-xs text-[#a855f7]">
                           {finding.location.selector}
                         </code>
                       </div>
@@ -239,7 +239,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                         <span className="text-[#646478] font-semibold block mb-1">
                           Source Location:
                         </span>
-                        <code className="inline-block p-2 rounded bg-[#0F0F14] border border-[#6C3CAA]/30 font-mono text-xs text-[#86efac]">
+                        <code className="inline-block p-2 rounded bg-[#0a0711] border border-[#6C3CAA]/30 font-mono text-xs text-[#86efac]">
                           {finding.location.file}
                           {finding.location.line ? `:${finding.location.line}` : ''}
                         </code>
@@ -256,7 +256,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                           {Object.entries(finding.details).map(([key, val]) => (
                             <div
                               key={key}
-                              className="p-2.5 rounded bg-[#373746]/40 border border-[#6C3CAA]/20 flex flex-col justify-between"
+                              className="p-2.5 rounded bg-[#2d1a4a]/40 border border-[#6C3CAA]/20 flex flex-col justify-between"
                             >
                               <span className="text-[10px] text-[#646478] uppercase tracking-wider font-semibold">
                                 {key.replace(/([A-Z])/g, ' $1')}
@@ -271,15 +271,15 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                     )}
 
                     {/* Technical Metadata Footer */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#B4BFC8] pt-2 border-t border-[#2C4B68]/30">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#d9d3e0] pt-2 border-t border-[#46334b]/30">
                       <div className="flex flex-wrap items-center gap-2">
                         <span>
                           Rite Engine:{' '}
-                          <strong className="text-[#ECE6D3]">{finding.profileId}</strong>
+                          <strong className="text-[#fff1dc]">{finding.profileId}</strong>
                         </span>
                         <span>•</span>
                         <span>
-                          Unique ID: <code className="font-mono text-[#ECE6D3]">{finding.id}</code>
+                          Unique ID: <code className="font-mono text-[#fff1dc]">{finding.id}</code>
                         </span>
                       </div>
 
@@ -290,7 +290,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                             e.stopPropagation();
                             onExorcise(finding);
                           }}
-                          className="px-2.5 py-1 rounded-[4px] bg-[#F4B860]/15 border border-[#F4B860]/50 text-[#F4B860] hover:bg-[#F4B860] hover:text-[#0E2233] font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                          className="px-2.5 py-1 rounded-[4px] bg-[#ff791f]/15 border border-[#ff791f]/50 text-[#ff791f] hover:bg-[#ff791f] hover:text-[#0a0711] font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
                         >
                           <SparklesIcon className="w-3.5 h-3.5" />
                           <span>Fix with Kiro</span>

@@ -13,14 +13,14 @@ export const Spinner: React.FC<SpinnerProps> = ({ size = 'md', className = '', .
 
   return (
     <svg
-      className={`animate-spin text-[#DC6428] ${sizeStyles[size]} ${className}`}
+      className={`animate-spin text-[#ff791f] ${sizeStyles[size]} ${className}`}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
       aria-label="Loading..."
       {...props}
     >
-      <circle className="opacity-20" cx="12" cy="12" r="10" stroke="#582696" strokeWidth="3" />
+      <circle className="opacity-20" cx="12" cy="12" r="10" stroke="#4a2b8a" strokeWidth="3" />
       <path
         className="opacity-90"
         fill="currentColor"

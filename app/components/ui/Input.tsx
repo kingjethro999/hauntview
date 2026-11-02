@@ -17,7 +17,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-semibold text-[#F5F5FA] mb-1.5">
+          <label htmlFor={inputId} className="block text-sm font-semibold text-[#fff1dc] mb-1.5">
             {label}
             {required && <span className="text-[#dc2626] ml-1">*</span>}
           </label>
@@ -35,13 +35,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${inputId}-error` : undefined}
             className={`
-              w-full bg-[#373746]/50 text-[#F5F5FA] placeholder-[#646478]
+              w-full bg-[#2d1a4a]/50 text-[#fff1dc] placeholder-[#646478]
               border-2 rounded-lg text-sm transition-all duration-200
               ${icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5
               ${
                 error
                   ? 'border-[#dc2626] bg-[#dc2626]/5 focus:border-[#dc2626] focus:ring-2 focus:ring-[#dc2626]/20'
-                  : 'border-[#6C3CAA] focus:border-[#DC6428] focus:ring-3 focus:ring-[#DC6428]/15'
+                  : 'border-[#6C3CAA] focus:border-[#ff791f] focus:ring-3 focus:ring-[#ff791f]/15'
               }
               disabled:opacity-60 disabled:cursor-not-allowed
               outline-none

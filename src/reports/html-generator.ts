@@ -262,13 +262,20 @@ export class HTMLReportGenerator implements ReportGenerator {
       return '';
     }
 
-    let html = `<section class="section"><h2>Screenshots</h2><div class="screenshots-grid">`;
+    let html = `<section class="section"><h2>Spirit Photography Apparition Plates</h2><div class="screenshots-grid">`;
 
     for (const screenshot of allScreenshots) {
+      const src =
+        screenshot.fileName.startsWith('screenshots/') ||
+        screenshot.fileName.startsWith('http') ||
+        screenshot.fileName.startsWith('/')
+          ? screenshot.fileName
+          : `screenshots/${screenshot.fileName}`;
+
       html += `
       <div class="screenshot-item">
         <div class="screenshot-header">${screenshot.profile}</div>
-        <img src="${screenshot.fileName}" alt="Screenshot from ${screenshot.profile}">
+        <img src="${src}" alt="Screenshot from ${screenshot.profile}">
         <div class="screenshot-meta">${new Date(screenshot.timestamp).toLocaleTimeString()}</div>
       </div>`;
     }
@@ -284,11 +291,27 @@ export class HTMLReportGenerator implements ReportGenerator {
       info: '#2196F3',
     };
 
+    const screenshotRef = finding.details?.screenshot as string | undefined;
+    const screenshotSrc = screenshotRef
+      ? screenshotRef.startsWith('screenshots/') ||
+        screenshotRef.startsWith('http') ||
+        screenshotRef.startsWith('/')
+        ? screenshotRef
+        : `screenshots/${screenshotRef}`
+      : null;
+
     return `
     <tr>
-      <td><span class="severity-badge" style="background-color: ${severityColor[finding.severity]};">${finding.severity}</span></td>
+      <td><span class="severity-badge" style="background-color: ${severityColor[finding.severity]};">${finding.severity.toUpperCase()}</span></td>
       <td>${this.escapeHtml(finding.category)}</td>
-      <td>${this.escapeHtml(finding.message)}</td>
+      <td>
+        ${this.escapeHtml(finding.message)}
+        ${
+          screenshotSrc
+            ? `<div style="margin-top: 5px;"><a href="${screenshotSrc}" target="_blank" style="color: var(--accent); font-size: 0.85em; text-decoration: underline;">📷 View Apparition Plate</a></div>`
+            : ''
+        }
+      </td>
     </tr>`;
   }
 
@@ -656,22 +679,22 @@ export class HTMLReportGenerator implements ReportGenerator {
 
   private darkTheme() {
     return {
-      primary: '#582696', // Purple
-      secondary: '#0F0F14', // Dark
-      accent: '#DC6428', // Dark orange
-      bg: '#0F0F14',
-      bgAlt: '#1a1a22',
-      text: '#e0e0e0',
-      textMuted: '#999',
-      border: '#333',
+      primary: '#1c1629', // Cyanotype Plate
+      secondary: '#0a0711', // Dusk Page
+      accent: '#ff791f', // Candle Amber
+      bg: '#0a0711',
+      bgAlt: '#1c1629',
+      text: '#fff1dc', // Bone primary text
+      textMuted: '#d9d3e0', // Dusk muted
+      border: '#46334b', // Hairline decorative rules
     };
   }
 
   private lightTheme() {
     return {
-      primary: '#582696',
+      primary: '#4a2b8a',
       secondary: '#f5f5f5',
-      accent: '#DC6428',
+      accent: '#ff791f',
       bg: '#ffffff',
       bgAlt: '#f9f9f9',
       text: '#333333',

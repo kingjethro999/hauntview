@@ -72,7 +72,7 @@ export default function ResultsIndexPage() {
                   Back
                 </Button>
               </Link>
-              <h1 className="font-display font-bold text-2xl md:text-3xl text-[#F5F5FA]">
+              <h1 className="font-display font-bold text-2xl md:text-3xl text-[#fff1dc]">
                 Test Reports & Execution History
               </h1>
             </div>
@@ -100,7 +100,7 @@ export default function ResultsIndexPage() {
 
         {/* Content */}
         {isLoading ? (
-          <div className="p-16 text-center text-sm text-[#646478] bg-[#373746]/20 rounded-xl border border-[#6C3CAA]/20">
+          <div className="p-16 text-center text-sm text-[#646478] bg-[#2d1a4a]/20 rounded-xl border border-[#6C3CAA]/20">
             Loading test reports history...
           </div>
         ) : reports.length === 0 ? (
@@ -120,9 +120,9 @@ export default function ResultsIndexPage() {
               Showing {reports.length} {reports.length === 1 ? 'report' : 'reports'}
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-[#6C3CAA]/30 bg-[#373746]/30">
-              <table className="w-full text-left text-sm text-[#F5F5FA]">
-                <thead className="bg-[#582696]/15 border-b border-[#6C3CAA]/30 text-xs font-semibold text-[#F5F5FA] uppercase tracking-wider">
+            <div className="overflow-x-auto rounded-xl border border-[#6C3CAA]/30 bg-[#2d1a4a]/30">
+              <table className="w-full text-left text-sm text-[#fff1dc]">
+                <thead className="bg-[#4a2b8a]/15 border-b border-[#6C3CAA]/30 text-xs font-semibold text-[#fff1dc] uppercase tracking-wider">
                   <tr>
                     <th className="py-3 px-4">Status</th>
                     <th className="py-3 px-4">Target URL</th>
@@ -137,7 +137,7 @@ export default function ResultsIndexPage() {
                     const isPass = report.errorCount === 0;
 
                     return (
-                      <tr key={report.id} className="hover:bg-[#582696]/10 transition-colors">
+                      <tr key={report.id} className="hover:bg-[#4a2b8a]/10 transition-colors">
                         <td className="py-3.5 px-4">
                           <Badge variant={isPass ? 'success' : 'error'} size="sm">
                             {isPass ? 'PASS' : `${report.errorCount} ERRORS`}
@@ -150,14 +150,14 @@ export default function ResultsIndexPage() {
                         >
                           <Link
                             href={`/results/${report.id}`}
-                            className="hover:text-[#DC6428] transition-colors"
+                            className="hover:text-[#ff791f] transition-colors"
                           >
                             {report.url}
                           </Link>
                         </td>
 
                         <td className="py-3.5 px-4 text-xs text-[#646478]">
-                          <span className="text-[#F5F5FA] font-semibold">
+                          <span className="text-[#fff1dc] font-semibold">
                             {report.successfulProfiles}
                           </span>
                           /{report.totalProfiles} passed
@@ -165,7 +165,7 @@ export default function ResultsIndexPage() {
 
                         <td className="py-3.5 px-4 text-xs">
                           {report.totalFindings > 0 ? (
-                            <span className="text-[#DC6428] font-semibold">
+                            <span className="text-[#ff791f] font-semibold">
                               {report.totalFindings} issues
                             </span>
                           ) : (
@@ -176,7 +176,7 @@ export default function ResultsIndexPage() {
                         <td className="py-3.5 px-4 text-xs text-[#646478] whitespace-nowrap">
                           <div>{new Date(report.startTime).toLocaleDateString()}</div>
                           <div className="text-[10px] text-[#646478]/80 flex items-center gap-1">
-                            <ClockIcon className="w-3 h-3 text-[#DC6428]" />
+                            <ClockIcon className="w-3 h-3 text-[#ff791f]" />
                             <span>{(report.duration / 1000).toFixed(1)}s</span>
                           </div>
                         </td>
@@ -187,7 +187,7 @@ export default function ResultsIndexPage() {
                               href={`/api/results/${report.id}?format=markdown`}
                               download
                               title="Download Markdown Report"
-                              className="p-1.5 rounded text-[#646478] hover:text-[#DC6428] hover:bg-[#373746]/60 transition-colors"
+                              className="p-1.5 rounded text-[#646478] hover:text-[#ff791f] hover:bg-[#2d1a4a]/60 transition-colors"
                             >
                               <DocumentTextIcon className="w-4 h-4" />
                             </a>
@@ -195,7 +195,7 @@ export default function ResultsIndexPage() {
                               href={`/api/results/${report.id}?format=html`}
                               download
                               title="Download HTML Report"
-                              className="p-1.5 rounded text-[#646478] hover:text-[#DC6428] hover:bg-[#373746]/60 transition-colors"
+                              className="p-1.5 rounded text-[#646478] hover:text-[#ff791f] hover:bg-[#2d1a4a]/60 transition-colors"
                             >
                               <ArrowDownTrayIcon className="w-4 h-4" />
                             </a>

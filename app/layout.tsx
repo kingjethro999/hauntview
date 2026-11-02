@@ -5,6 +5,7 @@ import './globals.css';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { Toaster } from 'sonner';
+import { AtmosphereLayer } from './components/features/AtmosphereLayer';
 
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
@@ -34,8 +35,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} dark h-full`}>
-      <body className="min-h-full flex flex-col bg-[#0F0F14] text-[#F5F5FA] bg-gothic-grid antialiased">
-        <Suspense fallback={<div className="h-16 bg-[#0F0F14]" />}>
+      <body
+        className="min-h-full flex flex-col antialiased"
+        style={{ background: '#100d13', color: '#fff1dc' }}
+      >
+        <AtmosphereLayer />
+        <Suspense fallback={<div className="h-16 bg-[#0a0711]" />}>
           <Navbar />
         </Suspense>
         <main className="flex-1 flex flex-col">{children}</main>

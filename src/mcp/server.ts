@@ -359,8 +359,13 @@ server.registerTool(
       includeScreenshots: false,
     });
 
+    const contentText =
+      typeof generated.content === 'string'
+        ? generated.content
+        : generated.content.toString('utf-8');
+
     return {
-      content: [{ type: 'text' as const, text: generated.content }],
+      content: [{ type: 'text' as const, text: contentText }],
     };
   }
 );
