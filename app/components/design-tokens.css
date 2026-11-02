@@ -4,16 +4,43 @@
    ============================================================================ */
 
 :root {
-  /* ========== PRIMARY COLORS - HALLOWEEN PALETTE ========== */
-  --color-midnight-black: #0f0f14;
-  --color-haunted-purple: #582696;
-  --color-dark-purple: #441c78;
-  --color-phantom-purple: #6c3caa;
-  --color-crimson-orange: #dc6428;
-  --color-dark-orange: #b43c14;
-  --color-ghostly-white: #f5f5fa;
-  --color-shadow-gray: #646478;
-  --color-deep-gray: #373746;
+  /* ========== VICTORIAN SÉANCE PARLOUR TOKENS (AGENTS.md §11.2) ========== */
+  --surface-page: #0e2233; /* Cyanotype dusk */
+  --surface-plate: #153049; /* Information plate */
+  --hairline: #2c4b68; /* Decorative rules */
+  --boundary: #5b7c99; /* Inputs, handles, frame borders */
+  --text: #ece6d3; /* Bone primary text */
+  --text-dim: #b4bfc8; /* Secondary text */
+  --accent: #f4b860; /* Candle-flame amber */
+  --on-accent: #0e2233;
+  --diff: #a6f0d6; /* Ectoplasm spectral mint */
+  --sev-info: #b9aee0; /* Moth purple */
+  --sev-warning: #f4b860; /* Candle amber */
+  --sev-serious: #f28b77; /* Wax red */
+  --focus: #f4b860;
+
+  /* Shapes */
+  --radius-plate: 2px;
+  --radius-control: 6px;
+  --radius-pill: 999px;
+  --radius-cameo: 50% / 42%;
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+  --dur-veil: 700ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* ========== MAPPED THEME SYSTEM ========== */
+  --color-midnight-black: var(--surface-page);
+  --color-haunted-purple: #3f1e6d;
+  --color-dark-purple: #23123d;
+  --color-phantom-purple: var(--boundary);
+  --color-crimson-orange: var(--accent);
+  --color-dark-orange: #d99b45;
+  --color-ghostly-white: var(--text);
+  --color-shadow-gray: var(--text-dim);
+  --color-deep-gray: var(--surface-plate);
 
   /* ========== SEMANTIC COLORS ========== */
   --color-success: #16a34a;
@@ -408,4 +435,38 @@ select:focus-visible {
 
 .transition-slow {
   transition: all var(--transition-slow);
+}
+
+/* ========== SPIRIT PHOTOGRAPHY STYLING (AGENTS.md §11) ========== */
+.plate {
+  background: var(--surface-plate);
+  border-radius: var(--radius-plate);
+  box-shadow:
+    0 0 0 3px var(--surface-plate),
+    0 0 0 4px var(--hairline);
+}
+
+.cameo-frame {
+  border-radius: var(--radius-cameo);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px var(--surface-plate),
+    0 0 0 3px var(--boundary);
+}
+
+/* Daylight / Paper Theme */
+[data-theme='daylight'] {
+  --surface-page: #ede6d6;
+  --surface-plate: #f7f2e6;
+  --hairline: #cfc6b2;
+  --boundary: #7a7466;
+  --text: #17202b;
+  --text-dim: #4a5663;
+  --accent: #1b4b6b;
+  --on-accent: #ede6d6;
+  --diff: #1b4b6b;
+  --sev-info: #5a4c85;
+  --sev-warning: #8a5a12;
+  --sev-serious: #9b2f1f;
+  --focus: #1b4b6b;
 }

@@ -210,49 +210,51 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({ selectedProfil
     onChange([]);
   };
 
-  const selectSmokeTest = () => {
-    onChange([
-      'mobile-iphone15',
-      'desktop-1080p',
-      'a11y-keyboard',
-      'performance',
-      'browser-webkit',
-    ]);
+  const selectQuickScare = () => {
+    onChange(['mobile-iphone15', 'a11y-keyboard', 'console-errors', 'a11y-visual']);
   };
 
-  const selectA11yOnly = () => {
-    onChange(AVAILABLE_PROFILES.filter((p) => p.category === 'accessibility').map((p) => p.id));
+  const selectBeforeLaunch = () => {
+    onChange(AVAILABLE_PROFILES.filter((p) => p.id !== 'performance').map((p) => p.id));
+  };
+
+  const selectResilience = () => {
+    onChange(['mobile-iphone15', 'desktop-1080p', 'i18n-rtl', 'browser-webkit', 'performance']);
   };
 
   return (
     <div className="space-y-4">
       {/* Action Header & Presets */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#6C3CAA]/20">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#2C4B68]">
         <div>
-          <h4 className="font-display font-bold text-base text-[#F5F5FA]">
-            Testing Profiles ({selectedProfiles.length}/{AVAILABLE_PROFILES.length} selected)
+          <h4 className="font-display font-bold text-base text-[#ECE6D3]">
+            Rites & Testing Profiles ({selectedProfiles.length}/{AVAILABLE_PROFILES.length}{' '}
+            selected)
           </h4>
-          <p className="text-xs text-[#646478]">
-            Select individual profiles or choose a quick preset suite
+          <p className="text-xs text-[#B4BFC8]">
+            Select individual rites or choose a quick preset suite
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <Button type="button" size="sm" variant="outline" onClick={selectAll}>
-            Select All
+            Full Test
           </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={selectSmokeTest}>
-            Smoke Test
+          <Button type="button" size="sm" variant="ghost" onClick={selectQuickScare}>
+            Quick Scare
           </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={selectA11yOnly}>
-            A11y Suite
+          <Button type="button" size="sm" variant="ghost" onClick={selectBeforeLaunch}>
+            Before Launch
+          </Button>
+          <Button type="button" size="sm" variant="ghost" onClick={selectResilience}>
+            Resilience
           </Button>
           <Button
             type="button"
             size="sm"
             variant="ghost"
             onClick={clearAll}
-            className="text-[#fca5a5]"
+            className="text-[#F28B77]"
           >
             Clear
           </Button>

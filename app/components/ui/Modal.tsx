@@ -9,6 +9,8 @@ export interface ModalProps {
   title?: React.ReactNode;
   children: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  footer?: React.ReactNode;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -16,7 +18,9 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   title,
   children,
-  maxWidth = 'lg',
+  maxWidth,
+  size = 'lg',
+  footer,
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -33,6 +37,8 @@ export const Modal: React.FC<ModalProps> = ({
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const resolvedWidth = maxWidth || size;
 
   const maxWidthStyles = {
     sm: 'max-w-md',
@@ -57,7 +63,7 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal Container */}
       <div
-        className={`relative w-full ${maxWidthStyles[maxWidth]} bg-[#0F0F14] border border-[#6C3CAA] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-10 flex flex-col max-h-[90vh]`}
+        className={`relative w-full ${maxWidthStyles[resolvedWidth]} bg-[#0F0F14] border border-[#6C3CAA] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-10 flex flex-col max-h-[90vh]`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#6C3CAA]/30 bg-[#373746]/20">
@@ -73,6 +79,11 @@ export const Modal: React.FC<ModalProps> = ({
 
         {/* Content */}
         <div className="px-6 py-5 overflow-y-auto flex-1">{children}</div>
+
+        {/* Footer */}
+        {footer && (
+          <div className="px-6 py-4 border-t border-[#6C3CAA]/30 bg-[#373746]/20">{footer}</div>
+        )}
       </div>
     </div>
   );

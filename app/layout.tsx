@@ -4,6 +4,7 @@ import { Space_Grotesk, Inter } from 'next/font/google';
 import './globals.css';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { Toaster } from 'sonner';
 
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Suspense>
         <main className="flex-1 flex flex-col">{children}</main>
         <Footer />
+        <Toaster position="bottom-right" theme="dark" richColors />
       </body>
     </html>
   );

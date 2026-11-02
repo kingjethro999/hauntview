@@ -43,3 +43,6 @@ PHASE_*
 
 # hauntview generated reports & screenshots
 .hauntview/
+test-results/
+playwright-report/
+usage.txt

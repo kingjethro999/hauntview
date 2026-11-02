@@ -7,3 +7,6 @@ pnpm-lock.yaml
 public
 .husky
 .git
+.hauntview
+test-results
+playwright-report

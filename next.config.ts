@@ -4,14 +4,12 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
-  turbopack: {
-    rules: {
-      '*.css': {
-        loaders: ['@tailwindcss/turbopack'],
-        as: '*.css',
-      },
-    },
-  },
+  serverExternalPackages: [
+    'playwright',
+    'playwright-core',
+    '@axe-core/playwright',
+    'better-sqlite3',
+  ],
 };
 
 export default nextConfig;

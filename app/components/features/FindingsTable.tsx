@@ -12,13 +12,15 @@ import {
   ChevronRightIcon,
   ExclamationCircleIcon,
   LightBulbIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 
 export interface FindingsTableProps {
   findings: Finding[];
+  onExorcise?: (finding: Finding) => void;
 }
 
-export const FindingsTable: React.FC<FindingsTableProps> = ({ findings }) => {
+export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorcise }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedSeverity, setSelectedSeverity] = useState<'all' | 'error' | 'warning' | 'info'>(
     'all'
@@ -269,15 +271,31 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings }) => {
                     )}
 
                     {/* Technical Metadata Footer */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#646478] pt-2 border-t border-[#6C3CAA]/15">
-                      <span>
-                        Profile Engine:{' '}
-                        <strong className="text-[#F5F5FA]">{finding.profileId}</strong>
-                      </span>
-                      <span>
-                        Unique ID: <code className="font-mono text-[#F5F5FA]">{finding.id}</code>
-                      </span>
-                      <span>Detected: {new Date(finding.timestamp).toLocaleTimeString()}</span>
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#B4BFC8] pt-2 border-t border-[#2C4B68]/30">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span>
+                          Rite Engine:{' '}
+                          <strong className="text-[#ECE6D3]">{finding.profileId}</strong>
+                        </span>
+                        <span>•</span>
+                        <span>
+                          Unique ID: <code className="font-mono text-[#ECE6D3]">{finding.id}</code>
+                        </span>
+                      </div>
+
+                      {onExorcise && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onExorcise(finding);
+                          }}
+                          className="px-2.5 py-1 rounded-[4px] bg-[#F4B860]/15 border border-[#F4B860]/50 text-[#F4B860] hover:bg-[#F4B860] hover:text-[#0E2233] font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          <SparklesIcon className="w-3.5 h-3.5" />
+                          <span>Fix with Kiro</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}

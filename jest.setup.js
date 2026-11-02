@@ -1,2 +1,2 @@
 // jest.setup.js
-import '@testing-library/jest-dom';
+// Test environment setup for HauntView unit tests

@@ -7,6 +7,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { Page } from 'playwright';
+import { PNG } from 'pngjs';
 import { ScreenshotMetadata, Viewport } from '../types';
 
 interface StoredScreenshot {
@@ -139,14 +140,16 @@ export class ScreenshotManager {
   }
 
   /**
-   * Compare two screenshots
+   * Compare two screenshots using pixelmatch and pngjs
    */
   async compareScreenshots(
     fileName1: string,
     fileName2: string
-  ): Promise<{ pixelDifference: number; percentageDifference: number }> {
-    const screenshot1 = this.screenshots.get(fileName1);
-    const screenshot2 = this.screenshots.get(fileName2);
+  ): Promise<{ pixelDifference: number; percentageDifference: number; diffBuffer?: Buffer }> {
+    const screenshot1 =
+      this.screenshots.get(fileName1) || (await this.loadStoredScreenshot(fileName1));
+    const screenshot2 =
+      this.screenshots.get(fileName2) || (await this.loadStoredScreenshot(fileName2));
 
     if (!screenshot1 || !screenshot2) {
       throw new Error('One or both screenshots not found');
@@ -157,29 +160,61 @@ export class ScreenshotManager {
       return { pixelDifference: 0, percentageDifference: 0 };
     }
 
-    // Calculate byte-level difference as proxy for pixel difference
-    const buf1 = screenshot1.buffer;
-    const buf2 = screenshot2.buffer;
+    try {
+      const img1 = PNG.sync.read(screenshot1.buffer);
+      const img2 = PNG.sync.read(screenshot2.buffer);
 
-    if (buf1.length !== buf2.length) {
+      const width = Math.max(img1.width, img2.width);
+      const height = Math.max(img1.height, img2.height);
+
+      // Normalize dimensions if they differ
+      const canvas1 = new PNG({ width, height });
+      const canvas2 = new PNG({ width, height });
+      PNG.bitblt(img1, canvas1, 0, 0, img1.width, img1.height, 0, 0);
+      PNG.bitblt(img2, canvas2, 0, 0, img2.width, img2.height, 0, 0);
+
+      const pixelmatchModule = await import('pixelmatch');
+      const pixelmatch = pixelmatchModule.default || pixelmatchModule;
+
+      const diff = new PNG({ width, height });
+      const pixelDifference = pixelmatch(canvas1.data, canvas2.data, diff.data, width, height, {
+        threshold: 0.1,
+      });
+
+      const totalPixels = width * height;
+      const percentageDifference = totalPixels > 0 ? pixelDifference / totalPixels : 0;
+      const diffBuffer = PNG.sync.write(diff);
+
       return {
-        pixelDifference: Math.abs(buf1.length - buf2.length),
-        percentageDifference:
-          Math.abs(buf1.length - buf2.length) / Math.max(buf1.length, buf2.length),
+        pixelDifference,
+        percentageDifference,
+        diffBuffer,
       };
+    } catch {
+      // Fallback for non-PNG or decoding issue
+      return { pixelDifference: -1, percentageDifference: 1 };
     }
+  }
 
-    let differences = 0;
-    for (let i = 0; i < buf1.length; i++) {
-      if (buf1[i] !== buf2[i]) {
-        differences++;
-      }
+  private async loadStoredScreenshot(fileName: string): Promise<StoredScreenshot | null> {
+    const filePath = path.join(this.screenshotDir, fileName);
+    try {
+      const buffer = await fs.readFile(filePath);
+      const hash = this.hashBuffer(buffer);
+      const metadata: ScreenshotMetadata = {
+        profileId: fileName.split('/')[0] || 'default',
+        timestamp: Date.now(),
+        url: '',
+        viewport: { width: 1280, height: 720, isMobile: false, hasTouch: false },
+        fileName,
+        hash,
+      };
+      const stored = { metadata, buffer, hash };
+      this.screenshots.set(fileName, stored);
+      return stored;
+    } catch {
+      return null;
     }
-
-    return {
-      pixelDifference: differences,
-      percentageDifference: differences / buf1.length,
-    };
   }
 
   /**

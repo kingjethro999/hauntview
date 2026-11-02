@@ -9,7 +9,11 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jest-environment-node',
-  testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
+  testMatch: [
+    '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
+    '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
+  ],
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/tests/'],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
     '!src/**/*.d.ts',
@@ -26,7 +30,18 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
+  transformIgnorePatterns: ['/node_modules/(?!(pixelmatch|p-limit|yocto-queue)/)'],
 };
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(customJestConfig);
+const asyncConfig = createJestConfig(customJestConfig);
+
+const jestConfig = async () => {
+  const config = await asyncConfig();
+  config.transformIgnorePatterns = [
+    'node_modules/(?!(\\.pnpm|pixelmatch)/)',
+    '^.+\\.module\\.(css|sass|scss)$',
+  ];
+  return config;
+};
+
+export default jestConfig;
