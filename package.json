@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
-    "postinstall": "playwright install",
+    "postinstall": "pnpm exec playwright install --with-deps",
     "build": "next build",
     "start": "next start --hostname 127.0.0.1",
     "lint": "eslint .",
@@ -47,6 +47,7 @@
     "@axe-core/playwright": "^4.14.0",
     "@heroicons/react": "^2.2.0",
     "@modelcontextprotocol/server": "^2.4.0",
+    "@sparticuz/chromium": "^153.0.0",
     "@types/jszip": "^3.4.1",
     "better-sqlite3": "^13.0.3",
     "class-variance-authority": "^0.7.1",
