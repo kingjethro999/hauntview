@@ -61,12 +61,6 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
     onUrlChange?.(newVal, valid);
   };
 
-  const toggleSingleProfile = (profileId: string) => {
-    setSelectedProfiles((prev) =>
-      prev.includes(profileId) ? prev.filter((p) => p !== profileId) : [...prev, profileId]
-    );
-  };
-
   const selectAllProfiles = () => {
     const allIds = AVAILABLE_PROFILES.map((p) => p.id);
     if (selectedProfiles.length === allIds.length) {

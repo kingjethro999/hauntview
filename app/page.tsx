@@ -117,14 +117,14 @@ export default function HomePage() {
                 }}
               >
                 HauntView captures the living page as you built it, and the apparition as your users
-                sometimes get it — under 16 failure conditions with visual diffs and evidence-backed
-                findings.
+                sometimes get it — under 25 testing profiles and failure conditions with visual
+                diffs and evidence-backed findings.
               </p>
 
               {/* Feature badges */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 44 }}>
                 <Badge variant="outline" size="md">
-                  16 Rites
+                  25 Rites
                 </Badge>
                 <Badge variant="outline" size="md">
                   Deterministic Faults

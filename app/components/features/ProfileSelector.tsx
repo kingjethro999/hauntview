@@ -8,13 +8,16 @@ import {
   EyeIcon,
   GlobeAltIcon,
   BeakerIcon,
+  ShieldExclamationIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
 export interface ProfileInfo {
   id: string;
   name: string;
   description: string;
-  category: 'device' | 'accessibility' | 'i18n' | 'browser' | 'performance';
+  category:
+    'device' | 'accessibility' | 'i18n' | 'browser' | 'performance' | 'resilience' | 'security';
 }
 
 export const AVAILABLE_PROFILES: ProfileInfo[] = [
@@ -75,6 +78,12 @@ export const AVAILABLE_PROFILES: ProfileInfo[] = [
     description: 'Complexity and clarity checks',
     category: 'accessibility',
   },
+  {
+    id: 'reduced-motion',
+    name: 'Reduced Motion',
+    description: 'Enforces prefers-reduced-motion; audits running animations',
+    category: 'accessibility',
+  },
 
   // Internationalization
   {
@@ -112,12 +121,64 @@ export const AVAILABLE_PROFILES: ProfileInfo[] = [
     category: 'browser',
   },
 
-  // Performance
+  // Performance & Failure Modes
   {
     id: 'performance',
     name: 'Performance',
     description: 'Core Web Vitals and CLS',
     category: 'performance',
+  },
+  {
+    id: 'font-failure',
+    name: 'Font Failure',
+    description: 'Blocks web fonts; detects layout shifts from font substitution',
+    category: 'performance',
+  },
+
+  // Resilience Rites
+  {
+    id: 'image-failure',
+    name: 'Image Failure',
+    description: 'Blocks all images; checks alt attributes and explicit dimensions',
+    category: 'resilience',
+  },
+  {
+    id: 'js-disabled',
+    name: 'JS Disabled',
+    description: 'Disables JavaScript; audits meaningful content and <noscript> fallbacks',
+    category: 'resilience',
+  },
+  {
+    id: 'offline',
+    name: 'Offline Resilience',
+    description: 'Simulates offline mode; checks service worker and fallback UI',
+    category: 'resilience',
+  },
+  {
+    id: 'broken-links',
+    name: 'Broken Links',
+    description: 'Probes same-origin anchor hrefs; flags 404/410/5xx dead links',
+    category: 'resilience',
+  },
+  {
+    id: 'network-resilience',
+    name: 'Network Resilience',
+    description: 'Aborts API requests; checks graceful degradation and error handling',
+    category: 'resilience',
+  },
+  {
+    id: 'form-resilience',
+    name: 'Form Resilience',
+    description: 'Submits empty forms; audits client/server validation feedback',
+    category: 'resilience',
+  },
+
+  // Security Hygiene
+  {
+    id: 'security-hygiene',
+    name: 'Security Hygiene',
+    description: 'Passively audits CSP, HSTS, X-Frame-Options, and security headers',
+    category: 'security',
   },
 ];
 
@@ -140,6 +201,10 @@ const getCategoryIcon = (category: string) => {
       return <ComputerDesktopIcon className="w-4 h-4" />;
     case 'performance':
       return <BeakerIcon className="w-4 h-4" />;
+    case 'resilience':
+      return <ShieldExclamationIcon className="w-4 h-4" />;
+    case 'security':
+      return <ShieldCheckIcon className="w-4 h-4" />;
     default:
       return <BeakerIcon className="w-4 h-4" />;
   }
@@ -157,6 +222,10 @@ const getCategoryColor = (category: string) => {
       return 'rgba(168, 85, 247, 0.15)';
     case 'performance':
       return 'rgba(234, 88, 12, 0.15)';
+    case 'resilience':
+      return 'rgba(239, 68, 68, 0.15)';
+    case 'security':
+      return 'rgba(16, 185, 129, 0.15)';
     default:
       return 'rgba(255, 121, 31, 0.15)';
   }
@@ -174,6 +243,10 @@ const getCategoryBorderColor = (category: string) => {
       return 'rgba(168, 85, 247, 0.3)';
     case 'performance':
       return 'rgba(234, 88, 12, 0.3)';
+    case 'resilience':
+      return 'rgba(239, 68, 68, 0.3)';
+    case 'security':
+      return 'rgba(16, 185, 129, 0.3)';
     default:
       return 'rgba(255, 121, 31, 0.3)';
   }
@@ -183,7 +256,6 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
   selectedProfiles,
   onChange,
   viewMode = 'grid',
-  onSelectAll,
 }) => {
   const toggleProfile = (id: string) => {
     if (selectedProfiles.includes(id)) {

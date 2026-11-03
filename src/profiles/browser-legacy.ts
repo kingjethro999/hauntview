@@ -4,7 +4,7 @@
  */
 
 import { Page } from 'playwright';
-import { Finding, ProfileResult, ProfileContext } from '../types';
+import { Finding, ProfileResult } from '../types';
 
 export class BrowserLegacyProfile {
   private profileId: string;
@@ -18,7 +18,7 @@ export class BrowserLegacyProfile {
   /**
    * Execute legacy browser fallback detection profile
    */
-  async execute(page: Page, url: string, _context?: ProfileContext): Promise<ProfileResult> {
+  async execute(page: Page, url: string): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
 

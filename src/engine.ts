@@ -32,9 +32,28 @@ import { I18nMixedProfile } from './profiles/i18n-mixed';
 import { BrowserFirefoxProfile } from './profiles/browser-firefox';
 import { BrowserEdgeProfile } from './profiles/browser-edge';
 import { BrowserLegacyProfile } from './profiles/browser-legacy';
+import { ImageFailureProfile } from './profiles/image-failure';
+import { FontFailureProfile } from './profiles/font-failure';
+import { JsDisabledProfile } from './profiles/js-disabled';
+import { ReducedMotionProfile } from './profiles/reduced-motion';
+import { OfflineProfile } from './profiles/offline';
+import { BrokenLinksProfile } from './profiles/broken-links';
+import { NetworkResilienceProfile } from './profiles/network-resilience';
+import { SecurityHygieneProfile } from './profiles/security-hygiene';
+import { FormResilienceProfile } from './profiles/form-resilience';
 
 interface ExecutableProfile {
   execute(page: Page, url: string, context?: ProfileContext): Promise<ProfileResult>;
+}
+
+/** Profiles that manage their own BrowserContext and accept a Browser instance. */
+export interface BrowserExecutableProfile {
+  execute(
+    browser: Browser,
+    url: string,
+    context?: ProfileContext,
+    screenshotManager?: ScreenshotManager
+  ): Promise<ProfileResult>;
 }
 
 export class HauntViewEngine {
@@ -150,17 +169,22 @@ export class HauntViewEngine {
     const page = await this.browserPool.acquirePage(browserType, context, browser);
 
     try {
-      let profile: ExecutableProfile;
+      let profile: ExecutableProfile | undefined;
+      let result: ProfileResult | undefined;
 
       // Device profiles
-      if (profileId === 'mobile-iphone15' || profileId === 'mobile-android') {
-        profile = new MobileProfile(profileId, `Mobile`);
-      } else if (profileId === 'tablet-ipad') {
-        profile = new TabletProfile(profileId, 'Tablet - iPad Pro');
+      if (
+        profileId === 'mobile-iphone15' ||
+        profileId === 'mobile-android' ||
+        profileId === 'mobile'
+      ) {
+        profile = new MobileProfile(profileId, 'Mobile');
+      } else if (profileId === 'tablet-ipad' || profileId === 'tablet') {
+        profile = new TabletProfile(profileId, 'Tablet');
       } else if (profileId === 'desktop-4k') {
         profile = new Desktop4KProfile(profileId, 'Desktop - 4K');
-      } else if (profileId === 'desktop-1080p') {
-        profile = new DesktopProfile(profileId, 'Desktop - 1080p');
+      } else if (profileId === 'desktop-1080p' || profileId === 'desktop') {
+        profile = new DesktopProfile(profileId, 'Desktop');
 
         // Console errors profile
       } else if (profileId === 'console-errors') {
@@ -197,31 +221,60 @@ export class HauntViewEngine {
         profile = new BrowserLegacyProfile(profileId, 'Browser - Legacy');
       } else if (profileId.startsWith('browser-')) {
         profile = new ConsoleErrorsProfile(profileId, `Browser - ${profileId}`);
+
+        // Canonical rites — Page-based
+      } else if (profileId === 'image-failure') {
+        profile = new ImageFailureProfile(profileId, 'Image Failure');
+      } else if (profileId === 'font-failure') {
+        profile = new FontFailureProfile(profileId, 'Font Failure');
+      } else if (profileId === 'broken-links') {
+        profile = new BrokenLinksProfile(profileId, 'Broken Links');
+      } else if (profileId === 'security-hygiene') {
+        profile = new SecurityHygieneProfile(profileId, 'Security Hygiene');
+
+        // Canonical rites — Browser-based (manage their own context)
+      } else if (profileId === 'js-disabled') {
+        const p = new JsDisabledProfile(profileId, 'JS Disabled');
+        result = await p.execute(browser, url, context, this.screenshotManager);
+      } else if (profileId === 'reduced-motion') {
+        const p = new ReducedMotionProfile(profileId, 'Reduced Motion');
+        result = await p.execute(browser, url, context, this.screenshotManager);
+      } else if (profileId === 'offline') {
+        const p = new OfflineProfile(profileId, 'Offline');
+        result = await p.execute(browser, url, context, this.screenshotManager);
+      } else if (profileId === 'network-resilience') {
+        const p = new NetworkResilienceProfile(profileId, 'Network Resilience');
+        result = await p.execute(browser, url, context, this.screenshotManager);
+      } else if (profileId === 'form-resilience') {
+        const p = new FormResilienceProfile(profileId, 'Form Resilience');
+        result = await p.execute(browser, url, context, this.screenshotManager);
       } else {
         // Default fallback
         profile = new ConsoleErrorsProfile(profileId, profileId);
       }
 
-      const result = await profile.execute(page, url, context);
+      if (!result) {
+        result = await profile!.execute(page, url, context);
 
-      // Capture actual apparition screenshot plate
-      try {
-        const screenshotMeta = await this.screenshotManager.captureScreenshot(
-          page,
-          profileId,
-          url,
-          context.viewport,
-          { fullPage: false }
-        );
-        result.screenshots = [screenshotMeta];
+        // Capture actual apparition screenshot plate
+        try {
+          const screenshotMeta = await this.screenshotManager.captureScreenshot(
+            page,
+            profileId,
+            url,
+            context.viewport,
+            { fullPage: false }
+          );
+          result.screenshots = [screenshotMeta];
 
-        // Attach visual evidence to findings
-        for (const finding of result.findings) {
-          if (!finding.details) finding.details = {};
-          finding.details.screenshot = screenshotMeta.fileName;
+          // Attach visual evidence to findings
+          for (const finding of result.findings) {
+            if (!finding.details) finding.details = {};
+            finding.details.screenshot = screenshotMeta.fileName;
+          }
+        } catch (screenshotErr) {
+          console.warn(`Could not capture screenshot for profile ${profileId}:`, screenshotErr);
         }
-      } catch (screenshotErr) {
-        console.warn(`Could not capture screenshot for profile ${profileId}:`, screenshotErr);
       }
 
       return result;

@@ -8,7 +8,6 @@ import { Footer } from './components/layout/Footer';
 import { Toaster } from 'sonner';
 import { AtmosphereLayer } from './components/features/AtmosphereLayer';
 import { HauntingEffects } from './components/features/HauntingEffects';
-import { SparklesIcon } from '@heroicons/react/24/outline';
 
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
@@ -27,7 +26,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'HauntView | Local Web Testing Engine',
   description:
-    'Comprehensive local testing engine with 16 automated profiles for accessibility, responsiveness, i18n, performance, and resilience.',
+    'Comprehensive local testing engine with 25 automated profiles for resilience, accessibility, responsiveness, i18n, performance, and security.',
   icons: {
     icon: '/icon.svg',
     shortcut: '/icon.svg',

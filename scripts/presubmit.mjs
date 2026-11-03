@@ -65,7 +65,7 @@ function dirFileCount(rel, ext) {
 function countOccurrences(rel, needle) {
   try {
     const content = fs.readFileSync(path.join(ROOT, rel), 'utf8');
-    return (content.match(new RegExp(needle, 'g')) ?? []).length;
+    return (content.match(new RegExp(needle, 'gm')) ?? []).length;
   } catch {
     return 0;
   }

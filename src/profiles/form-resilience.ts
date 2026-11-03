@@ -5,9 +5,10 @@
  */
 
 import { Browser } from 'playwright';
+import { ScreenshotManager } from '../core/screenshot-manager';
 import { sanitizeUntrusted } from '../types/contracts';
 import { buildFinding } from '../types/finding-utils';
-import { Finding, ProfileResult } from '../types';
+import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
 
 const PAYMENT_AUTOCOMPLETE = new Set(['payment', 'cc-number', 'cc-csc', 'cc-exp', 'cc-name']);
 
@@ -31,11 +32,26 @@ export class FormResilienceProfile {
     this.profileName = profileName;
   }
 
-  async execute(browser: Browser, url: string): Promise<ProfileResult> {
+  async execute(
+    browser: Browser,
+    url: string,
+    profileContext?: ProfileContext,
+    screenshotManager?: ScreenshotManager
+  ): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
+    const viewport = profileContext?.viewport ?? {
+      width: 1280,
+      height: 800,
+      deviceScaleFactor: 1,
+      isMobile: false,
+      hasTouch: false,
+    };
+    let screenshotMeta: ScreenshotMetadata | null = null;
 
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+      viewport: { width: viewport.width, height: viewport.height },
+    });
 
     // Abort all non-GET requests to prevent accidental data submission
     await context.route('**/*', (route) => {
@@ -105,7 +121,21 @@ export class FormResilienceProfile {
           await page.waitForTimeout(500);
 
           const captureId = `form-resilience-${Date.now()}`;
-          await page.screenshot({ fullPage: false }).catch(() => Buffer.alloc(0));
+          if (screenshotManager && !screenshotMeta) {
+            try {
+              screenshotMeta = await screenshotManager.captureScreenshot(
+                page,
+                this.profileId,
+                url,
+                viewport,
+                { fullPage: false }
+              );
+            } catch (screenshotErr) {
+              console.warn(`Could not capture screenshot for ${this.profileId}:`, screenshotErr);
+            }
+          } else {
+            await page.screenshot({ fullPage: false }).catch(() => Buffer.alloc(0));
+          }
 
           const validationResult = await page.evaluate((sel: string) => {
             const form = document.querySelector(sel);
@@ -229,6 +259,13 @@ export class FormResilienceProfile {
     const endTime = Date.now();
     const browserVersion = browser.version();
 
+    if (screenshotMeta) {
+      for (const finding of findings) {
+        if (!finding.details) finding.details = {};
+        finding.details.screenshot = screenshotMeta.fileName;
+      }
+    }
+
     return {
       profileId: this.profileId,
       profileName: this.profileName,
@@ -237,7 +274,7 @@ export class FormResilienceProfile {
       endTime,
       duration: endTime - startTime,
       findings,
-      screenshots: [],
+      screenshots: screenshotMeta ? [screenshotMeta] : [],
       metadata: {
         browserEngine: 'chromium',
         browserVersion,

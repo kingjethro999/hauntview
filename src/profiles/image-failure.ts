@@ -3,7 +3,7 @@
  * Blocks all image requests and checks for missing alt attributes and missing dimensions.
  */
 
-import { Browser, Page } from 'playwright';
+import { Page } from 'playwright';
 import { sanitizeUntrusted } from '../types/contracts';
 import { buildFinding } from '../types/finding-utils';
 import { Finding, ProfileResult } from '../types';
@@ -34,8 +34,7 @@ export class ImageFailureProfile {
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
 
       // Capture screenshot as evidence
-      const screenshotBuffer = await page.screenshot({ fullPage: false });
-      const screenshotB64 = screenshotBuffer.toString('base64');
+      await page.screenshot({ fullPage: false });
       const captureId = `image-failure-${Date.now()}`;
 
       const evalResult = await page.evaluate(() => {

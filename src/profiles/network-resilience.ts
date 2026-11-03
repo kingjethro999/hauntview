@@ -4,9 +4,10 @@
  */
 
 import { Browser } from 'playwright';
+import { ScreenshotManager } from '../core/screenshot-manager';
 import { sanitizeUntrusted } from '../types/contracts';
 import { buildFinding } from '../types/finding-utils';
-import { Finding, ProfileResult } from '../types';
+import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
 
 export class NetworkResilienceProfile {
   private profileId: string;
@@ -17,9 +18,22 @@ export class NetworkResilienceProfile {
     this.profileName = profileName;
   }
 
-  async execute(browser: Browser, url: string): Promise<ProfileResult> {
+  async execute(
+    browser: Browser,
+    url: string,
+    profileContext?: ProfileContext,
+    screenshotManager?: ScreenshotManager
+  ): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
+    const viewport = profileContext?.viewport ?? {
+      width: 1280,
+      height: 800,
+      deviceScaleFactor: 1,
+      isMobile: false,
+      hasTouch: false,
+    };
+    let screenshotMeta: ScreenshotMetadata | null = null;
 
     // --- Baseline pass: record XHR/fetch URLs ---
     const baselineContext = await browser.newContext();
@@ -85,7 +99,21 @@ export class NetworkResilienceProfile {
       });
 
       const captureId = `network-resilience-${Date.now()}`;
-      await failPage.screenshot({ fullPage: false }).catch(() => Buffer.alloc(0));
+      if (screenshotManager) {
+        try {
+          screenshotMeta = await screenshotManager.captureScreenshot(
+            failPage,
+            this.profileId,
+            url,
+            viewport,
+            { fullPage: false }
+          );
+        } catch (screenshotErr) {
+          console.warn(`Could not capture screenshot for ${this.profileId}:`, screenshotErr);
+        }
+      } else {
+        await failPage.screenshot({ fullPage: false }).catch(() => Buffer.alloc(0));
+      }
 
       const visibleLen = await failPage
         .evaluate(() => (document.body?.innerText ?? '').length)
@@ -154,6 +182,13 @@ export class NetworkResilienceProfile {
     const endTime = Date.now();
     const browserVersion = browser.version();
 
+    if (screenshotMeta) {
+      for (const finding of findings) {
+        if (!finding.details) finding.details = {};
+        finding.details.screenshot = screenshotMeta.fileName;
+      }
+    }
+
     return {
       profileId: this.profileId,
       profileName: this.profileName,
@@ -162,7 +197,7 @@ export class NetworkResilienceProfile {
       endTime,
       duration: endTime - startTime,
       findings,
-      screenshots: [],
+      screenshots: screenshotMeta ? [screenshotMeta] : [],
       metadata: {
         browserEngine: 'chromium',
         browserVersion,
