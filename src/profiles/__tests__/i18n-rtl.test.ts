@@ -14,7 +14,7 @@ describe('I18nRTLProfile', () => {
     const defaultLocatorObj = {
       getAttribute: jest
         .fn()
-        .mockResolvedValue(overrides.dir !== undefined ? overrides.dir : ('rtl' as never)),
+        .mockResolvedValue((overrides.dir !== undefined ? overrides.dir : 'rtl') as never),
       all: jest.fn().mockResolvedValue([] as never),
       count: jest.fn().mockResolvedValue(0 as never),
       first: jest.fn().mockReturnValue({
@@ -25,18 +25,18 @@ describe('I18nRTLProfile', () => {
     return {
       addInitScript: jest.fn().mockResolvedValue(undefined as never),
       goto: jest.fn().mockResolvedValue(undefined as never),
-      locator: jest.fn().mockImplementation((selector: string) => {
+      locator: jest.fn((selector: string) => {
         if (selector === 'html') {
           return {
             ...defaultLocatorObj,
             getAttribute: jest
               .fn()
-              .mockResolvedValue(overrides.dir !== undefined ? overrides.dir : ('rtl' as never)),
+              .mockResolvedValue((overrides.dir !== undefined ? overrides.dir : 'rtl') as never),
           };
         }
         if (selector === 'img') {
           const imgs = Array.from({ length: overrides.arrowImages ?? 0 }, () => ({
-            getAttribute: jest.fn().mockImplementation((attr: string) => {
+            getAttribute: jest.fn((attr: string) => {
               if (attr === 'src') return 'icon-arrow-right.png';
               if (attr === 'alt') return 'next page';
               return null;
@@ -49,7 +49,7 @@ describe('I18nRTLProfile', () => {
         }
         return defaultLocatorObj;
       }),
-      evaluate: jest.fn().mockImplementation((fn: unknown) => {
+      evaluate: jest.fn((fn: unknown) => {
         const fnStr = typeof fn === 'function' ? fn.toString() : '';
         if (fnStr.includes('textAlign')) {
           return overrides.textAlign ?? 'start';

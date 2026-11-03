@@ -14,19 +14,19 @@ describe('I18nMixedProfile', () => {
     return {
       addInitScript: jest.fn().mockResolvedValue(undefined as never),
       goto: jest.fn().mockResolvedValue(undefined as never),
-      locator: jest.fn().mockImplementation((selector: string) => {
+      locator: jest.fn((selector: string) => {
         if (selector === 'html') {
           return {
             getAttribute: jest
               .fn()
               .mockResolvedValue(
-                overrides.lang !== undefined ? overrides.lang : ('hi-IN' as never)
+                (overrides.lang !== undefined ? overrides.lang : 'hi-IN') as never
               ),
           };
         }
         return { getAttribute: jest.fn().mockResolvedValue(null as never) };
       }),
-      evaluate: jest.fn().mockImplementation((fn: unknown) => {
+      evaluate: jest.fn((fn: unknown) => {
         const fnStr = typeof fn === 'function' ? fn.toString() : '';
         if (fnStr.includes('fontFamily')) {
           return overrides.fontFamily ?? 'Noto Sans Devanagari, sans-serif';

@@ -15,12 +15,12 @@ describe('AccessibilityScreenReaderProfile', () => {
   ) {
     return {
       goto: jest.fn().mockResolvedValue(undefined as never),
-      locator: jest.fn().mockImplementation((selector: string) => {
+      locator: jest.fn((selector: string) => {
         if (selector === 'html') {
           return {
             getAttribute: jest
               .fn()
-              .mockResolvedValue(overrides.lang !== undefined ? overrides.lang : ('en' as never)),
+              .mockResolvedValue((overrides.lang !== undefined ? overrides.lang : 'en') as never),
           };
         }
         if (selector.includes('main')) {
@@ -38,7 +38,7 @@ describe('AccessibilityScreenReaderProfile', () => {
           getAttribute: jest.fn().mockResolvedValue(null as never),
         };
       }),
-      evaluate: jest.fn().mockImplementation((fn: unknown) => {
+      evaluate: jest.fn((fn: unknown) => {
         const fnStr = typeof fn === 'function' ? fn.toString() : '';
         if (fnStr.includes('h1, h2')) {
           return overrides.headings ?? [1, 2, 3];

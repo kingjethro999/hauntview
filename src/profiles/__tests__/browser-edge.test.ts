@@ -23,13 +23,13 @@ describe('BrowserEdgeProfile', () => {
         }
       }),
       waitForLoadState: jest.fn().mockResolvedValue(undefined as never),
-      on: jest.fn().mockImplementation((event: string, cb: unknown) => {
+      on: jest.fn((event: string, cb: unknown) => {
         if (event === 'console') {
           consoleCallback = cb as (msg: { type: () => string; text: () => string }) => void;
         }
       }),
       off: jest.fn(),
-      evaluate: jest.fn().mockImplementation((fn: unknown) => {
+      evaluate: jest.fn((fn: unknown) => {
         const fnStr = typeof fn === 'function' ? fn.toString() : '';
         if (fnStr.includes('forcedColorsAudit') || fnStr.includes('forced-color-adjust')) {
           return {

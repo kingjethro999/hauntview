@@ -128,7 +128,7 @@ interface ProfileSelectorProps {
   onSelectAll?: () => void;
 }
 
-const getCategoryIcon = (category: ProfileInfo['category']) => {
+const getCategoryIcon = (category: string) => {
   switch (category) {
     case 'device':
       return <DevicePhoneMobileIcon className="w-4 h-4" />;
@@ -140,10 +140,12 @@ const getCategoryIcon = (category: ProfileInfo['category']) => {
       return <ComputerDesktopIcon className="w-4 h-4" />;
     case 'performance':
       return <BeakerIcon className="w-4 h-4" />;
+    default:
+      return <BeakerIcon className="w-4 h-4" />;
   }
 };
 
-const getCategoryColor = (category: ProfileInfo['category']) => {
+const getCategoryColor = (category: string) => {
   switch (category) {
     case 'device':
       return 'rgba(59, 130, 246, 0.15)';
@@ -155,10 +157,12 @@ const getCategoryColor = (category: ProfileInfo['category']) => {
       return 'rgba(168, 85, 247, 0.15)';
     case 'performance':
       return 'rgba(234, 88, 12, 0.15)';
+    default:
+      return 'rgba(255, 121, 31, 0.15)';
   }
 };
 
-const getCategoryBorderColor = (category: ProfileInfo['category']) => {
+const getCategoryBorderColor = (category: string) => {
   switch (category) {
     case 'device':
       return 'rgba(59, 130, 246, 0.3)';
@@ -170,6 +174,8 @@ const getCategoryBorderColor = (category: ProfileInfo['category']) => {
       return 'rgba(168, 85, 247, 0.3)';
     case 'performance':
       return 'rgba(234, 88, 12, 0.3)';
+    default:
+      return 'rgba(255, 121, 31, 0.3)';
   }
 };
 

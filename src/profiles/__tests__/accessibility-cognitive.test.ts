@@ -15,13 +15,13 @@ describe('AccessibilityCognitiveProfile', () => {
   ) {
     return {
       goto: jest.fn().mockResolvedValue(undefined as never),
-      locator: jest.fn().mockImplementation((selector: string) => {
+      locator: jest.fn((selector: string) => {
         if (selector.includes('autoplay')) {
           return { count: jest.fn().mockResolvedValue((overrides.autoplay ?? 0) as never) };
         }
         return { count: jest.fn().mockResolvedValue(0 as never) };
       }),
-      evaluate: jest.fn().mockImplementation((fn: unknown) => {
+      evaluate: jest.fn((fn: unknown) => {
         const fnStr = typeof fn === 'function' ? fn.toString() : '';
         if (fnStr.includes('complexity') || fnStr.includes('document.querySelectorAll')) {
           return {

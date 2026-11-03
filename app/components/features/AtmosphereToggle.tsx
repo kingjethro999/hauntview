@@ -30,13 +30,13 @@ export const AtmosphereToggle: React.FC = () => {
     setAtmosphere(next);
   };
 
-  const labels = {
+  const labels: Record<AtmosphereLevel, string> = {
     off: 'Atmosphere: Off',
     subtle: 'Atmosphere: Subtle',
     full: 'Atmosphere: Full Séance',
   };
 
-  const statusIcons = {
+  const statusIcons: Record<AtmosphereLevel, string> = {
     off: '🕯️',
     subtle: '✨',
     full: '👻',

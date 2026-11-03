@@ -18,7 +18,7 @@ export class BrowserLegacyProfile {
   /**
    * Execute legacy browser fallback detection profile
    */
-  async execute(page: Page, url: string, context?: ProfileContext): Promise<ProfileResult> {
+  async execute(page: Page, url: string, _context?: ProfileContext): Promise<ProfileResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
 

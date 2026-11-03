@@ -15,12 +15,12 @@ describe('I18nCJKProfile', () => {
     return {
       addInitScript: jest.fn().mockResolvedValue(undefined as never),
       goto: jest.fn().mockResolvedValue(undefined as never),
-      locator: jest.fn().mockImplementation((selector: string) => {
+      locator: jest.fn((selector: string) => {
         if (selector === 'html') {
           return {
             getAttribute: jest
               .fn()
-              .mockResolvedValue(overrides.lang !== undefined ? overrides.lang : ('ja' as never)),
+              .mockResolvedValue((overrides.lang !== undefined ? overrides.lang : 'ja') as never),
           };
         }
         if (selector === 'ruby') {
@@ -31,7 +31,7 @@ describe('I18nCJKProfile', () => {
           count: jest.fn().mockResolvedValue(0 as never),
         };
       }),
-      evaluate: jest.fn().mockImplementation((fn: unknown) => {
+      evaluate: jest.fn((fn: unknown) => {
         const fnStr = typeof fn === 'function' ? fn.toString() : '';
         if (fnStr.includes('fontFamily')) {
           return overrides.fontFamily ?? 'Noto Sans CJK JP, sans-serif';

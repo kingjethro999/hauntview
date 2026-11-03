@@ -51,7 +51,9 @@ export function makeFindingId(
 // ---------------------------------------------------------------------------
 
 /** Parameters accepted by buildFinding. */
-export type BuildFindingParams = Omit<CanonicalFinding, 'id'> & {
+export type BuildFindingParams = Omit<CanonicalFinding, 'id' | 'evidence' | 'investigate'> & {
+  evidence: Evidence[];
+  investigate?: string[];
   /**
    * Optional stable locator string used to derive the id.
    * Falls back to `where.selector ?? where.url ?? ''` when omitted.

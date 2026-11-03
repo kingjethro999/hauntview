@@ -15,7 +15,7 @@ describe('Desktop4KProfile', () => {
     return {
       goto: jest.fn().mockResolvedValue(undefined as never),
       waitForLoadState: jest.fn().mockResolvedValue(undefined as never),
-      evaluate: jest.fn().mockImplementation((fn: unknown, ...args: unknown[]) => {
+      evaluate: jest.fn((fn: unknown) => {
         const fnStr = typeof fn === 'function' ? fn.toString() : '';
         if (evalHandler) {
           const custom = evalHandler(fnStr);

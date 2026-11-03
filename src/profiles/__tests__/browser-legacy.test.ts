@@ -17,21 +17,21 @@ describe('BrowserLegacyProfile', () => {
     return {
       goto: jest.fn().mockResolvedValue(undefined as never),
       waitForLoadState: jest.fn().mockResolvedValue(undefined as never),
-      locator: jest.fn().mockImplementation((selector: string) => {
+      locator: jest.fn((selector: string) => {
         if (selector.includes('X-UA-Compatible')) {
           return {
             getAttribute: jest
               .fn()
               .mockResolvedValue(
-                overrides.xUaCompatible !== undefined
+                (overrides.xUaCompatible !== undefined
                   ? overrides.xUaCompatible
-                  : ('IE=edge' as never)
+                  : 'IE=edge') as never
               ),
           };
         }
         return { getAttribute: jest.fn().mockResolvedValue(null as never) };
       }),
-      evaluate: jest.fn().mockImplementation((fn: unknown) => {
+      evaluate: jest.fn((fn: unknown) => {
         const fnStr = typeof fn === 'function' ? fn.toString() : '';
         if (fnStr.includes('cssAudit') || fnStr.includes('var(--')) {
           return {
