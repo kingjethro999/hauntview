@@ -54,6 +54,24 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
     report.profileResults.find((p) => p.profileId === selectedProfileId) ||
     report.profileResults[0];
 
+  // Baseline profile (desktop baseline capture)
+  const baselineProfile =
+    report.profileResults.find((p) => p.profileId === 'desktop' || p.profileId === 'desktop-4k') ||
+    report.profileResults[0];
+
+  const baselineFilename =
+    baselineProfile?.screenshots?.[0]?.fileName ||
+    (baselineProfile?.findings?.find((f) => f.details?.screenshot)?.details?.screenshot as
+      string | undefined);
+
+  const apparitionFilename =
+    selectedProfile?.screenshots?.[0]?.fileName ||
+    (selectedProfile?.findings?.find((f) => f.details?.screenshot)?.details?.screenshot as
+      string | undefined);
+
+  const livingSrc = baselineFilename ? `/api/screenshots/${baselineFilename}` : undefined;
+  const apparitionSrc = apparitionFilename ? `/api/screenshots/${apparitionFilename}` : undefined;
+
   // Map findings of selected profile to Veil pins
   const veilPins: OmenPin[] = (selectedProfile?.findings || []).map((f, idx) => ({
     id: f.id,
@@ -242,11 +260,13 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                 {/* The Veil Comparison Component */}
                 <div className="max-w-4xl mx-auto">
                   <TheVeil
-                    livingLabel="Living Page (Standard Baseline)"
-                    apparitionLabel={`Apparition: ${selectedProfile.profileName}`}
+                    livingSrc={livingSrc}
+                    apparitionSrc={apparitionSrc}
+                    livingLabel={`Living Page (${baselineProfile?.profileName || 'Baseline'})`}
+                    apparitionLabel={`Apparition: ${selectedProfile?.profileName || 'Under Condition'}`}
                     pins={veilPins}
                     onPinClick={(pinId) => {
-                      const found = selectedProfile.findings.find((f) => f.id === pinId);
+                      const found = selectedProfile?.findings.find((f) => f.id === pinId);
                       if (found) setExorciseFinding(found);
                     }}
                   />

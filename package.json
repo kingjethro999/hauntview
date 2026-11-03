@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
-    "postinstall": "pnpm exec playwright install --with-deps",
+    "postinstall": "node scripts/postinstall.mjs",
     "build": "next build",
     "start": "next start --hostname 127.0.0.1",
     "lint": "eslint .",

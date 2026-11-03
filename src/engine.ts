@@ -4,6 +4,7 @@
  */
 
 import { chromium, webkit, firefox, Browser, Page } from 'playwright';
+import { getChromiumLaunchOptions } from './core/browser-launch';
 import { ProfileManager } from './core/profile-manager';
 import { BrowserPool } from './core/browser-pool';
 import { FindingClassifier } from './core/finding-classifier';
@@ -153,13 +154,33 @@ export class HauntViewEngine {
     let browser = this.browsers.get(browserType);
     if (!browser || !browser.isConnected()) {
       if (browserType === 'firefox') {
-        browser = await firefox.launch({ headless: true });
+        try {
+          browser = await firefox.launch({ headless: true });
+        } catch {
+          const options = await getChromiumLaunchOptions();
+          browser = await chromium.launch({
+            headless: true,
+            executablePath: options.executablePath,
+            args: options.args,
+          });
+        }
       } else if (browserType === 'webkit') {
-        browser = await webkit.launch({ headless: true });
+        try {
+          browser = await webkit.launch({ headless: true });
+        } catch {
+          const options = await getChromiumLaunchOptions();
+          browser = await chromium.launch({
+            headless: true,
+            executablePath: options.executablePath,
+            args: options.args,
+          });
+        }
       } else {
+        const options = await getChromiumLaunchOptions();
         browser = await chromium.launch({
           headless: true,
-          args: ['--no-sandbox', '--disable-setuid-sandbox'],
+          executablePath: options.executablePath,
+          args: options.args,
         });
       }
       this.browsers.set(browserType, browser);

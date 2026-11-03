@@ -9,6 +9,11 @@ import { Badge } from './components/ui/Badge';
 import { Button } from './components/ui/Button';
 import { TestLauncher } from './components/features/TestLauncher';
 import { TheVeil } from './components/features/TheVeil';
+import {
+  DEMO_LIVING_SRC,
+  DEMO_APPARITION_SRC,
+  DEMO_DIFF_SRC,
+} from './components/features/veil-demo-assets';
 import { TestReportSummary } from '@/src/core/report-store';
 import { ArrowRightIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
@@ -178,22 +183,25 @@ export default function HomePage() {
               </div>
 
               <TheVeil
-                livingLabel="Living Page (Baseline)"
-                apparitionLabel="Apparition (Images Blocked)"
+                livingSrc={DEMO_LIVING_SRC}
+                apparitionSrc={DEMO_APPARITION_SRC}
+                diffSrc={DEMO_DIFF_SRC}
+                livingLabel="Living Page (Baseline: PromptDock Mini)"
+                apparitionLabel="Apparition (Images Blocked &amp; Shift)"
                 pins={[
                   {
                     id: '1',
-                    title: 'Broken image — no alt text',
+                    title: 'Broken hero banner — missing width/height attributes',
                     severity: 'serious',
-                    xPercent: 22,
-                    yPercent: 42,
+                    xPercent: 28,
+                    yPercent: 48,
                   },
                   {
                     id: '2',
-                    title: 'Touch target smaller than 24px',
+                    title: 'Touch target collision: button size 22px < 44px',
                     severity: 'warning',
-                    xPercent: 82,
-                    yPercent: 65,
+                    xPercent: 74,
+                    yPercent: 72,
                   },
                 ]}
               />
