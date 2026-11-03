@@ -164,12 +164,12 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
         />
       ) : (
         <div className="space-y-2">
-          {filteredFindings.map((finding) => {
+          {filteredFindings.map((finding, idx) => {
             const isExpanded = expandedId === finding.id;
 
             return (
               <div
-                key={finding.id}
+                key={`${finding.id}-${idx}`}
                 className="rounded-lg border border-[#6C3CAA]/20 bg-[#0a0711]/50 overflow-hidden transition-colors hover:border-[#6C3CAA]/40"
               >
                 <div

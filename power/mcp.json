@@ -6,6 +6,7 @@
       "command": "npx",
       "args": ["tsx", "src/mcp/server.ts"],
       "env": {
+        "HAUNT_API_URL": "https://hauntview.onrender.com",
         "HAUNT_DATA_DIR": ".hauntview/data"
       }
     }

@@ -10,7 +10,6 @@ import {
   ClipboardDocumentCheckIcon,
   ClipboardDocumentIcon,
   ArrowLeftIcon,
-  PrinterIcon,
 } from '@heroicons/react/24/outline';
 
 export interface ReportActionsProps {
@@ -27,12 +26,6 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Ignore
-    }
-  };
-
-  const printReport = () => {
-    if (typeof window !== 'undefined') {
-      window.print();
     }
   };
 
@@ -60,6 +53,7 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
           {copied ? 'Copied JSON!' : 'Copy JSON'}
         </Button>
 
+        {/* Print Grimoire button commented out per user request
         <Button
           variant="outline"
           size="sm"
@@ -68,6 +62,7 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
         >
           Print Grimoire
         </Button>
+        */}
 
         <a href={`/api/results/${report.id}?format=markdown`} download>
           <Button

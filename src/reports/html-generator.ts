@@ -27,7 +27,7 @@ interface HTMLReportTheme {
 export class HTMLReportGenerator implements ReportGenerator {
   async generate(report: TestReport, options: ReportOptions): Promise<GeneratedReport> {
     const content = this.generateHTMLContent(report, options);
-    const filename = `hauntview-grimoire-${new Date().getTime()}.html`;
+    const filename = `hauntview-grimoire-${report.id}.html`;
 
     return {
       format: 'html',

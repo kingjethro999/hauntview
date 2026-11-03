@@ -279,9 +279,9 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                       Omens Detected in this Rite ({selectedProfile.findings.length})
                     </h5>
                     <div className="space-y-2">
-                      {selectedProfile.findings.map((finding) => (
+                      {selectedProfile.findings.map((finding, idx) => (
                         <div
-                          key={finding.id}
+                          key={`${finding.id}-${idx}`}
                           className="p-3 rounded-[4px] bg-[#0a0711] border border-[#46334b] flex items-center justify-between gap-3"
                         >
                           <div className="flex items-center gap-2 min-w-0">

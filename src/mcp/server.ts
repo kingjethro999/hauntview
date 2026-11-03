@@ -9,6 +9,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/server/stdio';
 import { z } from 'zod';
 import pLimit from 'p-limit';
 import { HauntViewEngine } from '../engine';
+import { TestReport } from '../types';
 import { ProfileManager } from '../core/profile-manager';
 import { ReportStore } from '../core/report-store';
 import { ReportFactory } from '../reports/factory';
@@ -110,7 +111,38 @@ server.registerTool(
         requestedProfiles
       );
 
-      const report = await limit(async () => {
+      const report: TestReport = await limit(async (): Promise<TestReport> => {
+        const remoteUrl =
+          process.env.HAUNT_API_URL ||
+          (process.env.HAUNT_USE_REMOTE === '1' ? 'https://hauntview.onrender.com' : '');
+
+        if (remoteUrl) {
+          try {
+            console.error(
+              `[HauntView MCP] Routing test request to hosted instance: ${remoteUrl}...`
+            );
+            const res = await fetch(`${remoteUrl}/api/test`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url: targetUrl, profiles: requestedProfiles }),
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.success && data.report) {
+                return data.report as TestReport;
+              }
+            }
+            console.error(
+              '[HauntView MCP] Hosted instance failed, falling back to local engine...'
+            );
+          } catch (netErr) {
+            console.error(
+              '[HauntView MCP] Hosted instance unreachable, falling back to local engine:',
+              netErr
+            );
+          }
+        }
+
         const engine = await getEngine();
         return await engine.executeTests({
           url: targetUrl,

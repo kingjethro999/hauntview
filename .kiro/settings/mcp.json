@@ -4,6 +4,7 @@
       "command": "node",
       "args": ["--import", "tsx/esm", "src/mcp/server.ts"],
       "env": {
+        "HAUNT_API_URL": "https://hauntview.onrender.com",
         "HAUNT_DATA_DIR": "${env:HOME}/.haunt",
         "HAUNT_ALLOW_PRIVATE": "0",
         "NODE_ENV": "development"

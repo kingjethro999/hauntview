@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   CheckIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
   DevicePhoneMobileIcon,
   ComputerDesktopIcon,
   EyeIcon,
@@ -252,11 +254,47 @@ const getCategoryBorderColor = (category: string) => {
   }
 };
 
+const STORAGE_KEY = 'hauntview_collapsed_categories';
+
+const DEFAULT_COLLAPSED: Record<string, boolean> = {
+  device: false,
+  accessibility: true,
+  i18n: true,
+  browser: true,
+  performance: true,
+  resilience: true,
+  security: true,
+};
+
 export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
   selectedProfiles,
   onChange,
   viewMode = 'grid',
 }) => {
+  // Restore user's collapsed preferences lazily from persistent localStorage
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
+    if (typeof window === 'undefined') return DEFAULT_COLLAPSED;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) return { ...DEFAULT_COLLAPSED, ...JSON.parse(saved) };
+    } catch {
+      // Ignore storage read errors
+    }
+    return DEFAULT_COLLAPSED;
+  });
+
+  const toggleCollapse = (cat: string) => {
+    setCollapsed((prev) => {
+      const next = { ...prev, [cat]: !prev[cat] };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // Ignore storage write errors
+      }
+      return next;
+    });
+  };
+
   const toggleProfile = (id: string) => {
     if (selectedProfiles.includes(id)) {
       onChange(selectedProfiles.filter((p) => p !== id));
@@ -278,106 +316,178 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
 
   if (viewMode === 'list') {
     return (
-      <div className="space-y-3">
-        {Object.entries(groupedProfiles).map(([category, profiles]) => (
-          <div key={category}>
+      <div className="space-y-4">
+        {Object.entries(groupedProfiles).map(([category, profiles]) => {
+          const isCollapsed = collapsed[category] ?? true;
+          const selectedCount = profiles.filter((p) => selectedProfiles.includes(p.id)).length;
+
+          return (
             <div
-              className="text-xs font-semibold uppercase tracking-wider mb-2"
-              style={{ color: 'var(--phantom-gray)' }}
+              key={category}
+              className="rounded-lg border border-[#46334b]/40 bg-[#140d1e]/40 p-3"
             >
-              {category}
-            </div>
-            <div className="space-y-2">
-              {profiles.map((profile) => (
-                <label
-                  key={profile.id}
-                  className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all hover:border-[var(--candle-primary)]"
-                  style={{
-                    background: selectedProfiles.includes(profile.id)
-                      ? getCategoryColor(category)
-                      : 'rgba(28, 21, 35, 0.3)',
-                    borderColor: selectedProfiles.includes(profile.id)
-                      ? getCategoryBorderColor(category)
-                      : 'rgba(255, 121, 31, 0.1)',
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedProfiles.includes(profile.id)}
-                    onChange={() => toggleProfile(profile.id)}
-                    className="accent-[var(--candle-primary)] w-4 h-4"
-                  />
-                  <div className="flex items-center gap-2" style={{ color: 'var(--ghost-white)' }}>
+              <div
+                onClick={() => toggleCollapse(category)}
+                className="flex items-center justify-between cursor-pointer select-none py-1"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded" style={{ background: getCategoryColor(category) }}>
                     {getCategoryIcon(category)}
-                    <span className="text-sm font-medium">{profile.name}</span>
                   </div>
-                  <span className="text-xs ml-auto" style={{ color: 'var(--phantom-gray)' }}>
-                    {profile.description}
+                  <span
+                    className="text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--phantom-gray)' }}
+                  >
+                    {category}
                   </span>
-                </label>
-              ))}
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
+                    {selectedCount}/{profiles.length} selected
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  aria-label={isCollapsed ? `Expand ${category}` : `Collapse ${category}`}
+                  className="p-1 text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-colors"
+                >
+                  {isCollapsed ? (
+                    <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />
+                  ) : (
+                    <ChevronDownIcon className="w-4 h-4 text-[#ff791f]" />
+                  )}
+                </button>
+              </div>
+
+              {!isCollapsed && (
+                <div className="space-y-2 mt-3 pt-2 border-t border-[#46334b]/30">
+                  {profiles.map((profile) => (
+                    <label
+                      key={profile.id}
+                      className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all hover:border-[var(--candle-primary)]"
+                      style={{
+                        background: selectedProfiles.includes(profile.id)
+                          ? getCategoryColor(category)
+                          : 'rgba(28, 21, 35, 0.3)',
+                        borderColor: selectedProfiles.includes(profile.id)
+                          ? getCategoryBorderColor(category)
+                          : 'rgba(255, 121, 31, 0.1)',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedProfiles.includes(profile.id)}
+                        onChange={() => toggleProfile(profile.id)}
+                        className="accent-[var(--candle-primary)] w-4 h-4"
+                      />
+                      <div
+                        className="flex items-center gap-2"
+                        style={{ color: 'var(--ghost-white)' }}
+                      >
+                        {getCategoryIcon(category)}
+                        <span className="text-sm font-medium">{profile.name}</span>
+                      </div>
+                      <span className="text-xs ml-auto" style={{ color: 'var(--phantom-gray)' }}>
+                        {profile.description}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   }
 
   // Grid view
   return (
-    <div className="space-y-6">
-      {Object.entries(groupedProfiles).map(([category, profiles]) => (
-        <div key={category}>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded" style={{ background: getCategoryColor(category) }}>
-              {getCategoryIcon(category)}
-            </div>
+    <div className="space-y-5">
+      {Object.entries(groupedProfiles).map(([category, profiles]) => {
+        const isCollapsed = collapsed[category] ?? true;
+        const selectedCount = profiles.filter((p) => selectedProfiles.includes(p.id)).length;
+
+        return (
+          <div
+            key={category}
+            className="rounded-lg border border-[#46334b]/40 bg-[#140d1e]/30 p-3.5 transition-all"
+          >
+            {/* Collapsible Category Header */}
             <div
-              className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: 'var(--phantom-gray)' }}
+              onClick={() => toggleCollapse(category)}
+              className="flex items-center justify-between cursor-pointer select-none"
             >
-              {category}
-            </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {profiles.map((profile) => (
-              <button
-                key={profile.id}
-                type="button"
-                onClick={() => toggleProfile(profile.id)}
-                className="relative p-4 rounded-lg border text-left transition-all hover:border-[var(--candle-primary)] group"
-                style={{
-                  background: selectedProfiles.includes(profile.id)
-                    ? getCategoryColor(category)
-                    : 'rgba(28, 21, 35, 0.3)',
-                  borderColor: selectedProfiles.includes(profile.id)
-                    ? getCategoryBorderColor(category)
-                    : 'rgba(255, 121, 31, 0.1)',
-                }}
-              >
-                {selectedProfiles.includes(profile.id) && (
-                  <div
-                    className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
-                    style={{ background: getCategoryBorderColor(category) }}
-                  >
-                    <CheckIcon className="w-3 h-3" style={{ color: 'var(--ghost-white)' }} />
-                  </div>
-                )}
-                <div
-                  className="flex items-center gap-2 mb-2"
-                  style={{ color: 'var(--ghost-white)' }}
-                >
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded" style={{ background: getCategoryColor(category) }}>
                   {getCategoryIcon(category)}
-                  <span className="text-sm font-medium">{profile.name}</span>
                 </div>
-                <p className="text-xs leading-snug" style={{ color: 'var(--phantom-gray)' }}>
-                  {profile.description}
-                </p>
+                <div
+                  className="text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: 'var(--phantom-gray)' }}
+                >
+                  {category}
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
+                  {selectedCount}/{profiles.length} selected
+                </span>
+              </div>
+
+              {/* Far-Right Collapse Icon */}
+              <button
+                type="button"
+                aria-label={isCollapsed ? `Expand ${category} rites` : `Collapse ${category} rites`}
+                className="p-1 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-transform"
+              >
+                {isCollapsed ? (
+                  <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />
+                ) : (
+                  <ChevronDownIcon className="w-4 h-4 text-[#ff791f]" />
+                )}
               </button>
-            ))}
+            </div>
+
+            {/* Profile Tiles Grid (hidden when collapsed) */}
+            {!isCollapsed && (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-3 pt-3 border-t border-[#46334b]/30">
+                {profiles.map((profile) => (
+                  <button
+                    key={profile.id}
+                    type="button"
+                    onClick={() => toggleProfile(profile.id)}
+                    className="relative p-4 rounded-lg border text-left transition-all hover:border-[var(--candle-primary)] group"
+                    style={{
+                      background: selectedProfiles.includes(profile.id)
+                        ? getCategoryColor(category)
+                        : 'rgba(28, 21, 35, 0.3)',
+                      borderColor: selectedProfiles.includes(profile.id)
+                        ? getCategoryBorderColor(category)
+                        : 'rgba(255, 121, 31, 0.1)',
+                    }}
+                  >
+                    {selectedProfiles.includes(profile.id) && (
+                      <div
+                        className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                        style={{ background: getCategoryBorderColor(category) }}
+                      >
+                        <CheckIcon className="w-3 h-3" style={{ color: 'var(--ghost-white)' }} />
+                      </div>
+                    )}
+                    <div
+                      className="flex items-center gap-2 mb-2"
+                      style={{ color: 'var(--ghost-white)' }}
+                    >
+                      {getCategoryIcon(category)}
+                      <span className="text-sm font-medium">{profile.name}</span>
+                    </div>
+                    <p className="text-xs leading-snug" style={{ color: 'var(--phantom-gray)' }}>
+                      {profile.description}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

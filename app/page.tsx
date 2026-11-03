@@ -146,11 +146,11 @@ export default function HomePage() {
         </div>
 
         {/* The Veil preview - signature component */}
-        <div className="relative z-10 px-4 pb-20">
-          <Container size="lg">
-            <div className="victorian-panel p-6 md:p-8">
+        <div className="relative z-10 px-4 pb-16">
+          <div className="max-w-4xl mx-auto">
+            <div className="victorian-panel p-5 md:p-6">
               <div
-                className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4"
+                className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 pb-3"
                 style={{ borderBottom: '1px solid rgba(255, 121, 31, 0.15)' }}
               >
                 <div>
@@ -171,7 +171,7 @@ export default function HomePage() {
                   style={{
                     fontSize: 11,
                     fontFamily: 'monospace',
-                    padding: '6px 12px',
+                    padding: '5px 10px',
                     borderRadius: 4,
                     color: '#9aff9a',
                     background: 'rgba(154, 255, 154, 0.08)',
@@ -186,19 +186,19 @@ export default function HomePage() {
                 livingSrc={DEMO_LIVING_SRC}
                 apparitionSrc={DEMO_APPARITION_SRC}
                 diffSrc={DEMO_DIFF_SRC}
-                livingLabel="Living Page (Baseline: PromptDock Mini)"
+                livingLabel="Living Page (Baseline: ExampleSite)"
                 apparitionLabel="Apparition (Images Blocked &amp; Shift)"
                 pins={[
                   {
                     id: '1',
-                    title: 'Broken hero banner — missing width/height attributes',
+                    title: 'Asset load failure — missing width/height attributes',
                     severity: 'serious',
                     xPercent: 28,
                     yPercent: 48,
                   },
                   {
                     id: '2',
-                    title: 'Touch target collision: button size 22px < 44px',
+                    title: 'Touch target collision: button size 24px < 44px',
                     severity: 'warning',
                     xPercent: 74,
                     yPercent: 72,
@@ -206,7 +206,7 @@ export default function HomePage() {
                 ]}
               />
             </div>
-          </Container>
+          </div>
         </div>
       </section>
 

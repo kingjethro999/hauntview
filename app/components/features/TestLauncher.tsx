@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
 import { ProfileSelector, AVAILABLE_PROFILES } from './ProfileSelector';
+import { PlanchetteProgress } from './PlanchetteProgress';
 import {
   RocketLaunchIcon,
   HomeModernIcon,
@@ -36,6 +37,40 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [format, setFormat] = useState<'zip' | 'html' | 'markdown' | 'json'>('zip');
   const [error, setError] = useState<string | null>(null);
+  const [progressPercent, setProgressPercent] = useState<number>(0);
+  const [activeRiteName, setActiveRiteName] = useState<string>('');
+  const [completedCount, setCompletedCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (!isRunning) return;
+
+    const total = selectedProfiles.length || 1;
+    const startTime = Date.now();
+    // Estimate ~2.5s per profile
+    const estimatedDurationMs = Math.max(8000, total * 2500);
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const ratio = Math.min(0.95, elapsed / estimatedDurationMs);
+      const pct = Math.min(95, Math.round(ratio * 100));
+      setProgressPercent(pct);
+
+      const profileIndex = Math.min(total - 1, Math.floor(ratio * total));
+      const currentId = selectedProfiles[profileIndex];
+      const found = AVAILABLE_PROFILES.find((p) => p.id === currentId);
+      if (found) {
+        setActiveRiteName(found.name);
+      }
+      setCompletedCount(profileIndex + 1);
+    }, 350);
+
+    return () => {
+      clearInterval(interval);
+      setProgressPercent(0);
+      setCompletedCount(0);
+      setActiveRiteName('');
+    };
+  }, [isRunning, selectedProfiles]);
 
   const presets = [
     { label: 'localhost:3000', url: 'http://localhost:3000' },
@@ -258,6 +293,22 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
             onSelectAll={selectAllProfiles}
           />
         </div>
+
+        {/* Interactive Halloween Séance Progress Tracker */}
+        {isRunning && (
+          <div className="pt-2 animate-fadeIn">
+            <PlanchetteProgress
+              progressPercent={progressPercent}
+              statusMessage={
+                activeRiteName
+                  ? `Communing with spirits · Sensitizing plate for rite: ${activeRiteName}…`
+                  : 'Sensitizing photographic plates and invoking Chromium headless session…'
+              }
+              totalRites={selectedProfiles.length}
+              completedRites={completedCount}
+            />
+          </div>
+        )}
 
         {/* Format selection and submit */}
         <div

@@ -68,7 +68,7 @@ export class MobileProfile {
                 : `${tagName}${textContent ? `[text="${textContent}"]` : ''}`;
 
             findings.push({
-              id: `${this.profileId}-small-touch-target`,
+              id: `${this.profileId}-small-touch-target-${findings.length + 1}`,
               profileId: this.profileId,
               severity: 'warning',
               category: 'touch-targets',

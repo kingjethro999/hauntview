@@ -17,7 +17,7 @@ interface MarkdownStatistics {
 export class MarkdownReportGenerator implements ReportGenerator {
   async generate(report: TestReport, options: ReportOptions): Promise<GeneratedReport> {
     const content = this.generateMarkdownContent(report, options);
-    const filename = `hauntview-report-${new Date().getTime()}.md`;
+    const filename = `hauntview-report-${report.id}.md`;
 
     return {
       format: 'markdown',
