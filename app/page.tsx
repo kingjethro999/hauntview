@@ -10,11 +10,7 @@ import { Button } from './components/ui/Button';
 import { TestLauncher } from './components/features/TestLauncher';
 import { TheVeil } from './components/features/TheVeil';
 import { TestReportSummary } from '@/src/core/report-store';
-import { 
-  ArrowRightIcon, 
-  ClockIcon,
-  DocumentTextIcon
-} from '@heroicons/react/24/outline';
+import { ArrowRightIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 export default function HomePage() {
   const router = useRouter();
@@ -100,11 +96,13 @@ export default function HomePage() {
                 Photograph your
                 <br />
                 website
-                <em style={{ 
-                  fontStyle: 'normal', 
-                  color: 'var(--candle-primary)',
-                  textShadow: '0 0 40px rgba(255,121,31,0.3)'
-                }}>
+                <em
+                  style={{
+                    fontStyle: 'normal',
+                    color: 'var(--candle-primary)',
+                    textShadow: '0 0 40px rgba(255,121,31,0.3)',
+                  }}
+                >
                   twice
                 </em>
               </h1>
@@ -118,9 +116,9 @@ export default function HomePage() {
                   maxWidth: 440,
                 }}
               >
-                HauntView captures the living page as you built it, and the apparition 
-                as your users sometimes get it — under 16 failure conditions with 
-                visual diffs and evidence-backed findings.
+                HauntView captures the living page as you built it, and the apparition as your users
+                sometimes get it — under 16 failure conditions with visual diffs and evidence-backed
+                findings.
               </p>
 
               {/* Feature badges */}
@@ -146,10 +144,16 @@ export default function HomePage() {
         <div className="relative z-10 px-4 pb-20">
           <Container size="lg">
             <div className="victorian-panel p-6 md:p-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4" style={{ borderBottom: '1px solid rgba(255, 121, 31, 0.15)' }}>
+              <div
+                className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4"
+                style={{ borderBottom: '1px solid rgba(255, 121, 31, 0.15)' }}
+              >
                 <div>
                   <div className="flex items-center gap-3 mb-1">
-                    <DocumentTextIcon className="w-5 h-5" style={{ color: 'var(--candle-primary)' }} />
+                    <DocumentTextIcon
+                      className="w-5 h-5"
+                      style={{ color: 'var(--candle-primary)' }}
+                    />
                     <h3 className="font-semibold text-lg" style={{ color: 'var(--ghost-white)' }}>
                       The Veil
                     </h3>
@@ -204,10 +208,7 @@ export default function HomePage() {
       <Container size="lg" className="relative z-10 py-20 space-y-20">
         {/* Test Launcher */}
         <div>
-          <TestLauncher
-            onStartTest={handleStartTest}
-            isRunning={isRunning}
-          />
+          <TestLauncher onStartTest={handleStartTest} isRunning={isRunning} />
         </div>
 
         {/* Recent Séances */}
@@ -216,7 +217,14 @@ export default function HomePage() {
             <div>
               <h2 className="font-semibold text-2xl" style={{ color: 'var(--ghost-white)' }}>
                 The Crypt
-                <span style={{ fontWeight: 400, fontSize: 15, color: 'var(--phantom-gray)', marginLeft: 12 }}>
+                <span
+                  style={{
+                    fontWeight: 400,
+                    fontSize: 15,
+                    color: 'var(--phantom-gray)',
+                    marginLeft: 12,
+                  }}
+                >
                   · Recent Séances
                 </span>
               </h2>
@@ -243,17 +251,24 @@ export default function HomePage() {
                 borderRadius: 8,
               }}
             >
-              <ClockIcon className="w-8 h-8 mx-auto mb-3 ember-pulse" style={{ color: 'var(--candle-primary)' }} />
+              <ClockIcon
+                className="w-8 h-8 mx-auto mb-3 ember-pulse"
+                style={{ color: 'var(--candle-primary)' }}
+              />
               <p style={{ fontSize: 13, fontFamily: 'monospace' }}>Consulting the archives…</p>
             </div>
           ) : recentRuns.length === 0 ? (
             <Card variant="default" className="text-center py-16 px-6">
-              <DocumentTextIcon className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--phantom-gray)' }} />
+              <DocumentTextIcon
+                className="w-12 h-12 mx-auto mb-4"
+                style={{ color: 'var(--phantom-gray)' }}
+              />
               <h4 className="font-semibold text-base mb-2" style={{ color: 'var(--ghost-white)' }}>
                 The Crypt Is Peaceful
               </h4>
               <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--phantom-gray)' }}>
-                No past séances yet. Run your first test to begin building your gallery of apparitions.
+                No past séances yet. Run your first test to begin building your gallery of
+                apparitions.
               </p>
             </Card>
           ) : (
@@ -273,8 +288,14 @@ export default function HomePage() {
                         <Badge variant={isPass ? 'success' : 'error'} size="sm">
                           {isPass ? 'No Omens' : `${run.errorCount} Screams`}
                         </Badge>
-                        <div className="flex items-center gap-1.5" style={{ fontSize: 12, color: 'var(--phantom-gray)' }}>
-                          <ClockIcon className="w-4 h-4" style={{ color: 'var(--candle-primary)' }} />
+                        <div
+                          className="flex items-center gap-1.5"
+                          style={{ fontSize: 12, color: 'var(--phantom-gray)' }}
+                        >
+                          <ClockIcon
+                            className="w-4 h-4"
+                            style={{ color: 'var(--candle-primary)' }}
+                          />
                           <span>{(run.duration / 1000).toFixed(1)}s</span>
                         </div>
                       </div>
@@ -286,7 +307,8 @@ export default function HomePage() {
                         {run.url}
                       </h4>
                       <p style={{ fontSize: 12, color: 'var(--phantom-gray)' }}>
-                        {run.successfulProfiles}/{run.totalProfiles} rites · {run.totalFindings} omens
+                        {run.successfulProfiles}/{run.totalProfiles} rites · {run.totalFindings}{' '}
+                        omens
                       </p>
                     </div>
 
@@ -294,7 +316,13 @@ export default function HomePage() {
                       className="mt-4 pt-4 flex items-center justify-between"
                       style={{ borderTop: '1px solid rgba(255, 121, 31, 0.1)' }}
                     >
-                      <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'var(--phantom-gray)' }}>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontFamily: 'monospace',
+                          color: 'var(--phantom-gray)',
+                        }}
+                      >
                         {new Date(run.startTime).toLocaleDateString()}
                       </span>
                       <Link href={`/results/${run.id}`}>

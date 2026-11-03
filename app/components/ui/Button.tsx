@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2Icon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'candle';
@@ -46,7 +46,7 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading}
       {...props}
     >
-      {loading && <Loader2Icon className="w-4 h-4 animate-spin" />}
+      {loading && <ArrowPathIcon className="w-4 h-4 animate-spin" />}
       {!loading && icon}
       {children}
     </button>

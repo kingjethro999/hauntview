@@ -45,40 +45,65 @@ export const TargetUrlSchema = z
 
 /**
  * Checks if a parsed IP address is safe to contact.
+ *
+ * Rules (§4.7):
+ * - Cloud metadata 169.254.169.254 is ALWAYS blocked regardless of any env or option.
+ * - link-local (169.254.x.x), multicast, broadcast, unspecified, and carrierGradeNat
+ *   are always blocked.
+ * - Loopback (127.x / ::1) is allowed only when allowLocal === true.
+ * - Private ranges (RFC 1918: 10.x, 172.16-31.x, 192.168.x) and unique-local IPv6
+ *   (fc00::/7) are allowed only when HAUNT_ALLOW_PRIVATE=1 is set in the environment.
+ * - All other addresses (public internet) are allowed.
  */
 export function isSafeIp(ipString: string, allowLocal = true): boolean {
   if (!ipaddr.isValid(ipString)) {
     return false;
   }
 
+  // Cloud metadata endpoint — unconditionally blocked (§4.7).
+  if (ipString === '169.254.169.254') {
+    return false;
+  }
+
   const parsed = ipaddr.parse(ipString);
   const range = parsed.range();
 
-  // Dangerous or internal metadata ranges that should never be scanned
-  const blockedRanges = [
-    'linkLocal', // e.g. 169.254.169.254 AWS metadata
+  // Always-blocked ranges regardless of any option or env variable.
+  const alwaysBlockedRanges = [
+    'linkLocal', // covers 169.254.0.0/16 (including cloud metadata)
     'multicast',
     'broadcast',
     'carrierGradeNat',
     'unspecified',
   ];
 
-  if (blockedRanges.includes(range)) {
+  if (alwaysBlockedRanges.includes(range)) {
     return false;
   }
 
-  // Cloud metadata explicit protection
-  if (ipString === '169.254.169.254') {
-    return false;
+  // Unique-local IPv6 (fc00::/7) — treat same as private (§4.7).
+  if (parsed.kind() === 'ipv6') {
+    const ipv6 = parsed as ipaddr.IPv6;
+    // The first byte in fc00::/7 has the top 7 bits set to 1111110x.
+    const firstByte = ipv6.parts[0] >> 8; // high byte of first 16-bit part
+    const isUniqueLocal = (firstByte & 0xfe) === 0xfc;
+    if (isUniqueLocal) {
+      return process.env.HAUNT_ALLOW_PRIVATE === '1';
+    }
   }
 
-  if (allowLocal) {
-    // In local testing mode, loopback and private LAN addresses are permitted (e.g. localhost, 127.0.0.1, 192.168.x.x)
-    return true;
+  // Loopback: 127.0.0.0/8 or ::1 — controlled by allowLocal.
+  if (range === 'loopback') {
+    return allowLocal;
   }
 
-  // In restricted public mode, private and loopback are blocked
-  return range !== 'loopback' && range !== 'private';
+  // Private ranges (RFC 1918): 10.x, 172.16-31.x, 192.168.x — requires env gate.
+  if (range === 'private') {
+    return process.env.HAUNT_ALLOW_PRIVATE === '1';
+  }
+
+  // Public internet address — safe.
+  return true;
 }
 
 /**
