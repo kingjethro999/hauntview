@@ -8,7 +8,8 @@ import { FindingsTable } from '../../components/features/FindingsTable';
 import { ProfileResultsList } from '../../components/features/ProfileResultsList';
 import { ReportActions } from '../../components/features/ReportActions';
 import { CameoFrame } from '../../components/features/CameoFrame';
-import { TheVeil, OmenPin } from '../../components/features/TheVeil';
+// The Veil is a work in progress - commented out
+// import { TheVeil, OmenPin } from '../../components/features/TheVeil';
 import { WispGhost, WispState } from '../../components/features/WispGhost';
 import { ExorcismPromptModal } from '../../components/features/ExorcismPromptModal';
 import { Card } from '../../components/ui/Card';
@@ -54,32 +55,25 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
     report.profileResults.find((p) => p.profileId === selectedProfileId) ||
     report.profileResults[0];
 
-  // Baseline profile (desktop baseline capture)
-  const baselineProfile =
-    report.profileResults.find((p) => p.profileId === 'desktop' || p.profileId === 'desktop-4k') ||
-    report.profileResults[0];
-
-  const baselineFilename =
-    baselineProfile?.screenshots?.[0]?.fileName ||
-    (baselineProfile?.findings?.find((f) => f.details?.screenshot)?.details?.screenshot as
-      string | undefined);
+  // Baseline profile and livingSrc (used by The Veil - commented out for now)
+  // const baselineProfile =
+  //   report.profileResults.find((p) => p.profileId === 'desktop' || p.profileId === 'desktop-4k') ||
+  //   report.profileResults[0];
+  // const baselineFilename =
+  //   baselineProfile?.screenshots?.[0]?.fileName ||
+  //   (baselineProfile?.findings?.find((f) => f.details?.screenshot)?.details?.screenshot as
+  //     string | undefined);
+  // const livingSrc = baselineFilename ? `/api/screenshots/${baselineFilename}` : undefined;
 
   const apparitionFilename =
     selectedProfile?.screenshots?.[0]?.fileName ||
     (selectedProfile?.findings?.find((f) => f.details?.screenshot)?.details?.screenshot as
       string | undefined);
 
-  const livingSrc = baselineFilename ? `/api/screenshots/${baselineFilename}` : undefined;
   const apparitionSrc = apparitionFilename ? `/api/screenshots/${apparitionFilename}` : undefined;
 
-  // Map findings of selected profile to Veil pins
-  const veilPins: OmenPin[] = (selectedProfile?.findings || []).map((f, idx) => ({
-    id: f.id,
-    title: f.message,
-    severity: f.severity === 'error' ? 'serious' : f.severity === 'warning' ? 'warning' : 'info',
-    xPercent: 18 + ((idx * 27) % 64),
-    yPercent: 22 + ((idx * 21) % 56),
-  }));
+  // Map findings of selected profile to Veil pins (commented out while The Veil is work-in-progress)
+  // const veilPins: OmenPin[] = (selectedProfile?.findings || []).map((f, idx) => ({ ... }));
 
   const tabs = [
     {
@@ -91,7 +85,7 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
     {
       id: 'apparitions',
       label: `Gallery of Apparitions (${report.profileResults.length})`,
-      plain: 'Spirit Photos & Veil',
+      plain: 'Spirit Photos & Apparitions',
       icon: <PhotoIcon className="w-4 h-4" />,
     },
     {
@@ -198,8 +192,7 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                   </Badge>
                 </div>
                 <p className="text-xs text-[#d9d3e0] mt-1">
-                  Select an apparition plate to part The Veil and inspect visual divergence against
-                  the living baseline.
+                  Select an apparition plate to inspect visual captures and diagnostic omens.
                 </p>
               </div>
 
@@ -228,14 +221,14 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
               </div>
             </Card>
 
-            {/* The Veil Inspector for Selected Profile */}
+            {/* Apparition Plate Inspector for Selected Profile */}
             {selectedProfile && (
               <Card variant="default" className="p-6 bg-[#1c1629]/90 border-[#46334b]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-[#46334b]">
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs uppercase tracking-wider font-mono text-[#ff791f]">
-                        The Veil Inspector
+                        Apparition Plate
                       </span>
                       <span className="text-[#b9acbf]">•</span>
                       <h4 className="font-display font-bold text-base text-[#fff1dc]">
@@ -243,8 +236,7 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                       </h4>
                     </div>
                     <p className="text-xs text-[#d9d3e0] mt-0.5">
-                      Drag the planchette handle left and right to inspect how this condition
-                      manifests.
+                      Visual capture and diagnostic findings recorded during this testing rite.
                     </p>
                   </div>
 
@@ -257,7 +249,8 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                   </div>
                 </div>
 
-                {/* The Veil Comparison Component */}
+                {/* The Veil Comparison Component (work in progress - commented out) */}
+                {/*
                 <div className="max-w-4xl mx-auto">
                   <TheVeil
                     livingSrc={livingSrc}
@@ -271,6 +264,18 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                     }}
                   />
                 </div>
+                */}
+
+                {/* Display Screenshot Plate if captured */}
+                {apparitionSrc && (
+                  <div className="max-w-4xl mx-auto rounded border border-[#46334b] overflow-hidden bg-[#0a0711] mb-6">
+                    <img
+                      src={apparitionSrc}
+                      alt={selectedProfile.profileName}
+                      className="w-full h-auto max-h-[500px] object-contain mx-auto"
+                    />
+                  </div>
+                )}
 
                 {/* Profile Findings List under the Veil */}
                 {selectedProfile.findings.length > 0 && (

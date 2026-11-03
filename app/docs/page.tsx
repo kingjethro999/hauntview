@@ -19,10 +19,10 @@ import {
 import { CodeBlock } from '../components/ui/CodeBlock';
 import { HAUNTVIEW_DOCS_MARKDOWN } from './docs-markdown';
 
-type ClientTab = 'remote' | 'cursor' | 'claude' | 'kiro' | 'windsurf' | 'vscode';
+type ClientTab = 'kiro' | 'remote' | 'claude' | 'cursor' | 'windsurf' | 'vscode';
 
 export default function ManualPage() {
-  const [activeTab, setActiveTab] = useState<ClientTab>('remote');
+  const [activeTab, setActiveTab] = useState<ClientTab>('kiro');
   const [copiedMd, setCopiedMd] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
 
@@ -38,7 +38,7 @@ export default function ManualPage() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['overview', 'transports', 'clients', 'tools', 'kiro-power', 'local-setup'];
+      const sections = ['overview', 'clients', 'kiro-power', 'transports', 'tools', 'local-setup'];
       const scrollPosition = window.scrollY + 160;
 
       for (const sectionId of sections) {
@@ -60,7 +60,7 @@ export default function ManualPage() {
 
   return (
     <div className="min-h-screen py-8 md:py-12 bg-[#060309] text-[#d9d3e0]">
-      {/* Outer Docs Frame (Context7 inspired wide layout) */}
+      {/* Outer Docs Frame (Wide responsive layout) */}
       <div className="mx-auto w-full max-w-[1520px] px-4 sm:px-6 md:px-8 lg:px-10">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* ========================================================= */}
@@ -82,7 +82,7 @@ export default function ManualPage() {
                         : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
                     }`}
                   >
-                    <span>Overview &amp; Codex</span>
+                    <span>Overview</span>
                   </a>
                   <a
                     href="#transports"
@@ -97,12 +97,30 @@ export default function ManualPage() {
                 </nav>
               </div>
 
-              {/* Navigation Group 2: Integration */}
+              {/* Navigation Group 2: Client Integration (KIRO FIRST) */}
               <div>
-                <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#a855f7]/80 mb-2.5 font-semibold px-2">
-                  Client Integration
+                <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#a855f7]/80 mb-2.5 font-semibold px-2 flex items-center justify-between">
+                  <span>Client Integration</span>
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ff791f]/20 text-[#ff791f] font-mono">
+                    Kiro First
+                  </span>
                 </h4>
                 <nav className="space-y-1">
+                  {/* Kiro IDE First */}
+                  <a
+                    href="#clients"
+                    onClick={() => setActiveTab('kiro')}
+                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      activeSection === 'clients' && activeTab === 'kiro'
+                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#ff791f]'
+                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                    }`}
+                  >
+                    <span className="text-[#fff1dc] font-semibold">Kiro IDE</span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#ff791f]/20 text-[#ff791f] font-mono">
+                      Primary
+                    </span>
+                  </a>
                   <a
                     href="#clients"
                     onClick={() => setActiveTab('remote')}
@@ -113,20 +131,9 @@ export default function ManualPage() {
                     }`}
                   >
                     <span>Remote HTTP / SSE</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#ff791f]/20 text-[#ff791f] font-mono">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#9aff9a]/20 text-[#9aff9a] font-mono">
                       Cloud
                     </span>
-                  </a>
-                  <a
-                    href="#clients"
-                    onClick={() => setActiveTab('cursor')}
-                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
-                      activeSection === 'clients' && activeTab === 'cursor'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#a855f7]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
-                    }`}
-                  >
-                    <span>Cursor IDE</span>
                   </a>
                   <a
                     href="#clients"
@@ -141,14 +148,14 @@ export default function ManualPage() {
                   </a>
                   <a
                     href="#clients"
-                    onClick={() => setActiveTab('kiro')}
+                    onClick={() => setActiveTab('cursor')}
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
-                      activeSection === 'clients' && activeTab === 'kiro'
+                      activeSection === 'clients' && activeTab === 'cursor'
                         ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#a855f7]'
                         : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
                     }`}
                   >
-                    <span>Kiro IDE</span>
+                    <span>Cursor IDE</span>
                   </a>
                   <a
                     href="#clients"
@@ -175,12 +182,23 @@ export default function ManualPage() {
                 </nav>
               </div>
 
-              {/* Navigation Group 3: Reference & Power */}
+              {/* Navigation Group 3: Kiro Power & Reference */}
               <div>
                 <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#9aff9a]/80 mb-2.5 font-semibold px-2">
-                  Reference &amp; Development
+                  Kiro Power &amp; Reference
                 </h4>
                 <nav className="space-y-1">
+                  <a
+                    href="#kiro-power"
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      activeSection === 'kiro-power'
+                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#9aff9a]'
+                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                    }`}
+                  >
+                    <SparklesIcon className="w-3.5 h-3.5 text-[#ff791f]" />
+                    <span className="text-[#fff1dc] font-semibold">Kiro Power Pack</span>
+                  </a>
                   <a
                     href="#tools"
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
@@ -190,16 +208,6 @@ export default function ManualPage() {
                     }`}
                   >
                     <span>MCP Tools (6 Tools)</span>
-                  </a>
-                  <a
-                    href="#kiro-power"
-                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
-                      activeSection === 'kiro-power'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#9aff9a]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
-                    }`}
-                  >
-                    <span>Kiro Power Extension</span>
                   </a>
                   <a
                     href="#local-setup"
@@ -218,7 +226,7 @@ export default function ManualPage() {
             {/* Quick Link Card in Sidebar */}
             <div className="p-3.5 rounded-lg border border-[#46334b]/40 bg-[#0d0714] text-xs space-y-2">
               <div className="flex items-center justify-between text-[#b9acbf]">
-                <span className="font-mono text-[11px] text-[#ff791f]">Live Engine</span>
+                <span className="font-mono text-[11px] text-[#ff791f]">Kiro Engine Live</span>
                 <span className="inline-block w-2 h-2 rounded-full bg-[#9aff9a] animate-pulse" />
               </div>
               <p className="text-[11px] text-[#7a6a82] leading-relaxed">
@@ -296,7 +304,7 @@ export default function ManualPage() {
             <section id="overview" className="space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(255,121,31,0.12)] text-[#ff791f] border border-[rgba(255,121,31,0.3)]">
-                  Developer Codex · v0.1.0
+                  Kiro Hackathon Edition · v0.1.0
                 </span>
                 <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(154,255,154,0.12)] text-[#9aff9a] border border-[rgba(154,255,154,0.3)]">
                   Hosted Service Active
@@ -312,180 +320,109 @@ export default function ManualPage() {
 
               <p className="text-sm sm:text-base text-[#b9acbf] leading-relaxed max-w-3xl">
                 The authoritative manual for orchestrating HauntView across autonomous coding
-                agents. Equip your AI assistants in <strong>Cursor</strong>,{' '}
-                <strong>Claude Code</strong>, <strong>Kiro IDE</strong>, and{' '}
-                <strong>Windsurf</strong> with deterministic resilience testing, responsive viewport
-                audits, and visual regression diffs.
+                agents. Built for the <strong>Kiro Hackathon</strong> to equip your{' '}
+                <strong>Kiro agents</strong> with deterministic resilience testing, responsive
+                viewport audits, and accessibility defect detection.
               </p>
             </section>
 
             {/* ========================================================= */}
-            {/* SECTION 2: TRANSPORTS ARCHITECTURE                        */}
-            {/* ========================================================= */}
-            <section id="transports" className="space-y-6 pt-6 border-t border-[#46334b]/40">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-[#ff791f]/15 text-[#ff791f]">
-                  <ServerStackIcon className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-[#fff1dc]">
-                    1. MCP Transports: Remote URL vs. Local Stdio
-                  </h2>
-                  <p className="text-xs text-[#7a6a82]">
-                    Why some MCP servers use remote URLs and others use local commands.
-                  </p>
-                </div>
-              </div>
-
-              {/* Explanatory cards side-by-side */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Remote HTTP / SSE Card */}
-                <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[#9aff9a]">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-[#9aff9a] font-semibold flex items-center gap-1.5">
-                      <GlobeAltIcon className="w-4 h-4" />
-                      Remote HTTP / SSE (&quot;url&quot;)
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#9aff9a]/15 text-[#9aff9a] text-[10px] font-mono">
-                      Context7 Style
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#b9acbf] leading-relaxed">
-                    Connects directly over the web via Server-Sent Events (SSE) and HTTP POST.
-                    <strong> Zero local installation</strong>: your agent simply talks to the remote
-                    cloud URL. No Node.js, Playwright, or browser downloads on your machine.
-                  </p>
-                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[#46334b]/40">
-                    Endpoint:{' '}
-                    <span className="text-[#9aff9a]">https://hauntview.onrender.com/api/mcp</span>
-                  </div>
-                </div>
-
-                {/* Local Stdio Subprocess Card */}
-                <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[#ff791f]">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-[#ff791f] font-semibold flex items-center gap-1.5">
-                      <CommandLineIcon className="w-4 h-4" />
-                      Local Stdio Subprocess (&quot;command&quot;)
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#ff791f]/15 text-[#ff791f] text-[10px] font-mono">
-                      Subprocess
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#b9acbf] leading-relaxed">
-                    Spawns a local process on your computer communicating through standard
-                    input/output (<code className="text-[#ff791f]">stdio</code>). Ideal for running
-                    100% offline, inspecting local source files, or forwarding test executions to a
-                    private engine.
-                  </p>
-                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[#46334b]/40">
-                    Command:{' '}
-                    <span className="text-[#ff791f]">node --import tsx/esm src/mcp/server.ts</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Architectural note */}
-              <div className="p-4 rounded-lg bg-[#140b20]/60 border border-[#ff791f]/30 text-xs text-[#d9d3e0] leading-relaxed">
-                <span className="text-[#ff791f] font-semibold font-mono mr-1">
-                  Architectural Insight:
-                </span>
-                Commercial tools like Context7 use remote URL gateways (
-                <code className="text-[#9aff9a] font-mono">
-                  &quot;url&quot;: &quot;https://.../mcp&quot;
-                </code>
-                ) because they host multi-tenant vector indexes in the cloud. HauntView provides{' '}
-                <strong>both</strong> options: you can point your AI editor directly to
-                HauntView&apos;s hosted remote endpoint at{' '}
-                <code className="text-[#9aff9a] font-mono">
-                  https://hauntview.onrender.com/api/mcp
-                </code>{' '}
-                with zero local overhead, or run the engine locally via{' '}
-                <code className="text-[#ff791f] font-mono">stdio</code>.
-              </div>
-            </section>
-
-            {/* ========================================================= */}
-            {/* SECTION 3: CLIENT CONFIGURATION TABS                      */}
+            {/* SECTION 2: CLIENT CONFIGURATION TABS (KIRO FIRST)         */}
             {/* ========================================================= */}
             <section id="clients" className="space-y-6 pt-6 border-t border-[#46334b]/40">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-[#a855f7]/15 text-[#a855f7]">
+                <div className="p-2 rounded bg-[#ff791f]/15 text-[#ff791f]">
                   <BoltIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#fff1dc]">2. Client Integration Guides</h2>
+                  <h2 className="text-xl font-bold text-[#fff1dc]">
+                    1. Client Integration Guides (Kiro First)
+                  </h2>
                   <p className="text-xs text-[#7a6a82]">
-                    Select your preferred AI coding editor to view and copy the configuration
-                    snippet.
+                    Connect your AI coding assistant to HauntView via the Model Context Protocol.
                   </p>
                 </div>
               </div>
 
-              {/* Tabs navigation */}
+              {/* Tabs navigation - KIRO FIRST */}
               <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-lg bg-[#0e0717] border border-[#46334b]/50">
+                {/* 1. KIRO IDE (FIRST) */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('kiro')}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
+                    activeTab === 'kiro'
+                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#ff791f]/50 text-[#ff791f]'
+                      : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
+                  }`}
+                >
+                  <SparklesIcon className="w-3.5 h-3.5 text-[#ff791f]" />
+                  <span>Kiro IDE</span>
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ff791f]/20 text-[#ff791f] font-mono">
+                    Primary
+                  </span>
+                </button>
+
+                {/* 2. REMOTE HTTP / SSE */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('remote')}
                   className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'remote'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#ff791f]/40 text-[#ff791f]'
+                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#9aff9a]/40 text-[#9aff9a]'
                       : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
                   }`}
                 >
-                  <GlobeAltIcon className="w-3.5 h-3.5 text-[#ff791f]" />
-                  <span>Remote URL (Zero-Install)</span>
+                  <GlobeAltIcon className="w-3.5 h-3.5 text-[#9aff9a]" />
+                  <span>Remote HTTP / SSE</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('cursor')}
-                  className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
-                    activeTab === 'cursor'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40'
-                      : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
-                  }`}
-                >
-                  Cursor
-                </button>
+
+                {/* 3. CLAUDE CODE */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('claude')}
                   className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'claude'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40'
+                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40 text-[#fff1dc]'
                       : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
                   }`}
                 >
                   Claude Code
                 </button>
+
+                {/* 4. CURSOR */}
                 <button
                   type="button"
-                  onClick={() => setActiveTab('kiro')}
+                  onClick={() => setActiveTab('cursor')}
                   className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
-                    activeTab === 'kiro'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40'
+                    activeTab === 'cursor'
+                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40 text-[#fff1dc]'
                       : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
                   }`}
                 >
-                  Kiro IDE
+                  Cursor
                 </button>
+
+                {/* 5. WINDSURF */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('windsurf')}
                   className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'windsurf'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40'
+                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40 text-[#fff1dc]'
                       : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
                   }`}
                 >
                   Windsurf
                 </button>
+
+                {/* 6. VS CODE */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('vscode')}
                   className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'vscode'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40'
+                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40 text-[#fff1dc]'
                       : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
                   }`}
                 >
@@ -495,12 +432,69 @@ export default function ManualPage() {
 
               {/* Tab Content Panes */}
               <div className="victorian-panel p-6 space-y-4">
-                {/* 1. REMOTE TAB */}
+                {/* 1. KIRO IDE TAB (FIRST) */}
+                {activeTab === 'kiro' && (
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#fff1dc] flex items-center gap-2">
+                        <SparklesIcon className="w-4 h-4 text-[#ff791f]" />
+                        Kiro IDE Configuration (Primary Hackathon Target)
+                      </h3>
+                      <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
+                        In your Kiro workspace, place this configuration directly inside{' '}
+                        <code className="text-[#ff791f] font-mono">.kiro/settings/mcp.json</code>.
+                        Your Kiro agent will instantly gain access to all HauntView chaos testing
+                        tools.
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-[#9aff9a] font-mono mb-2">
+                        Option A: Remote Cloud (Zero local dependencies — Recommended)
+                      </p>
+                      <CodeBlock
+                        title=".kiro/settings/mcp.json (Remote Cloud)"
+                        language="json"
+                        code={`{
+  "mcpServers": {
+    "hauntview": {
+      "url": "https://hauntview.onrender.com/api/mcp"
+    }
+  }
+}`}
+                      />
+                    </div>
+
+                    <div className="pt-2">
+                      <p className="text-xs text-[#ff791f] font-mono mb-2">
+                        Option B: Local Stdio Subprocess (With remote engine routing)
+                      </p>
+                      <CodeBlock
+                        title=".kiro/settings/mcp.json (Stdio Engine)"
+                        language="json"
+                        code={`{
+  "mcpServers": {
+    "hauntview": {
+      "command": "node",
+      "args": ["--import", "tsx/esm", "src/mcp/server.ts"],
+      "env": {
+        "HAUNT_API_URL": "https://hauntview.onrender.com",
+        "NODE_ENV": "development"
+      }
+    }
+  }
+}`}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. REMOTE TAB */}
                 {activeTab === 'remote' && (
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-sm font-semibold text-[#fff1dc] flex items-center gap-2">
-                        <GlobeAltIcon className="w-4 h-4 text-[#ff791f]" />
+                        <GlobeAltIcon className="w-4 h-4 text-[#9aff9a]" />
                         Universal Remote HTTP / SSE Endpoint (Zero-Install)
                       </h3>
                       <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
@@ -521,57 +515,6 @@ export default function ManualPage() {
   }
 }`}
                     />
-                  </div>
-                )}
-
-                {/* 2. CURSOR TAB */}
-                {activeTab === 'cursor' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[#fff1dc]">
-                        Cursor IDE Configuration
-                      </h3>
-                      <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
-                        In Cursor, open <strong>Settings &gt; Features &gt; MCP</strong>, or paste
-                        into <code className="text-[#ff791f] font-mono">.cursor/mcp.json</code>{' '}
-                        (workspace) or{' '}
-                        <code className="text-[#ff791f] font-mono">~/.cursor/mcp.json</code>{' '}
-                        (global):
-                      </p>
-                    </div>
-
-                    <CodeBlock
-                      title=".cursor/mcp.json (Hosted Remote)"
-                      language="json"
-                      code={`{
-  "mcpServers": {
-    "hauntview": {
-      "url": "https://hauntview.onrender.com/api/mcp"
-    }
-  }
-}`}
-                    />
-
-                    <div className="pt-2">
-                      <p className="text-xs text-[#7a6a82] mb-2 font-mono">
-                        Alternative: Run via local stdio within the cloned repository:
-                      </p>
-                      <CodeBlock
-                        title=".cursor/mcp.json (Local Stdio)"
-                        language="json"
-                        code={`{
-  "mcpServers": {
-    "hauntview": {
-      "command": "node",
-      "args": ["--import", "tsx/esm", "src/mcp/server.ts"],
-      "env": {
-        "HAUNT_API_URL": "https://hauntview.onrender.com"
-      }
-    }
-  }
-}`}
-                      />
-                    </div>
                   </div>
                 )}
 
@@ -613,22 +556,24 @@ export default function ManualPage() {
                   </div>
                 )}
 
-                {/* 4. KIRO IDE TAB */}
-                {activeTab === 'kiro' && (
+                {/* 4. CURSOR TAB */}
+                {activeTab === 'cursor' && (
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-sm font-semibold text-[#fff1dc]">
-                        Kiro IDE Configuration
+                        Cursor IDE Configuration
                       </h3>
                       <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
-                        Place this configuration inside your project&apos;s{' '}
-                        <code className="text-[#ff791f] font-mono">.kiro/settings/mcp.json</code>{' '}
-                        file:
+                        In Cursor, open <strong>Settings &gt; Features &gt; MCP</strong>, or paste
+                        into <code className="text-[#ff791f] font-mono">.cursor/mcp.json</code>{' '}
+                        (workspace) or{' '}
+                        <code className="text-[#ff791f] font-mono">~/.cursor/mcp.json</code>{' '}
+                        (global):
                       </p>
                     </div>
 
                     <CodeBlock
-                      title=".kiro/settings/mcp.json (Remote Cloud)"
+                      title=".cursor/mcp.json (Hosted Remote)"
                       language="json"
                       code={`{
   "mcpServers": {
@@ -641,10 +586,10 @@ export default function ManualPage() {
 
                     <div className="pt-2">
                       <p className="text-xs text-[#7a6a82] mb-2 font-mono">
-                        Or use the Stdio connector with remote engine routing:
+                        Alternative: Run via local stdio within the cloned repository:
                       </p>
                       <CodeBlock
-                        title=".kiro/settings/mcp.json (Stdio Engine)"
+                        title=".cursor/mcp.json (Local Stdio)"
                         language="json"
                         code={`{
   "mcpServers": {
@@ -652,8 +597,7 @@ export default function ManualPage() {
       "command": "node",
       "args": ["--import", "tsx/esm", "src/mcp/server.ts"],
       "env": {
-        "HAUNT_API_URL": "https://hauntview.onrender.com",
-        "NODE_ENV": "development"
+        "HAUNT_API_URL": "https://hauntview.onrender.com"
       }
     }
   }
@@ -723,16 +667,155 @@ export default function ManualPage() {
             </section>
 
             {/* ========================================================= */}
-            {/* SECTION 4: MCP TOOLS REFERENCE                            */}
+            {/* SECTION 3: KIRO POWER EXTENSION                           */}
+            {/* ========================================================= */}
+            <section id="kiro-power" className="space-y-6 pt-6 border-t border-[#46334b]/40">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded bg-[#ff791f]/15 text-[#ff791f]">
+                  <SparklesIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-[#fff1dc]">
+                    2. Installing as a Kiro Power
+                  </h2>
+                  <p className="text-xs text-[#7a6a82]">
+                    Package HauntView skills into your Kiro agent to automatically audit and
+                    exorcise code defects.
+                  </p>
+                </div>
+              </div>
+
+              <div className="victorian-panel p-6 space-y-4">
+                <p className="text-xs text-[#d9d3e0] leading-relaxed">
+                  HauntView ships a fully packaged Kiro Power in the{' '}
+                  <code className="font-mono text-[#ff791f]">power/</code> directory. You can import
+                  it directly into Kiro IDE using GitHub:
+                </p>
+
+                <ol className="list-decimal list-inside space-y-2 text-xs text-[#d9d3e0]">
+                  <li>
+                    Open Kiro IDE and open the <strong>Powers</strong> panel.
+                  </li>
+                  <li>
+                    Click <strong>Import Power from GitHub</strong>.
+                  </li>
+                  <li>
+                    Paste repository URL:
+                    <code className="ml-2 px-2 py-0.5 rounded bg-[#0a0711] text-[#9aff9a] font-mono border border-[#46334b]">
+                      https://github.com/kingjethro999/hauntview
+                    </code>
+                  </li>
+                  <li>
+                    Click <strong>Install</strong>. Kiro will register the MCP tools and three
+                    specialized skills:
+                  </li>
+                </ol>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                  <div className="p-3.5 rounded bg-[#0a0711] border border-[#46334b]">
+                    <div className="text-xs font-mono font-semibold text-[#ff791f] mb-1">
+                      haunt-a-website
+                    </div>
+                    <p className="text-[11px] text-[#b9acbf]">
+                      Scans target website under failure rites and returns structured defect plates.
+                    </p>
+                  </div>
+                  <div className="p-3.5 rounded bg-[#0a0711] border border-[#46334b]">
+                    <div className="text-xs font-mono font-semibold text-[#9aff9a] mb-1">
+                      exorcise-findings
+                    </div>
+                    <p className="text-[11px] text-[#b9acbf]">
+                      Takes findings from a run, inspects codebase, and patches root causes.
+                    </p>
+                  </div>
+                  <div className="p-3.5 rounded bg-[#0a0711] border border-[#46334b]">
+                    <div className="text-xs font-mono font-semibold text-[#60a5fa] mb-1">setup</div>
+                    <p className="text-[11px] text-[#b9acbf]">
+                      One-shot environment verifier and configuration helper.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ========================================================= */}
+            {/* SECTION 4: TRANSPORTS ARCHITECTURE                        */}
+            {/* ========================================================= */}
+            <section id="transports" className="space-y-6 pt-6 border-t border-[#46334b]/40">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded bg-[#9aff9a]/15 text-[#9aff9a]">
+                  <ServerStackIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-[#fff1dc]">
+                    3. MCP Transports: Remote URL vs. Local Stdio
+                  </h2>
+                  <p className="text-xs text-[#7a6a82]">
+                    Why some MCP servers use remote URLs and others use local commands.
+                  </p>
+                </div>
+              </div>
+
+              {/* Explanatory cards side-by-side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Remote HTTP / SSE Card */}
+                <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[#9aff9a]">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs text-[#9aff9a] font-semibold flex items-center gap-1.5">
+                      <GlobeAltIcon className="w-4 h-4" />
+                      Remote HTTP / SSE (&quot;url&quot;)
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#9aff9a]/15 text-[#9aff9a] text-[10px] font-mono">
+                      Cloud Gateway
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#b9acbf] leading-relaxed">
+                    Connects directly over the web via Server-Sent Events (SSE) and HTTP POST.
+                    <strong> Zero local installation</strong>: your agent simply talks to the remote
+                    cloud URL. No Node.js, Playwright, or browser downloads on your machine.
+                  </p>
+                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[#46334b]/40">
+                    Endpoint:{' '}
+                    <span className="text-[#9aff9a]">https://hauntview.onrender.com/api/mcp</span>
+                  </div>
+                </div>
+
+                {/* Local Stdio Subprocess Card */}
+                <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[#ff791f]">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs text-[#ff791f] font-semibold flex items-center gap-1.5">
+                      <CommandLineIcon className="w-4 h-4" />
+                      Local Stdio Subprocess (&quot;command&quot;)
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#ff791f]/15 text-[#ff791f] text-[10px] font-mono">
+                      Subprocess
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#b9acbf] leading-relaxed">
+                    Spawns a local process on your computer communicating through standard
+                    input/output (<code className="text-[#ff791f]">stdio</code>). Ideal for running
+                    100% offline, inspecting local source files, or forwarding test executions to a
+                    private engine.
+                  </p>
+                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[#46334b]/40">
+                    Command:{' '}
+                    <span className="text-[#ff791f]">node --import tsx/esm src/mcp/server.ts</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ========================================================= */}
+            {/* SECTION 5: MCP TOOLS REFERENCE                            */}
             {/* ========================================================= */}
             <section id="tools" className="space-y-6 pt-6 border-t border-[#46334b]/40">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-[#9aff9a]/15 text-[#9aff9a]">
+                <div className="p-2 rounded bg-[#a855f7]/15 text-[#a855f7]">
                   <CodeBracketIcon className="w-5 h-5" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-[#fff1dc]">
-                    3. Model Context Protocol Tools Reference
+                    4. Model Context Protocol Tools Reference
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
                     Six tools registered on the server for automated chaos testing, auditing, and
@@ -840,78 +923,6 @@ export default function ManualPage() {
                     Generates an interactive stand-alone HTML Grimoire report, clean Markdown
                     document, or JSON export.
                   </p>
-                </div>
-              </div>
-            </section>
-
-            {/* ========================================================= */}
-            {/* SECTION 5: KIRO POWER EXTENSION                           */}
-            {/* ========================================================= */}
-            <section id="kiro-power" className="space-y-6 pt-6 border-t border-[#46334b]/40">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-[#ff791f]/15 text-[#ff791f]">
-                  <SparklesIcon className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-[#fff1dc]">
-                    4. Installing as a Kiro Power
-                  </h2>
-                  <p className="text-xs text-[#7a6a82]">
-                    Package HauntView skills into your Kiro agent to automatically audit and
-                    exorcise code defects.
-                  </p>
-                </div>
-              </div>
-
-              <div className="victorian-panel p-6 space-y-4">
-                <p className="text-xs text-[#d9d3e0] leading-relaxed">
-                  HauntView ships a fully packaged Kiro Power in the{' '}
-                  <code className="font-mono text-[#ff791f]">power/</code> directory. You can import
-                  it directly into Kiro IDE using GitHub:
-                </p>
-
-                <ol className="list-decimal list-inside space-y-2 text-xs text-[#d9d3e0]">
-                  <li>
-                    Open Kiro IDE and open the <strong>Powers</strong> panel.
-                  </li>
-                  <li>
-                    Click <strong>Import Power from GitHub</strong>.
-                  </li>
-                  <li>
-                    Paste repository URL:
-                    <code className="ml-2 px-2 py-0.5 rounded bg-[#0a0711] text-[#9aff9a] font-mono border border-[#46334b]">
-                      https://github.com/kingjethro999/hauntview
-                    </code>
-                  </li>
-                  <li>
-                    Click <strong>Install</strong>. Kiro will register the MCP tools and three
-                    specialized skills:
-                  </li>
-                </ol>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-                  <div className="p-3.5 rounded bg-[#0a0711] border border-[#46334b]">
-                    <div className="text-xs font-mono font-semibold text-[#ff791f] mb-1">
-                      haunt-a-website
-                    </div>
-                    <p className="text-[11px] text-[#b9acbf]">
-                      Scans target website under failure rites and returns structured defect plates.
-                    </p>
-                  </div>
-                  <div className="p-3.5 rounded bg-[#0a0711] border border-[#46334b]">
-                    <div className="text-xs font-mono font-semibold text-[#9aff9a] mb-1">
-                      exorcise-findings
-                    </div>
-                    <p className="text-[11px] text-[#b9acbf]">
-                      Takes findings from a run, inspects codebase, and patches root causes.
-                    </p>
-                  </div>
-                  <div className="p-3.5 rounded bg-[#0a0711] border border-[#46334b]">
-                    <div className="text-xs font-mono font-semibold text-[#60a5fa] mb-1">setup</div>
-                    <p className="text-[11px] text-[#b9acbf]">
-                      One-shot environment verifier and configuration helper.
-                    </p>
-                  </div>
                 </div>
               </div>
             </section>

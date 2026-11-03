@@ -8,12 +8,13 @@ import { Card } from './components/ui/Card';
 import { Badge } from './components/ui/Badge';
 import { Button } from './components/ui/Button';
 import { TestLauncher } from './components/features/TestLauncher';
-import { TheVeil } from './components/features/TheVeil';
-import {
-  DEMO_LIVING_SRC,
-  DEMO_APPARITION_SRC,
-  DEMO_DIFF_SRC,
-} from './components/features/veil-demo-assets';
+// The Veil preview is a work in progress - commented out
+// import { TheVeil } from './components/features/TheVeil';
+// import {
+//   DEMO_LIVING_SRC,
+//   DEMO_APPARITION_SRC,
+//   DEMO_DIFF_SRC,
+// } from './components/features/veil-demo-assets';
 import { TestReportSummary } from '@/src/core/report-store';
 import { ArrowRightIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
@@ -145,7 +146,8 @@ export default function HomePage() {
           </Container>
         </div>
 
-        {/* The Veil preview - signature component */}
+        {/* The Veil preview - signature component (work in progress - commented out) */}
+        {/*
         <div className="relative z-10 px-4 pb-16">
           <div className="max-w-4xl mx-auto">
             <div className="victorian-panel p-5 md:p-6">
@@ -155,10 +157,6 @@ export default function HomePage() {
               >
                 <div>
                   <div className="flex items-center gap-3 mb-1">
-                    <DocumentTextIcon
-                      className="w-5 h-5"
-                      style={{ color: 'var(--candle-primary)' }}
-                    />
                     <h3 className="font-semibold text-lg" style={{ color: 'var(--ghost-white)' }}>
                       The Veil
                     </h3>
@@ -208,6 +206,7 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+        */}
       </section>
 
       {/* ═════════════════════════════════════════

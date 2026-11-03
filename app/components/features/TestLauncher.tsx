@@ -35,7 +35,6 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
     AVAILABLE_PROFILES.map((p) => p.id)
   );
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [format, setFormat] = useState<'zip' | 'html' | 'markdown' | 'json'>('zip');
   const [error, setError] = useState<string | null>(null);
   const [progressPercent, setProgressPercent] = useState<number>(0);
   const [activeRiteName, setActiveRiteName] = useState<string>('');
@@ -129,7 +128,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
     }
 
     try {
-      await onStartTest(trimmed, selectedProfiles, format);
+      await onStartTest(trimmed, selectedProfiles);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while launching tests.');
     }
@@ -310,33 +309,11 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
           </div>
         )}
 
-        {/* Format selection and submit */}
+        {/* Action submit button */}
         <div
-          className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-6"
+          className="pt-6 flex items-center justify-end"
           style={{ borderTop: '1px solid rgba(255, 121, 31, 0.1)' }}
         >
-          <div className="flex flex-wrap items-center gap-4">
-            <span className="text-sm" style={{ color: 'var(--phantom-gray)' }}>
-              Export format:
-            </span>
-            {(['zip', 'html', 'markdown', 'json'] as const).map((fmt) => (
-              <label
-                key={fmt}
-                className="flex items-center gap-2 text-sm cursor-pointer"
-                style={{ color: 'var(--ghost-white)' }}
-              >
-                <input
-                  type="radio"
-                  name="format"
-                  checked={format === fmt}
-                  onChange={() => setFormat(fmt)}
-                  className="accent-[var(--candle-primary)]"
-                />
-                <span className="font-mono text-xs uppercase">{fmt}</span>
-              </label>
-            ))}
-          </div>
-
           <Button
             type="submit"
             size="lg"
@@ -344,7 +321,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
             loading={isRunning}
             disabled={isRunning}
             icon={<RocketLaunchIcon className="w-5 h-5" />}
-            className="w-full sm:w-auto font-semibold"
+            className="w-full sm:w-auto font-semibold px-8"
           >
             {isRunning ? 'Conducting Séance...' : `Haunt with ${selectedProfiles.length} Rites`}
           </Button>
