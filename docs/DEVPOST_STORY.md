@@ -1,7 +1,7 @@
 # HauntView — Devpost Project Story
 
 > Paste this content into the Devpost submission form.
-> Replace `<USERNAME>` and `<YOUTUBE_LINK>` before submitting.
+> Replace `<YOUTUBE_LINK>` before submitting.
 
 ---
 
@@ -142,7 +142,7 @@ See `VIBE_CODING_LOG.md` for full entries.
 ## Installation
 
 ```bash
-git clone https://github.com/<USERNAME>/hauntview.git
+git clone https://github.com/kingjethro999/hauntview.git
 cd hauntview
 pnpm install
 pnpm dev       # web UI at http://localhost:3000
@@ -151,7 +151,7 @@ pnpm dev       # web UI at http://localhost:3000
 To connect the MCP server in Kiro, add `.kiro/settings/mcp.json` (contents in the
 repo README).
 
-**Live demo:** https://hauntview.vercel.app _(replace with actual URL)_
+**Live demo:** https://hauntview.onrender.com
 
 ---
 

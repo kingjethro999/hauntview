@@ -121,7 +121,7 @@ _Flash the property test count: "20 property tests, 100+ iterations each."_
 **On screen:** Fresh terminal window.
 
 ```bash
-git clone https://github.com/<username>/hauntview.git
+git clone https://github.com/kingjethro999/hauntview.git
 cd hauntview && pnpm install && pnpm dev
 ```
 

@@ -12,7 +12,7 @@
     "dev": "next dev --hostname 127.0.0.1",
     "postinstall": "node scripts/postinstall.mjs",
     "build": "next build",
-    "start": "next start --hostname 127.0.0.1",
+    "start": "next start --hostname 0.0.0.0",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
