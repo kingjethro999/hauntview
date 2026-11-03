@@ -34,7 +34,7 @@ The `.kiro/specs/` directory contains five spec suites:
 | Spec                         | Workflow           | What it covers                      |
 | ---------------------------- | ------------------ | ----------------------------------- |
 | `hauntview-core`             | Design-first       | Engine architecture, error handling |
-| `hauntview-testing-profiles` | Requirements-first | All 16 rites                        |
+| `hauntview-testing-profiles` | Requirements-first | All 25 testing profiles & rites     |
 | `hauntview-ui-design`        | Design-first       | Design tokens, Veil, House, Wisp    |
 | `medium-mcp-server`          | Requirements-first | MCP tools and contracts             |
 | `submission-kit`             | Requirements-first | Demo, compliance, bonus tracks      |
