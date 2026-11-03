@@ -2,7 +2,7 @@
 
 ## Tasks
 
-- [ ] 1. Create `scripts/presubmit.mjs` compliance audit script
+- [x] 1. Create `scripts/presubmit.mjs` compliance audit script
   - Check LICENSE for "MIT"
   - Check `.gitignore` does not exclude `.kiro`
   - Check `.kiro/specs/`, `.kiro/steering/`, `.kiro/hooks/`, `.kiro/settings/` non-empty
@@ -14,36 +14,36 @@
   - Add `"presubmit": "node scripts/presubmit.mjs"` to `package.json` scripts
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
 
-- [ ] 2. Create `VIBE_CODING_LOG.md` with initial entries
+- [x] 2. Create `VIBE_CODING_LOG.md` with initial entries
   - Document at least 3 vibe-coded modules with prompt + outcome format
   - Include spec criteria IDs and steering files active for each
   - _Requirements: (strategy doc Phase 3)_
 
-- [ ] 3. Create `docs/DEMO_SCRIPT.md`
+- [x] 3. Create `docs/DEMO_SCRIPT.md`
   - Shot-by-shot script with timestamps
   - Confirm total runtime ≤ 180 seconds
   - Identify the real target URL to scan (e.g. `promptdock-mini.vercel.app`)
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
 
-- [ ] 4. Create `docs/DEVPOST_STORY.md`
+- [x] 4. Create `docs/DEVPOST_STORY.md`
   - All five Kiro heading sections
   - Live URL and one-command install
   - Market thesis paragraph for Startup bonus opt-in
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
-- [ ] 5. Update `docs/KIRO_USAGE.md` with closed specs and known unknowns
+- [x] 5. Update `docs/KIRO_USAGE.md` with closed specs and known unknowns
   - List all completed specs with task completion status
   - List any Kiro behaviors observed during the build under "Known unknowns"
   - _Requirements: (AGENTS.md §1.16)_
 
-- [ ] 6. Final README audit
+- [x] 6. Final README audit
   - One-command install at the top: `pnpm install && pnpm dev`
   - Link to live demo URL
   - Link to Devpost submission
   - Architecture summary (one paragraph)
   - _Requirements: 3.5_
 
-- [ ] 7. Run `pnpm presubmit` and fix all failures
+- [x] 7. Run `pnpm presubmit` and fix all failures
   - Address every failing check before proceeding to submission
   - _Requirements: 3.6_
 

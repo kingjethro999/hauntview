@@ -1,0 +1,30 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "hauntview",
+  "version": "0.1.0",
+  "description": "Rehearse failure conditions against a website (mobile layout, blocked images and fonts, no JavaScript, offline, broken links, accessibility) and read evidence-backed findings.",
+  "author": {
+    "name": "HauntView",
+    "url": "https://github.com/kingjethro999/hauntview"
+  },
+  "keywords": [
+    "website testing",
+    "responsive",
+    "mobile layout",
+    "layout overflow",
+    "broken images",
+    "font fallback",
+    "javascript disabled",
+    "offline",
+    "console errors",
+    "broken links",
+    "accessibility check",
+    "reduced motion",
+    "website resilience",
+    "visual comparison",
+    "haunt"
+  ],
+  "homepage": "https://github.com/kingjethro999/hauntview",
+  "repository": "https://github.com/kingjethro999/hauntview",
+  "license": "MIT"
+}

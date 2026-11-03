@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { HauntViewEngine } from '@/src/engine';
 import { TestReport } from '@/src/types';
 import { ReportStore } from '@/src/core/report-store';
+import { saveTestReportToDb } from '@/src/lib/server/database';
 
 interface TestApiResponse {
   success: boolean;
@@ -44,8 +45,13 @@ export async function POST(request: NextRequest) {
       includeScreenshots: true,
     });
 
-    // Save report to store
+    // Save report to store & SQLite
     await ReportStore.saveReport(report);
+    try {
+      saveTestReportToDb(report);
+    } catch (dbErr) {
+      console.warn('Failed to persist report to SQLite:', dbErr);
+    }
 
     // Generate report if format specified
     const result: TestApiResponse = { success: true, report };

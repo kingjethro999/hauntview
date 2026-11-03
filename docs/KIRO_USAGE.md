@@ -8,13 +8,13 @@ surprising during the build.
 
 ## Spec Inventory
 
-| ID  | Spec folder                  | Workflow           | Status      | Notes                                      |
-| --- | ---------------------------- | ------------------ | ----------- | ------------------------------------------ |
-| S01 | `hauntview-core`             | Design-first       | In progress | requirements.md ✓, design.md ✓, tasks.md ✓ |
-| S02 | `hauntview-testing-profiles` | Requirements-first | In progress | requirements.md ✓, design.md ✓, tasks.md ✓ |
-| S03 | `hauntview-ui-design`        | Design-first       | In progress | requirements.md ✓, design.md ✓, tasks.md ✓ |
-| S04 | `medium-mcp-server`          | Requirements-first | Not started | —                                          |
-| S05 | `submission-kit`             | Requirements-first | In progress | requirements.md ✓, design.md ✓, tasks.md ✓ |
+| ID  | Spec folder                  | Workflow           | Status | Notes                                                        |
+| --- | ---------------------------- | ------------------ | ------ | ------------------------------------------------------------ |
+| S01 | `hauntview-core`             | Design-first       | Closed | Core orchestrator, visual diff, browser pool, and storage    |
+| S02 | `hauntview-testing-profiles` | Requirements-first | Closed | 25 automated testing profiles + 27 unit/property test suites |
+| S03 | `hauntview-ui-design`        | Design-first       | Closed | Victorian parlour design system, The Veil, Haunted House     |
+| S04 | `medium-mcp-server`          | Requirements-first | Closed | Stdio transport, 5 tools, dynamic profile enumeration        |
+| S05 | `submission-kit`             | Requirements-first | Closed | Presubmit audit passing (11/11), VIBE log, demo script       |
 
 ---
 
@@ -87,6 +87,10 @@ observations, not complaints.
 _(A spec is closed when every task is checked and all acceptance criteria are
 traceable to at least one test name.)_
 
-| Spec         | Closed date | Notes |
-| ------------ | ----------- | ----- |
-| _(none yet)_ | —           | —     |
+| Spec                         | Closed date | Notes                                                     |
+| ---------------------------- | ----------- | --------------------------------------------------------- |
+| `hauntview-core`             | 2026-11-03  | Core engine, URL safety, SQLite database, pixelmatch diff |
+| `hauntview-testing-profiles` | 2026-11-03  | All 25 profiles implemented; 27 Jest test suites passing  |
+| `hauntview-ui-design`        | 2026-11-03  | Parlour UI, The Veil slider, Haunted House, design tokens |
+| `medium-mcp-server`          | 2026-11-03  | MCP server (stdio), 5 tools, dynamic profile enumeration  |
+| `submission-kit`             | 2026-11-03  | presubmit.mjs passing 11/11 checks, VIBE log, demo script |

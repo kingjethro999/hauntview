@@ -1,0 +1,13 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "haunt": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["tsx", "src/mcp/server.ts"],
+      "env": {
+        "HAUNT_DATA_DIR": ".hauntview/data"
+      }
+    }
+  }
+}
