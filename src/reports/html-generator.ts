@@ -68,6 +68,7 @@ export class HTMLReportGenerator implements ReportGenerator {
   }
 
   private renderHeader(report: TestReport, statistics: HTMLReportStatistics): string {
+    const theme = this.darkTheme();
     const passRate = ((statistics.successfulProfiles / statistics.totalProfiles) * 100).toFixed(1);
     const hasErrors = statistics.errorCount > 0;
 
@@ -120,7 +121,7 @@ export class HTMLReportGenerator implements ReportGenerator {
         <li><a href="#severity">Omens by Severity</a></li>
         <li><a href="#category">Omens by Category</a></li>
         <li><a href="#profiles">Rite Details</a></li>
-        ${this.hasScreenshots ? '<li><a href="#apparitions">Gallery of Apparitions</a></li>' : ''}
+        ${this.hasScreenshots() ? '<li><a href="#apparitions">Gallery of Apparitions</a></li>' : ''}
       </ul>
     </nav>`;
   }

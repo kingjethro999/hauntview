@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Spec-to-Code Quality Gate",
+      "trigger": "PostFileSave",
+      "description": "Runs TypeScript type-check on every .ts/.tsx save and surfaces errors immediately, acting as a compile-gate between spec and running code.",
+      "matcher": "\\.(ts|tsx)$",
+      "action": {
+        "type": "command",
+        "command": "cd /home/japheth/Desktop/hauntview && npx tsc --noEmit 2>&1 | head -40; exit 0",
+        "timeout": 60
+      }
+    }
+  ]
+}

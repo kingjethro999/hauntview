@@ -30,6 +30,7 @@
     "test:report": "playwright show-report",
     "browsers:install": "playwright install chromium firefox webkit",
     "mcp": "tsx src/mcp/server.ts",
+    "presubmit": "node scripts/presubmit.mjs",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -77,6 +78,7 @@
     "eslint": "^9.0.0",
     "eslint-config-next": "16.4.3",
     "eslint-config-prettier": "^10.1.8",
+    "fast-check": "^4.10.2",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-environment-node": "^29.7.0",

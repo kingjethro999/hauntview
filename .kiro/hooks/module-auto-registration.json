@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Module Auto-Registration Reminder",
+      "trigger": "PostFileCreate",
+      "description": "When a new rite, profile, or findings module is created, reminds Kiro to register it in the orchestrator, create a test stub, update contracts, and add a barrel export.",
+      "matcher": "src/(core/rites|core/findings|profiles)/.*\\.(ts|tsx)$",
+      "action": {
+        "type": "agent",
+        "prompt": "A new module file was created in the HauntView core rites, findings, or profiles directory.\n\nCheck the following and fix any gaps:\n\n1. **Rite/Profile registration** — if this is a new rite or profile, verify it is imported and registered in the main orchestrator/index (e.g. `src/core/rites/index.ts` or equivalent). The rite must be listed in the `RiteId` union in `src/core/contracts/`.\n\n2. **Test stub** — a corresponding test file must exist at the matching path under `src/` or `tests/`. If it does not exist, create a minimal property-based test stub that references the relevant acceptance criterion ID.\n\n3. **Contracts** — if the new module exports a new type or schema, it must use Zod and be derived with `z.infer<>`. Update `docs/CONTRACTS.md` if any contract changed.\n\n4. **Barrel export** — verify the relevant `index.ts` re-exports the new module.\n\nDo not move on until all four checks pass."
+      }
+    }
+  ]
+}

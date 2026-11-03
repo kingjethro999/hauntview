@@ -18,6 +18,7 @@ import {
 import { ReportFactory } from './reports/factory';
 import { MobileProfile } from './profiles/mobile';
 import { DesktopProfile } from './profiles/desktop';
+import { Desktop4KProfile } from './profiles/desktop-4k';
 import { ConsoleErrorsProfile } from './profiles/console-errors';
 import { TabletProfile } from './profiles/tablet';
 import { PerformanceProfile } from './profiles/performance';
@@ -28,6 +29,9 @@ import { AccessibilityCognitiveProfile } from './profiles/accessibility-cognitiv
 import { I18nRTLProfile } from './profiles/i18n-rtl';
 import { I18nCJKProfile } from './profiles/i18n-cjk';
 import { I18nMixedProfile } from './profiles/i18n-mixed';
+import { BrowserFirefoxProfile } from './profiles/browser-firefox';
+import { BrowserEdgeProfile } from './profiles/browser-edge';
+import { BrowserLegacyProfile } from './profiles/browser-legacy';
 
 interface ExecutableProfile {
   execute(page: Page, url: string, context?: ProfileContext): Promise<ProfileResult>;
@@ -153,8 +157,10 @@ export class HauntViewEngine {
         profile = new MobileProfile(profileId, `Mobile`);
       } else if (profileId === 'tablet-ipad') {
         profile = new TabletProfile(profileId, 'Tablet - iPad Pro');
-      } else if (profileId === 'desktop-1080p' || profileId === 'desktop-4k') {
-        profile = new DesktopProfile(profileId, `Desktop`);
+      } else if (profileId === 'desktop-4k') {
+        profile = new Desktop4KProfile(profileId, 'Desktop - 4K');
+      } else if (profileId === 'desktop-1080p') {
+        profile = new DesktopProfile(profileId, 'Desktop - 1080p');
 
         // Console errors profile
       } else if (profileId === 'console-errors') {
@@ -182,7 +188,13 @@ export class HauntViewEngine {
       } else if (profileId === 'i18n-mixed') {
         profile = new I18nMixedProfile(profileId, 'I18N - Mixed Scripts');
 
-        // Browser compatibility - for now use ConsoleErrorsProfile as fallback
+        // Browser compatibility profiles
+      } else if (profileId === 'browser-firefox') {
+        profile = new BrowserFirefoxProfile(profileId, 'Browser - Firefox');
+      } else if (profileId === 'browser-edge') {
+        profile = new BrowserEdgeProfile(profileId, 'Browser - Edge');
+      } else if (profileId === 'browser-legacy') {
+        profile = new BrowserLegacyProfile(profileId, 'Browser - Legacy');
       } else if (profileId.startsWith('browser-')) {
         profile = new ConsoleErrorsProfile(profileId, `Browser - ${profileId}`);
       } else {

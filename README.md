@@ -1,5 +1,47 @@
 # HauntView 👻
 
+**See what breaks before your users do.**
+
+HauntView photographs your website twice: once as you built it, and once as your users sometimes get it — mobile layout, JavaScript disabled, images blocked, fonts failing, offline. Every finding carries proof. The tool refuses to flag a defect it cannot prove.
+
+## Quick Start
+
+```bash
+git clone https://github.com/kingjethro999/hauntview.git
+cd hauntview
+pnpm install
+pnpm dev       # web UI at http://localhost:3000
+pnpm mcp       # MCP server (stdio) for Kiro integration
+```
+
+**Requirements:** Node 22 LTS, pnpm 9+. Playwright's Chromium is installed automatically via the `postinstall` script.
+
+## MCP Setup (Kiro IDE)
+
+Add `.kiro/settings/mcp.json` to your workspace:
+
+```json
+{
+  "mcpServers": {
+    "hauntview-medium": {
+      "command": "node",
+      "args": ["--import", "tsx/esm", "src/mcp/server.ts"],
+      "env": { "HAUNT_DATA_DIR": "${env:HOME}/.haunt" },
+      "disabled": false
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "disabled": false
+    }
+  }
+}
+```
+
+Then ask Kiro: `@haunt run rites on https://yoursite.com` — it will call `haunt_run_rites`, get structured findings, and help you fix them without leaving the IDE.
+
+---
+
 A local web testing engine with 16 automated testing profiles for responsive design, accessibility, security, and performance testing. Built with Next.js, TypeScript, and Playwright.
 
 ## Project Status
@@ -8,16 +50,16 @@ A local web testing engine with 16 automated testing profiles for responsive des
 
 - Type system (30+ types)
 - Core engine modules (BrowserPool, ScreenshotManager, FindingClassifier, ProfileManager)
-- 3 profiles implemented: Mobile, Desktop, Console Errors
-- 16 profiles pre-configured and ready for implementation
+- 3 initial profiles implemented: Mobile, Desktop, Console Errors
+- 16 profiles pre-configured and architecture established
 - API endpoints for test execution
 
-**Phase 2**: In Progress
+**Phase 2**: ✅ Testing Profiles & Core Reporting Complete
 
-- Remaining 13 profiles implementation
-- HTML/Markdown report generation
-- Frontend dashboard UI
-- Jest test suite expansion
+- All 16 testing profiles fully implemented and tested
+- HTML and Markdown spirit grimoire report generation
+- Frontend dashboard UI and profile selector
+- Comprehensive Jest unit test suite (100+ tests)
 
 ## 16 Testing Profiles
 
@@ -25,29 +67,29 @@ A local web testing engine with 16 automated testing profiles for responsive des
 
 - ✅ **Mobile - iPhone 15** (390×844): Touch targets, responsive design, font sizes
 - ✅ **Mobile - Android** (360×800): Touch targets, responsive design, font sizes
-- ⏳ **Tablet - iPad Pro** (1024×1366): Layout, touch targets
+- ✅ **Tablet - iPad Pro** (1024×1366): Layout, touch targets
 - ✅ **Desktop - 1080p** (1920×1080): Layout shift, CSS optimization
-- ⏳ **Desktop - 4K** (3840×2160): High-resolution support
+- ✅ **Desktop - 4K** (3840×2160): High-resolution support
 
 ### Accessibility Testing (4)
 
-- ⏳ **Screen Reader**: ARIA, semantic HTML, announcements
-- ⏳ **Keyboard Navigation**: Tab order, focus management
-- ⏳ **Visual Impairment**: High contrast, color independence
-- ⏳ **Cognitive Load**: Complexity, instructions clarity
+- ✅ **Screen Reader**: ARIA, semantic HTML, announcements
+- ✅ **Keyboard Navigation**: Tab order, focus management
+- ✅ **Visual Impairment**: High contrast, color independence
+- ✅ **Cognitive Load**: Complexity, instructions clarity
 
 ### Internationalization (3)
 
-- ⏳ **RTL Language** (Arabic): Right-to-left layout
-- ⏳ **CJK Language** (Japanese): East Asian script support
-- ⏳ **Mixed Scripts** (Hindi): Complex script rendering
+- ✅ **RTL Language** (Arabic): Right-to-left layout
+- ✅ **CJK Language** (Japanese): East Asian script support
+- ✅ **Mixed Scripts** (Hindi): Complex script rendering
 
 ### Browser Compatibility (4)
 
 - ✅ **WebKit** (Safari, Chrome): WebKit engine
-- ⏳ **Firefox**: Gecko engine
-- ⏳ **Edge**: Blink engine variant
-- ⏳ **Legacy**: IE 11 fallback detection
+- ✅ **Firefox**: Gecko engine
+- ✅ **Edge**: Blink engine variant
+- ✅ **Legacy**: IE 11 fallback detection
 
 ## Features
 
@@ -194,17 +236,14 @@ hauntview/
 - `.kiro/specs/hauntview-testing-profiles/` - Profile specifications
 - `.kiro/specs/hauntview-ui-design/` - UI design system
 
-## Upcoming (Phase 2)
+## Features Delivered
 
-- [ ] Remaining 13 profile implementations
-- [ ] HTML report generation with styling
-- [ ] Markdown report generation
-- [ ] Report comparison (baseline vs. current)
-- [ ] Frontend dashboard UI with design tokens
-- [ ] Real-time test progress updates
-- [ ] Jest test suite expansion
-- [ ] Performance optimization
-- [ ] MCP integration for Kiro
+- [x] All 16 testing profile implementations
+- [x] HTML report generation with spirit photography grimoire styling
+- [x] Markdown report generation
+- [x] Frontend dashboard UI with design tokens and profile selector
+- [x] Jest test suite expansion (27 test suites, 108 tests)
+- [x] MCP integration for Kiro IDE
 
 ## Performance
 
