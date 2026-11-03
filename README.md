@@ -16,29 +16,47 @@ pnpm mcp       # MCP server (stdio) for Kiro integration
 
 **Requirements:** Node 22 LTS, pnpm 9+. Playwright's Chromium is installed automatically via the `postinstall` script.
 
-## MCP Setup (Kiro IDE)
+## Kiro Power Installation
 
-Add `.kiro/settings/mcp.json` to your workspace:
+HauntView is packaged as an installable **Kiro Power** under [`power/`](power/) following the Agent Plugins specification. It bundles all 25 testing profile tools, specialized skills (`haunt-a-website`, `exorcise-findings`, `setup`), and automatic conversational activation keywords.
+
+### Option A: Install as a Custom Power (Recommended)
+
+1. In **Kiro IDE**, open the **Powers** sidebar and click **Add Custom Power**.
+2. Select **Import power from GitHub**.
+3. Paste the repository URL:
+   ```text
+   https://github.com/kingjethro999/hauntview
+   ```
+4. Confirm import.
+
+Once installed, simply ask Kiro in chat:
+
+> _"Test my site on mobile and check for broken links on http://localhost:3000"_  
+> _"Audit accessibility and prefers-reduced-motion on https://example.com"_  
+> _"Exorcise findings from the last run and verify the fix"_
+
+Kiro will automatically activate the Power, execute the test rites in headless Chromium, analyze visual diff plates and DOM snapshots, and guide you to fix issues with verified evidence.
+
+### Option B: Workspace MCP Setup
+
+If you prefer configuring MCP directly in your workspace, add `.kiro/settings/mcp.json`:
 
 ```json
 {
   "mcpServers": {
-    "hauntview-medium": {
-      "command": "node",
-      "args": ["--import", "tsx/esm", "src/mcp/server.ts"],
-      "env": { "HAUNT_DATA_DIR": "${env:HOME}/.haunt" },
-      "disabled": false
-    },
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"],
+    "hauntview": {
+      "command": "pnpm",
+      "args": ["mcp"],
       "disabled": false
     }
   }
 }
 ```
 
-Then ask Kiro: `@haunt run rites on https://yoursite.com` — it will call `haunt_run_rites`, get structured findings, and help you fix them without leaving the IDE.
+Then ask Kiro in chat:
+
+> `@hauntview run tests on https://yoursite.com` — it will invoke `run-test-profile`, extract structured findings, and help you fix them without leaving the IDE.
 
 ---
 
