@@ -117,7 +117,7 @@ export default function CryptPage() {
         </div>
 
         {/* Filter and View Style Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-8">
           {/* Category Filters */}
           <div className="flex items-center gap-2">
             {(['all', 'screams', 'peaceful'] as const).map((mode) => (
@@ -166,94 +166,96 @@ export default function CryptPage() {
               title="Ledger table view"
             >
               <TableCellsIcon className="w-3.5 h-3.5" />
-              <span>Ledger</span>
+              <span>Scroll</span>
             </button>
           </div>
         </div>
 
-        {/* Reports Content */}
-        {isLoading ? (
-          <div className="p-16 text-center text-xs text-[#d9d3e0] bg-[#1c1629]/40 rounded-[2px] border border-[#46334b] font-serif">
-            <SparklesIcon className="w-6 h-6 text-[#ff791f] mx-auto mb-2 animate-spin" />
-            Reading the crypt stones...
-          </div>
-        ) : filteredReports.length === 0 ? (
-          <div className="text-center py-16 px-4 bg-[#1c1629]/30 rounded-[4px] border border-[#46334b] flex flex-col items-center">
-            <WispGhost state="napping" size="lg" className="mb-3" />
-            <h3 className="font-serif font-bold text-lg text-[#fff1dc] mb-1">
-              The Crypt is Silent
-            </h3>
-            <p className="text-xs text-[#d9d3e0] max-w-sm mx-auto mb-5 font-serif">
-              No matching séances found in the graveyard. Begin a new run from The Parlour.
-            </p>
-            <Link href="/">
-              <Button variant="secondary" size="md" className="font-serif font-bold">
-                Haunt a Website Now
-              </Button>
-            </Link>
-          </div>
-        ) : viewStyle === 'tombstones' ? (
-          /* Graveyard of Gothic Tombstones */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredReports.map((report) => (
-              <TombstoneCard key={report.id} report={report} />
-            ))}
-          </div>
-        ) : (
-          /* Traditional Ledger Table */
-          <div className="rounded-[4px] bg-[#1c1629] overflow-hidden border border-[#46334b]">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-serif">
-                <thead className="bg-[#0a0711] text-[#d9d3e0] border-b border-[#46334b] font-mono uppercase text-[10px] tracking-wider">
-                  <tr>
-                    <th className="py-3 px-4">House (Target URL)</th>
-                    <th className="py-3 px-4">Status & Omens</th>
-                    <th className="py-3 px-4">Rites Completed</th>
-                    <th className="py-3 px-4">Duration</th>
-                    <th className="py-3 px-4">Demise Date</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#46334b] text-[#fff1dc]">
-                  {filteredReports.map((report) => (
-                    <tr key={report.id} className="hover:bg-[#0a0711]/40 transition-colors">
-                      <td className="py-3.5 px-4 font-medium max-w-xs truncate">
-                        <Link
-                          href={`/results/${report.id}`}
-                          className="hover:text-[#ff791f] transition-colors"
-                        >
-                          {report.url}
-                        </Link>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className="font-mono text-xs">
-                          {report.errorCount > 0 ? `${report.errorCount} Screams` : '0 Screams'} •{' '}
-                          {report.totalFindings} Omens
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 font-mono text-[#d9d3e0]">
-                        {report.successfulProfiles} / {report.totalProfiles}
-                      </td>
-                      <td className="py-3.5 px-4 font-mono text-[#d9d3e0]">
-                        {(report.duration / 1000).toFixed(1)}s
-                      </td>
-                      <td className="py-3.5 px-4 text-[#d9d3e0]">
-                        {new Date(report.startTime).toLocaleDateString()}
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <Link href={`/results/${report.id}`}>
-                          <Button size="sm" variant="outline" className="text-xs py-1 px-2.5">
-                            Grimoire →
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* Séance Grid - with spacing */}
+        <div className="mt-8">
+          {isLoading ? (
+            <div className="p-16 text-center text-xs text-[#d9d3e0] bg-[#1c1629]/40 rounded-[2px] border border-[#46334b] font-serif">
+              <SparklesIcon className="w-6 h-6 text-[#ff791f] mx-auto mb-2 animate-spin" />
+              Reading the crypt stones...
             </div>
-          </div>
-        )}
+          ) : filteredReports.length === 0 ? (
+            <div className="text-center py-16 px-4 bg-[#1c1629]/30 rounded-[4px] border border-[#46334b] flex flex-col items-center">
+              <WispGhost state="napping" size="lg" className="mb-3" />
+              <h3 className="font-serif font-bold text-lg text-[#fff1dc] mb-1">
+                The Crypt is Silent
+              </h3>
+              <p className="text-xs text-[#d9d3e0] max-w-sm mx-auto mb-5 font-serif">
+                No matching séances found in the graveyard. Begin a new run from The Parlour.
+              </p>
+              <Link href="/">
+                <Button variant="secondary" size="md" className="font-serif font-bold">
+                  Haunt a Website Now
+                </Button>
+              </Link>
+            </div>
+          ) : viewStyle === 'tombstones' ? (
+            /* Graveyard of Gothic Tombstones */
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredReports.map((report) => (
+                <TombstoneCard key={report.id} report={report} />
+              ))}
+            </div>
+          ) : (
+            /* Traditional Ledger Table */
+            <div className="rounded-[4px] bg-[#1c1629] overflow-hidden border border-[#46334b]">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs font-serif">
+                  <thead className="bg-[#0a0711] text-[#d9d3e0] border-b border-[#46334b] font-mono uppercase text-[10px] tracking-wider">
+                    <tr>
+                      <th className="py-3 px-4">House (Target URL)</th>
+                      <th className="py-3 px-4">Status & Omens</th>
+                      <th className="py-3 px-4">Rites Completed</th>
+                      <th className="py-3 px-4">Duration</th>
+                      <th className="py-3 px-4">Demise Date</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#46334b] text-[#fff1dc]">
+                    {filteredReports.map((report) => (
+                      <tr key={report.id} className="hover:bg-[#0a0711]/40 transition-colors">
+                        <td className="py-3.5 px-4 font-medium max-w-xs truncate">
+                          <Link
+                            href={`/results/${report.id}`}
+                            className="hover:text-[#ff791f] transition-colors"
+                          >
+                            {report.url}
+                          </Link>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className="font-mono text-xs">
+                            {report.errorCount > 0 ? `${report.errorCount} Screams` : '0 Screams'} •{' '}
+                            {report.totalFindings} Omens
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-[#d9d3e0]">
+                          {report.successfulProfiles} / {report.totalProfiles}
+                        </td>
+                        <td className="py-3.5 px-4 font-mono text-[#d9d3e0]">
+                          {(report.duration / 1000).toFixed(1)}s
+                        </td>
+                        <td className="py-3.5 px-4 text-[#d9d3e0]">
+                          {new Date(report.startTime).toLocaleDateString()}
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <Link href={`/results/${report.id}`}>
+                            <Button size="sm" variant="outline" className="text-xs py-1 px-2.5">
+                              Read Grimoire
+                            </Button>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
       </Container>
     </div>
   );

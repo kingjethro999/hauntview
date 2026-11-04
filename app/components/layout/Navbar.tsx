@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { HomeIcon, DocumentTextIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 export function Navbar() {
   return (
@@ -50,8 +50,12 @@ export function Navbar() {
             className="px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-[rgba(255,121,31,0.08)]"
             style={{ color: 'var(--phantom-gray)' }}
           >
-            <BookOpenIcon className="w-4 h-4 inline mr-2" />
-            Manual
+            <img
+              src="/scroll-icon.svg"
+              alt="Scroll"
+              className="w-5 h-5 inline mr-2 brightness-0 invert"
+            />
+            Scroll
           </Link>
         </div>
       </div>

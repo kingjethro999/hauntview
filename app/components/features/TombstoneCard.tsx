@@ -30,7 +30,13 @@ export const TombstoneCard: React.FC<TombstoneCardProps> = ({ report }) => {
       {/* Cobweb Indicator for older runs */}
       {isOld && (
         <div className="absolute top-1 right-1 opacity-40 pointer-events-none select-none text-xs">
-          🕸️
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8-8z"
+              opacity="0.3"
+            />
+            <path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8z" opacity="0.5" />
+          </svg>
         </div>
       )}
 

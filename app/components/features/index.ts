@@ -18,3 +18,4 @@ export * from './AtmosphereLayer';
 export * from './AtmosphereToggle';
 export * from './HauntedHouse';
 export * from './TombstoneCard';
+export * from './HauntingDecorations';

@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Container } from './components/layout/Container';
 import { Card } from './components/ui/Card';
 import { Badge } from './components/ui/Badge';
 import { Button } from './components/ui/Button';
 import { TestLauncher } from './components/features/TestLauncher';
+import { HauntingDecorations } from './components/features/HauntingDecorations';
 // The Veil preview is a work in progress - commented out
 // import { TheVeil } from './components/features/TheVeil';
 // import {
@@ -79,68 +81,102 @@ export default function HomePage() {
           Spirit photography aesthetic with The Veil preview
       ═════════════════════════════════════════ */}
       <section className="landing-bay relative" style={{ minHeight: 680 }}>
+        <HauntingDecorations />
         <div className="relative z-10" style={{ paddingTop: 100, paddingBottom: 120 }}>
           <Container size="lg">
-            <div style={{ maxWidth: 520 }}>
-              {/* Specimen label */}
-              <div className="specimen-label" style={{ marginBottom: 28 }}>
-                <span>✦</span>
-                Kiroween 2026 · Spirit Photography Web Testing Engine
-              </div>
+            <div className="flex flex-col md:flex-row items-center gap-12">
+              {/* Left side - content */}
+              <div style={{ maxWidth: 520 }}>
+                {/* Specimen label */}
+                <div className="specimen-label" style={{ marginBottom: 28 }}>
+                  Kiroween 2026 · Spirit Photography Web Testing Engine
+                </div>
 
-              {/* Headline */}
-              <h1
-                style={{
-                  fontSize: 'clamp(3rem, 7vw, 4.5rem)',
-                  fontWeight: 600,
-                  lineHeight: 1.02,
-                  letterSpacing: '-0.04em',
-                  color: 'var(--ghost-white)',
-                  marginBottom: 16,
-                }}
-              >
-                Photograph your
-                <br />
-                website
-                <em
+                {/* Headline */}
+                <h1
                   style={{
-                    fontStyle: 'normal',
-                    color: 'var(--candle-primary)',
-                    textShadow: '0 0 40px rgba(255,121,31,0.3)',
+                    fontSize: 'clamp(3rem, 7vw, 4.5rem)',
+                    fontWeight: 600,
+                    lineHeight: 1.02,
+                    letterSpacing: '-0.04em',
+                    color: 'var(--ghost-white)',
+                    marginBottom: 16,
                   }}
                 >
-                  twice
-                </em>
-              </h1>
+                  Photograph your
+                  <br />
+                  website
+                  <em
+                    style={{
+                      fontStyle: 'normal',
+                      color: 'var(--candle-primary)',
+                      textShadow: '0 0 40px rgba(255,121,31,0.3)',
+                    }}
+                  >
+                    twice
+                  </em>
+                </h1>
 
-              <p
-                style={{
-                  fontSize: 15,
-                  color: 'var(--phantom-gray)',
-                  lineHeight: 1.8,
-                  marginBottom: 36,
-                  maxWidth: 440,
-                }}
-              >
-                HauntView captures the living page as you built it, and the apparition as your users
-                sometimes get it — under 25 testing profiles and failure conditions with visual
-                diffs and evidence-backed findings.
-              </p>
+                <p
+                  style={{
+                    fontSize: 15,
+                    color: 'var(--phantom-gray)',
+                    lineHeight: 1.8,
+                    marginBottom: 36,
+                    maxWidth: 440,
+                  }}
+                >
+                  HauntView captures the living page as you built it, and the apparition as your
+                  users sometimes get it — under 25 testing profiles and failure conditions with
+                  visual diffs and evidence-backed findings.
+                </p>
 
-              {/* Feature badges */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 44 }}>
-                <Badge variant="outline" size="md">
-                  25 Rites
-                </Badge>
-                <Badge variant="outline" size="md">
-                  Deterministic Faults
-                </Badge>
-                <Badge variant="outline" size="md">
-                  WCAG Audits
-                </Badge>
-                <Badge variant="outline" size="md">
-                  MCP Agent-Native
-                </Badge>
+                {/* Feature badges */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 44 }}>
+                  <Badge variant="outline" size="md">
+                    25 Rites
+                  </Badge>
+                  <Badge variant="outline" size="md">
+                    Deterministic Faults
+                  </Badge>
+                  <Badge variant="outline" size="md">
+                    WCAG Audits
+                  </Badge>
+                  <Badge variant="outline" size="md">
+                    MCP Agent-Native
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Right side - pumpkins and ghost */}
+              <div className="flex items-end justify-center gap-4 md:gap-6">
+                {/* 3 Pumpkins standalone image */}
+                <Image
+                  src="/pumpkins.png"
+                  alt="HauntView Carved Pumpkins"
+                  width={380}
+                  height={253}
+                  className="w-56 sm:w-64 md:w-80 lg:w-96 h-auto object-contain select-none pointer-events-none drop-shadow-[0_10px_30px_rgba(255,121,31,0.25)]"
+                  priority
+                />
+
+                {/* Ghost */}
+                <svg
+                  viewBox="0 0 75 100"
+                  className="w-20 h-28 md:w-24 md:h-32 animate-float"
+                  fill="currentColor"
+                  fillRule="evenodd"
+                  aria-hidden="true"
+                >
+                  <g transform="matrix(3.800695,0,0,4.166604,-7.598366,0.001061)">
+                    <path
+                      d="M4.594,6.677C6.67,-2.226 18.746,-2.211,21.16,6.632C21.513,7.929 22.885,14.214 19.487,20.379C17.942,23.176 13.646,25.869 12.497,22.262C8.6,25.477 3.315,24.1,5.789,18.609L5.471,18.752C1.901,20.057 1.608,17.544 2.298,16.239C2.748,15.399 3.025,14.904 3.235,14.342C3.588,13.367 3.693,12.774 3.828,11.844C4.098,10.007 4.105,8.237 4.593,6.677L4.594,6.677Z"
+                      fill="currentColor"
+                    />
+                    <circle cx="12.964" cy="6.687" r="1.5" fill="#0a0711" />
+                    <circle cx="17.044" cy="6.687" r="1.5" fill="#0a0711" />
+                  </g>
+                </svg>
               </div>
             </div>
           </Container>
@@ -242,7 +278,7 @@ export default function HomePage() {
             {recentRuns.length > 0 && (
               <Link href="/crypt">
                 <Button variant="ghost" size="sm" icon={<ArrowRightIcon className="w-4 h-4" />}>
-                  Open The Crypt →
+                  Open The Crypt
                 </Button>
               </Link>
             )}

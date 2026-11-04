@@ -2,15 +2,20 @@ import React from 'react';
 
 export function Footer() {
   return (
-    <footer
-      className="border-t"
-      style={{
-        background: 'rgba(10, 7, 17, 0.95)',
-        borderColor: 'rgba(255, 121, 31, 0.1)',
-        padding: '32px 0',
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="graveyard-footer">
+      <div className="graveyard-decorations">
+        {/* Tombstone silhouettes */}
+        <div className="tombstone t-1" />
+        <div className="tombstone t-2" />
+        <div className="tombstone t-3" />
+        <div className="tombstone t-4" />
+        <div className="tombstone t-5" />
+
+        {/* Iron fence */}
+        <div className="iron-fence" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--phantom-gray)' }}>
             <span>© 2026 HauntView</span>

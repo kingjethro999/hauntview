@@ -12,6 +12,277 @@
   overflow: hidden;
 }
 
+/* Hero-specific decorations */
+.haunting-decorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Ghost floating animation */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Spider web */
+.spider-web {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 150px;
+  height: 150px;
+  color: rgba(201, 168, 219, 0.18);
+  opacity: 0.18;
+}
+
+/* Haunted moon */
+.haunted-moon {
+  position: absolute;
+  width: 115px;
+  height: 115px;
+  right: 8%;
+  top: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e5e3da, #8c7e96);
+  box-shadow:
+    0 0 50px rgba(154, 142, 148, 0.3),
+    inset -24px -10px 0 rgba(91, 81, 99, 0.5);
+  opacity: 0.7;
+}
+
+.moon-crater-1,
+.moon-crater-2,
+.moon-crater-3 {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(102, 90, 110, 0.24);
+}
+
+.moon-crater-1 {
+  width: 17px;
+  height: 18px;
+  top: 22px;
+  left: 30px;
+}
+
+.moon-crater-2 {
+  width: 23px;
+  height: 21px;
+  top: 60px;
+  left: 63px;
+}
+
+.moon-crater-3 {
+  width: 11px;
+  height: 10px;
+  top: 79px;
+  left: 27px;
+}
+
+/* Hero spirit */
+.hero-spirit {
+  position: absolute;
+  right: 32%;
+  top: 12%;
+  width: 74px;
+  color: #d7d2db;
+  animation: ghost-hover 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(219, 215, 222, 0.3));
+}
+
+.spirit-svg {
+  width: 100%;
+  height: auto;
+}
+
+@keyframes ghost-hover {
+  50% {
+    transform: translateY(-12px) rotate(6deg);
+  }
+}
+
+/* Victorian frame ornaments */
+.frame-ornament {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 1px solid rgba(255, 121, 31, 0.2);
+  opacity: 0.4;
+}
+
+.frame-ornament::before,
+.frame-ornament::after {
+  content: '';
+  position: absolute;
+  background: var(--candle-primary);
+  opacity: 0.3;
+}
+
+.frame-tl {
+  top: 10%;
+  left: 5%;
+  border-right: none;
+  border-bottom: none;
+}
+
+.frame-tl::before {
+  width: 1px;
+  height: 20px;
+  top: 0;
+  left: 0;
+}
+
+.frame-tl::after {
+  width: 20px;
+  height: 1px;
+  top: 0;
+  left: 0;
+}
+
+.frame-tr {
+  top: 10%;
+  right: 5%;
+  border-left: none;
+  border-bottom: none;
+}
+
+.frame-tr::before {
+  width: 1px;
+  height: 20px;
+  top: 0;
+  right: 0;
+}
+
+.frame-tr::after {
+  width: 20px;
+  height: 1px;
+  top: 0;
+  right: 0;
+}
+
+.frame-bl {
+  bottom: 20%;
+  left: 5%;
+  border-right: none;
+  border-top: none;
+}
+
+.frame-bl::before {
+  width: 1px;
+  height: 20px;
+  bottom: 0;
+  left: 0;
+}
+
+.frame-bl::after {
+  width: 20px;
+  height: 1px;
+  bottom: 0;
+  left: 0;
+}
+
+.frame-br {
+  bottom: 20%;
+  right: 5%;
+  border-left: none;
+  border-top: none;
+}
+
+.frame-br::before {
+  width: 1px;
+  height: 20px;
+  bottom: 0;
+  right: 0;
+}
+
+.frame-br::after {
+  width: 20px;
+  height: 1px;
+  bottom: 0;
+  right: 0;
+}
+
+/* Candle glows */
+.candle-glow {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 121, 31, 0.15), transparent 70%);
+  pointer-events: none;
+}
+
+.candle-1 {
+  right: 15%;
+  top: 35%;
+  animation: candle-flicker 3s ease-in-out infinite;
+}
+
+.candle-2 {
+  right: 25%;
+  bottom: 25%;
+  animation: candle-flicker 4s ease-in-out infinite 1.5s;
+}
+
+.candle-3 {
+  right: 45%;
+  top: 55%;
+  animation: candle-flicker 3.5s ease-in-out infinite 0.8s;
+}
+
+/* Hanging spider */
+.hanging-spider {
+  position: absolute;
+  right: 4%;
+  top: 15%;
+}
+
+.spider-thread {
+  position: absolute;
+  width: 1px;
+  height: 45px;
+  background: linear-gradient(to bottom, transparent, rgba(201, 168, 219, 0.3));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.spider-svg {
+  width: 60px;
+  height: 50px;
+  color: rgba(201, 168, 219, 0.4);
+  animation: spider-sway 8s ease-in-out infinite;
+}
+
+@keyframes spider-sway {
+  50% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes candle-flicker {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
 /* Corridor fog - subtle drift */
 .corridor-fog {
   position: absolute;
@@ -139,7 +410,8 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .haunting-layer * {
+  .haunting-layer *,
+  .haunting-decorations * {
     animation: none !important;
     transition: none !important;
   }
@@ -152,4 +424,106 @@
   .corridor-fog {
     display: none;
   }
+
+  .hero-spirit {
+    opacity: 0.6;
+    transform: none;
+  }
+
+  .candle-glow {
+    opacity: 0.5;
+    animation: none;
+  }
+
+  .spider-svg {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* Graveyard footer */
+.graveyard-footer {
+  position: relative;
+  background: linear-gradient(to bottom, #0a0711, #050508);
+  border-top: 1px solid rgba(255, 121, 31, 0.15);
+  padding: 48px 0 32px;
+  overflow: hidden;
+}
+
+.graveyard-decorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tombstone {
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(to top, #1a151c, #0d0a10);
+  border-radius: 50% 50% 0 0;
+  opacity: 0.3;
+}
+
+.t-1 {
+  left: 5%;
+  width: 30px;
+  height: 60px;
+}
+
+.t-2 {
+  left: 15%;
+  width: 24px;
+  height: 48px;
+}
+
+.t-3 {
+  right: 15%;
+  width: 26px;
+  height: 52px;
+}
+
+.t-4 {
+  right: 8%;
+  width: 20px;
+  height: 40px;
+}
+
+.t-5 {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 56px;
+}
+
+.iron-fence {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 40px,
+    rgba(70, 60, 70, 0.15) 40px,
+    rgba(70, 60, 70, 0.15) 42px
+  );
+  border-top: 2px solid rgba(70, 60, 70, 0.2);
+}
+
+.iron-fence::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 40px,
+    rgba(70, 60, 70, 0.1) 40px,
+    rgba(70, 60, 70, 0.1) 42px
+  );
 }
