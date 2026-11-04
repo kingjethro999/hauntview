@@ -94,7 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main
           id="main-content"
           tabIndex={-1}
-          className="flex-1 flex flex-col w-full max-w-[2560px] mx-auto focus:outline-none"
+          className="flex-1 flex flex-col w-full focus:outline-none"
         >
           {children}
         </main>

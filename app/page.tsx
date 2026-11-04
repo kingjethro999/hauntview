@@ -9,7 +9,6 @@ import { Card } from './components/ui/Card';
 import { Badge } from './components/ui/Badge';
 import { Button } from './components/ui/Button';
 import { TestLauncher } from './components/features/TestLauncher';
-import { HauntingDecorations } from './components/features/HauntingDecorations';
 // The Veil preview is a work in progress - commented out
 // import { TheVeil } from './components/features/TheVeil';
 // import {
@@ -77,164 +76,49 @@ export default function HomePage() {
   return (
     <div className="relative">
       {/* ═════════════════════════════════════════
-          HERO LANDING BAY
-          Spirit photography aesthetic with The Veil preview
+          HERO BANNER SECTION
+          Full-width, edge-to-edge cinematic banner
       ═════════════════════════════════════════ */}
-      <section className="landing-bay relative min-h-[480px] lg:min-h-[680px]">
-        <HauntingDecorations />
-        <div className="relative z-10 pt-16 pb-20 md:pt-24 md:pb-24 lg:pt-28 lg:pb-32">
-          <Container size="lg">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
-              {/* Left side - content */}
-              <div className="w-full max-w-2xl lg:max-w-[520px]">
-                {/* Specimen label */}
-                <div className="specimen-label" style={{ marginBottom: 28 }}>
-                  Kiroween 2026 · Spirit Photography Web Testing Engine
-                </div>
-
-                {/* Headline */}
-                <h1
-                  style={{
-                    fontSize: 'clamp(3rem, 7vw, 4.5rem)',
-                    fontWeight: 600,
-                    lineHeight: 1.02,
-                    letterSpacing: '-0.04em',
-                    color: 'var(--ghost-white)',
-                    marginBottom: 16,
-                  }}
-                >
-                  Photograph your
-                  <br />
-                  website
-                  <em
-                    style={{
-                      fontStyle: 'normal',
-                      color: 'var(--candle-primary)',
-                      textShadow: '0 0 40px rgba(255,121,31,0.3)',
-                    }}
-                  >
-                    twice
-                  </em>
-                </h1>
-
-                <p
-                  style={{
-                    fontSize: 15,
-                    color: 'var(--phantom-gray)',
-                    lineHeight: 1.8,
-                    marginBottom: 36,
-                    maxWidth: 440,
-                  }}
-                >
-                  HauntView captures the living page as you built it, and the apparition as your
-                  users sometimes get it — under 25 testing profiles and failure conditions with
-                  visual diffs and evidence-backed findings.
-                </p>
-
-                {/* Feature badges */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 44 }}>
-                  <Badge variant="outline" size="md">
-                    25 Rites
-                  </Badge>
-                  <Badge variant="outline" size="md">
-                    Deterministic Faults
-                  </Badge>
-                  <Badge variant="outline" size="md">
-                    WCAG Audits
-                  </Badge>
-                  <Badge variant="outline" size="md">
-                    MCP Agent-Native
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Right side - pumpkins and ghost (d-none on mobile & tablet, visible on lg desktop) */}
-              <div className="hidden lg:flex items-end justify-center gap-4 lg:gap-6 shrink-0">
-                {/* 3 Pumpkins standalone image */}
-                <Image
-                  src="/pumpkins.png"
-                  alt="HauntView Carved Pumpkins"
-                  width={380}
-                  height={253}
-                  className="w-72 lg:w-96 h-auto object-contain select-none pointer-events-none drop-shadow-[0_10px_30px_rgba(255,121,31,0.25)]"
-                  priority
-                />
-
-                {/* Friendly Ghost image */}
-                <Image
-                  src="/ghost.png"
-                  alt="HauntView Friendly Ghost"
-                  width={220}
-                  height={233}
-                  className="w-24 lg:w-32 h-auto object-contain select-none pointer-events-none animate-float shrink-0 self-end mb-6 lg:mb-10 drop-shadow-[0_8px_25px_rgba(255,241,220,0.3)]"
-                  priority
-                />
-              </div>
-            </div>
-          </Container>
+      <section className="relative w-full overflow-hidden bg-[#0a0711]">
+        {/* Hidden screen-reader heading for WCAG & SEO */}
+        <div className="sr-only">
+          <h1>HauntView — Photograph your website twice</h1>
+          <p>Kiroween 2026 · Spirit Photography Web Testing Engine</p>
+          <p>
+            HauntView captures the living page as you built it, and the apparition as your users
+            sometimes get it — under 25 testing profiles and failure conditions with visual diffs
+            and evidence-backed findings.
+          </p>
+          <ul>
+            <li>25 Rites</li>
+            <li>Deterministic Faults</li>
+            <li>WCAG Audits</li>
+            <li>MCP Agent-Native</li>
+          </ul>
         </div>
 
-        {/* The Veil preview - signature component (work in progress - commented out) */}
-        {/*
-        <div className="relative z-10 px-4 pb-16">
-          <div className="max-w-4xl mx-auto">
-            <div className="victorian-panel p-5 md:p-6">
-              <div
-                className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5 pb-3"
-                style={{ borderBottom: '1px solid rgba(255, 121, 31, 0.15)' }}
-              >
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="font-semibold text-lg" style={{ color: 'var(--ghost-white)' }}>
-                      The Veil
-                    </h3>
-                  </div>
-                  <p style={{ fontSize: 13, color: 'var(--phantom-gray)' }}>
-                    Part the curtain between living page and apparition
-                  </p>
-                </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontFamily: 'monospace',
-                    padding: '5px 10px',
-                    borderRadius: 4,
-                    color: '#9aff9a',
-                    background: 'rgba(154, 255, 154, 0.08)',
-                    border: '1px solid rgba(154, 255, 154, 0.25)',
-                  }}
-                >
-                  Interactive Preview
-                </div>
-              </div>
+        {/* Hero image scaled edge-to-edge without margin or fixed width */}
+        <div className="relative w-full">
+          <Image
+            src="/hero-banner.jpg"
+            alt="HauntView — Photograph your website twice. Kiroween 2026 Spirit Photography Web Testing Engine"
+            width={3146}
+            height={1312}
+            priority
+            sizes="100vw"
+            className="w-full h-auto block select-none pointer-events-none"
+          />
 
-              <TheVeil
-                livingSrc={DEMO_LIVING_SRC}
-                apparitionSrc={DEMO_APPARITION_SRC}
-                diffSrc={DEMO_DIFF_SRC}
-                livingLabel="Living Page (Baseline: ExampleSite)"
-                apparitionLabel="Apparition (Images Blocked &amp; Shift)"
-                pins={[
-                  {
-                    id: '1',
-                    title: 'Asset load failure — missing width/height attributes',
-                    severity: 'serious',
-                    xPercent: 28,
-                    yPercent: 48,
-                  },
-                  {
-                    id: '2',
-                    title: 'Touch target collision: button size 24px < 44px',
-                    severity: 'warning',
-                    xPercent: 74,
-                    yPercent: 72,
-                  },
-                ]}
-              />
-            </div>
-          </div>
+          {/* Smooth bottom feather into the séance parlour background */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-12 sm:h-20 md:h-28 lg:h-40 pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(to bottom, transparent 0%, rgba(10, 7, 17, 0.3) 40%, rgba(10, 7, 17, 0.8) 75%, #0a0711 100%)',
+            }}
+            aria-hidden="true"
+          />
         </div>
-        */}
       </section>
 
       {/* ═════════════════════════════════════════
