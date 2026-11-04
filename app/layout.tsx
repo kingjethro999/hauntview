@@ -44,7 +44,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} dark h-full`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${spaceGrotesk.variable} ${inter.variable} dark h-full`}
+    >
       <head>
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="screen-orientation" content="portrait-primary" />
@@ -62,8 +66,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     document.documentElement.setAttribute('lang', 'ja');
                   } else if (lang.indexOf('hi') === 0) {
                     document.documentElement.setAttribute('lang', 'hi');
-                  } else if (lang) {
-                    document.documentElement.setAttribute('lang', lang);
                   }
                   if ('serviceWorker' in navigator && window.location.protocol.indexOf('http') === 0) {
                     window.addEventListener('load', function() {

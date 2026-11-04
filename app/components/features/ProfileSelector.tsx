@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useSyncExternalStore } from 'react';
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -266,33 +266,60 @@ const DEFAULT_COLLAPSED: Record<string, boolean> = {
   security: true,
 };
 
+// Subscribable external store for persistent collapsed category preferences
+let cachedCollapsed: Record<string, boolean> | null = null;
+const collapseListeners = new Set<() => void>();
+
+function getCollapsedSnapshot(): Record<string, boolean> {
+  if (typeof window === 'undefined') return DEFAULT_COLLAPSED;
+  if (!cachedCollapsed) {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      cachedCollapsed = saved ? { ...DEFAULT_COLLAPSED, ...JSON.parse(saved) } : DEFAULT_COLLAPSED;
+    } catch {
+      cachedCollapsed = DEFAULT_COLLAPSED;
+    }
+  }
+  return cachedCollapsed;
+}
+
+function getServerSnapshot(): Record<string, boolean> {
+  return DEFAULT_COLLAPSED;
+}
+
+function subscribeToCollapsed(callback: () => void) {
+  collapseListeners.add(callback);
+  return () => {
+    collapseListeners.delete(callback);
+  };
+}
+
+function updateCollapsedCategory(cat: string) {
+  const current = getCollapsedSnapshot();
+  const next = { ...current, [cat]: !current[cat] };
+  cachedCollapsed = next;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    // Ignore storage write errors
+  }
+  collapseListeners.forEach((fn) => fn());
+}
+
 export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
   selectedProfiles,
   onChange,
   viewMode = 'grid',
 }) => {
-  // Restore user's collapsed preferences lazily from persistent localStorage
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
-    if (typeof window === 'undefined') return DEFAULT_COLLAPSED;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return { ...DEFAULT_COLLAPSED, ...JSON.parse(saved) };
-    } catch {
-      // Ignore storage read errors
-    }
-    return DEFAULT_COLLAPSED;
-  });
+  // Synchronize state between SSR default and client preferences without cascading renders or hydration mismatch
+  const collapsed = useSyncExternalStore(
+    subscribeToCollapsed,
+    getCollapsedSnapshot,
+    getServerSnapshot
+  );
 
   const toggleCollapse = (cat: string) => {
-    setCollapsed((prev) => {
-      const next = { ...prev, [cat]: !prev[cat] };
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        // Ignore storage write errors
-      }
-      return next;
-    });
+    updateCollapsedCategory(cat);
   };
 
   const toggleProfile = (id: string) => {
