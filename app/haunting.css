@@ -527,3 +527,17 @@
     rgba(70, 60, 70, 0.1) 42px
   );
 }
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 1023px) {
+  .hero-spirit {
+    display: none;
+  }
+  .haunted-moon {
+    width: 70px;
+    height: 70px;
+    right: 4%;
+    top: 4%;
+    opacity: 0.35;
+  }
+}

@@ -80,13 +80,13 @@ export default function HomePage() {
           HERO LANDING BAY
           Spirit photography aesthetic with The Veil preview
       ═════════════════════════════════════════ */}
-      <section className="landing-bay relative" style={{ minHeight: 680 }}>
+      <section className="landing-bay relative min-h-[480px] lg:min-h-[680px]">
         <HauntingDecorations />
-        <div className="relative z-10" style={{ paddingTop: 100, paddingBottom: 120 }}>
+        <div className="relative z-10 pt-16 pb-20 md:pt-24 md:pb-24 lg:pt-28 lg:pb-32">
           <Container size="lg">
-            <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
               {/* Left side - content */}
-              <div style={{ maxWidth: 520 }}>
+              <div className="w-full max-w-2xl lg:max-w-[520px]">
                 {/* Specimen label */}
                 <div className="specimen-label" style={{ marginBottom: 28 }}>
                   Kiroween 2026 · Spirit Photography Web Testing Engine
@@ -148,22 +148,22 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Right side - pumpkins and ghost */}
-              <div className="flex items-end justify-center gap-4 md:gap-6">
+              {/* Right side - pumpkins and ghost (d-none on mobile & tablet, visible on lg desktop) */}
+              <div className="hidden lg:flex items-end justify-center gap-4 lg:gap-6 shrink-0">
                 {/* 3 Pumpkins standalone image */}
                 <Image
                   src="/pumpkins.png"
                   alt="HauntView Carved Pumpkins"
                   width={380}
                   height={253}
-                  className="w-56 sm:w-64 md:w-80 lg:w-96 h-auto object-contain select-none pointer-events-none drop-shadow-[0_10px_30px_rgba(255,121,31,0.25)]"
+                  className="w-72 lg:w-96 h-auto object-contain select-none pointer-events-none drop-shadow-[0_10px_30px_rgba(255,121,31,0.25)]"
                   priority
                 />
 
                 {/* Ghost */}
                 <svg
                   viewBox="0 0 75 100"
-                  className="w-20 h-28 md:w-24 md:h-32 animate-float"
+                  className="w-20 h-28 lg:w-24 lg:h-32 animate-float shrink-0 text-[#fff1dc]"
                   fill="currentColor"
                   fillRule="evenodd"
                   aria-hidden="true"
