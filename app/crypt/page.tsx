@@ -6,6 +6,7 @@ import { Container } from '../components/layout/Container';
 import { Button } from '../components/ui/Button';
 import { TombstoneCard } from '../components/features/TombstoneCard';
 import { WispGhost } from '../components/features/WispGhost';
+import { FloatingDraggableGhost } from '../components/features/FloatingDraggableGhost';
 import { TestReportSummary } from '@/src/core/report-store';
 import {
   ArchiveBoxIcon,
@@ -70,6 +71,9 @@ export default function CryptPage() {
 
   return (
     <div className="py-10 md:py-14 space-y-8">
+      {/* Draggable wandering ghost companion */}
+      <FloatingDraggableGhost />
+
       <Container size="lg">
         {/* Navigation back and actions */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">

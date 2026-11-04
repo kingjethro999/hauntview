@@ -19,3 +19,4 @@ export * from './AtmosphereToggle';
 export * from './HauntedHouse';
 export * from './TombstoneCard';
 export * from './HauntingDecorations';
+export * from './FloatingDraggableGhost';

@@ -1,5 +1,5 @@
 const CACHE_NAME = 'hauntview-cache-v1';
-const OFFLINE_URLS = ['/', '/ghost.png', '/pumpkins.png', '/icon.svg'];
+const OFFLINE_URLS = ['/', '/ghost.png', '/icon.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

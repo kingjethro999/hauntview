@@ -280,7 +280,7 @@ function getCollapsedSnapshot(): Record<string, boolean> {
       cachedCollapsed = DEFAULT_COLLAPSED;
     }
   }
-  return cachedCollapsed;
+  return cachedCollapsed || DEFAULT_COLLAPSED;
 }
 
 function getServerSnapshot(): Record<string, boolean> {

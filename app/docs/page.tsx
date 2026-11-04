@@ -17,6 +17,7 @@ import {
   CodeBracketIcon,
 } from '@heroicons/react/24/outline';
 import { CodeBlock } from '../components/ui/CodeBlock';
+import { FloatingDraggableGhost } from '../components/features/FloatingDraggableGhost';
 import { HAUNTVIEW_DOCS_MARKDOWN } from './docs-markdown';
 
 type ClientTab = 'kiro' | 'remote' | 'claude' | 'cursor' | 'windsurf' | 'vscode';
@@ -60,6 +61,9 @@ export default function ManualPage() {
 
   return (
     <div className="min-h-screen py-8 md:py-12 bg-[#060309] text-[#d9d3e0]">
+      {/* Draggable wandering ghost companion */}
+      <FloatingDraggableGhost />
+
       {/* Outer Docs Frame (Wide responsive layout) */}
       <div className="mx-auto w-full max-w-[1520px] px-4 sm:px-6 md:px-8 lg:px-10">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
