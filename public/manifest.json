@@ -1,0 +1,16 @@
+{
+  "name": "HauntView",
+  "short_name": "HauntView",
+  "description": "Spirit Photography Web Testing Engine",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0711",
+  "theme_color": "#0a0711",
+  "icons": [
+    {
+      "src": "/ghost.png",
+      "sizes": "220x233",
+      "type": "image/png"
+    }
+  ]
+}

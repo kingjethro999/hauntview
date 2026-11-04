@@ -59,10 +59,7 @@ export class BrowserFirefoxProfile {
               if (cssText.includes('-webkit-backdrop-filter')) {
                 hasWebkitBackdrop = true;
               }
-              if (
-                cssText.includes('backdrop-filter') &&
-                !cssText.includes('-webkit-backdrop-filter')
-              ) {
+              if (/(?:^|[^-])backdrop-filter\s*:/.test(cssText)) {
                 hasStandardBackdrop = true;
               }
 

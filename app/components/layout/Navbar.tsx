@@ -53,6 +53,8 @@ export function Navbar() {
             <img
               src="/scroll-icon.svg"
               alt="Scroll"
+              width={20}
+              height={20}
               className="w-5 h-5 inline mr-2 brightness-0 invert"
             />
             Scroll

@@ -59,9 +59,21 @@ export class AccessibilityVisualProfile {
           'p, span, a, button, label, h1, h2, h3, h4, h5, h6'
         );
 
+        function getEffectiveBg(element: Element): string {
+          let current: Element | null = element;
+          while (current) {
+            const bg = window.getComputedStyle(current).backgroundColor;
+            if (bg && bg !== 'transparent' && !bg.match(/rgba\([^)]+,\s*0\)/)) {
+              return bg;
+            }
+            current = current.parentElement;
+          }
+          return 'rgb(10, 7, 17)';
+        }
+
         for (const el of textElements) {
           const style = window.getComputedStyle(el);
-          const bgColor = style.backgroundColor;
+          const bgColor = getEffectiveBg(el);
           const color = style.color;
 
           if (bgColor && color && (el as HTMLElement).offsetHeight > 0) {

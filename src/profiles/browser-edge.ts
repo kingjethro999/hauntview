@@ -44,8 +44,15 @@ export class BrowserEdgeProfile {
           const style = window.getComputedStyle(svg);
           const fill = style.fill;
           const stroke = style.stroke;
+          const attrFill = svg.getAttribute('fill');
+          const attrStroke = svg.getAttribute('stroke');
+          const hasCurrentColor =
+            attrFill === 'currentColor' ||
+            attrStroke === 'currentColor' ||
+            fill === 'currentColor' ||
+            stroke === 'currentColor';
           // In forced-colors mode, hardcoded hex/rgb fills are overridden, but SVG icons without currentColor or borders can disappear
-          if (fill !== 'currentColor' && stroke !== 'currentColor' && style.borderWidth === '0px') {
+          if (!hasCurrentColor && style.borderWidth === '0px') {
             svgIconsWithoutFillOrCurrentColor++;
           }
         }

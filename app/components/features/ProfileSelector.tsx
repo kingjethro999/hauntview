@@ -340,14 +340,14 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                   >
                     {category}
                   </span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
+                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
                     {selectedCount}/{profiles.length} selected
                   </span>
                 </div>
                 <button
                   type="button"
                   aria-label={isCollapsed ? `Expand ${category}` : `Collapse ${category}`}
-                  className="p-1 text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-colors"
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-colors"
                 >
                   {isCollapsed ? (
                     <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />
@@ -426,7 +426,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                 >
                   {category}
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
+                <span className="text-xs font-mono px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
                   {selectedCount}/{profiles.length} selected
                 </span>
               </div>
@@ -435,7 +435,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
               <button
                 type="button"
                 aria-label={isCollapsed ? `Expand ${category} rites` : `Collapse ${category} rites`}
-                className="p-1 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-transform"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-transform"
               >
                 {isCollapsed ? (
                   <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />

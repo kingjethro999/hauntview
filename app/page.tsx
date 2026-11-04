@@ -269,7 +269,12 @@ export default function HomePage() {
             </div>
             {recentRuns.length > 0 && (
               <Link href="/crypt">
-                <Button variant="ghost" size="sm" icon={<ArrowRightIcon className="w-4 h-4" />}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="min-h-[44px]"
+                  icon={<ArrowRightIcon className="w-4 h-4" />}
+                >
                   Open The Crypt
                 </Button>
               </Link>
@@ -298,9 +303,9 @@ export default function HomePage() {
                 className="w-12 h-12 mx-auto mb-4"
                 style={{ color: 'var(--phantom-gray)' }}
               />
-              <h4 className="font-semibold text-base mb-2" style={{ color: 'var(--ghost-white)' }}>
+              <h3 className="font-semibold text-base mb-2" style={{ color: 'var(--ghost-white)' }}>
                 The Crypt Is Peaceful
-              </h4>
+              </h3>
               <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--phantom-gray)' }}>
                 No past séances yet. Run your first test to begin building your gallery of
                 apparitions.
@@ -334,13 +339,13 @@ export default function HomePage() {
                           <span>{(run.duration / 1000).toFixed(1)}s</span>
                         </div>
                       </div>
-                      <h4
+                      <h3
                         className="font-medium text-sm truncate mb-2"
                         style={{ color: 'var(--ghost-white)' }}
                         title={run.url}
                       >
                         {run.url}
-                      </h4>
+                      </h3>
                       <p style={{ fontSize: 12, color: 'var(--phantom-gray)' }}>
                         {run.successfulProfiles}/{run.totalProfiles} rites · {run.totalFindings}{' '}
                         omens
@@ -353,7 +358,7 @@ export default function HomePage() {
                     >
                       <span
                         style={{
-                          fontSize: 11,
+                          fontSize: 12,
                           fontFamily: 'monospace',
                           color: 'var(--phantom-gray)',
                         }}
@@ -361,7 +366,11 @@ export default function HomePage() {
                         {new Date(run.startTime).toLocaleDateString()}
                       </span>
                       <Link href={`/results/${run.id}`}>
-                        <Button size="sm" variant="outline" className="text-xs py-1.5 px-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs py-1.5 px-3 min-h-[44px]"
+                        >
                           Grimoire →
                         </Button>
                       </Link>

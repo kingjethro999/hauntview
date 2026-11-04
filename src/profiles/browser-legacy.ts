@@ -29,7 +29,8 @@ export class BrowserLegacyProfile {
       // 1. Check for X-UA-Compatible meta tag
       const xUaCompatible = await page
         .locator('meta[http-equiv="X-UA-Compatible"]')
-        .getAttribute('content');
+        .getAttribute('content', { timeout: 2000 })
+        .catch(() => null);
       if (!xUaCompatible || !xUaCompatible.includes('IE=edge')) {
         findings.push({
           id: `${this.profileId}-missing-x-ua-compatible`,

@@ -143,7 +143,17 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
         background: 'rgba(28, 21, 35, 0.6)',
       }}
     >
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8" noValidate={false}>
+        {/* Step Guide for Cognitive Accessibility */}
+        <div className="flex items-center gap-2 text-xs font-mono text-[var(--candle-primary)] bg-[rgba(255,121,31,0.08)] px-3 py-1.5 rounded border border-[rgba(255,121,31,0.2)]">
+          <span>Guide:</span>
+          <span>Step 1 Enter Target URL</span>
+          <span>·</span>
+          <span>Step 2 Select Testing Rites</span>
+          <span>·</span>
+          <span>Step 3 Summon Spirits</span>
+        </div>
+
         {/* URL Input Section */}
         <div>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
@@ -156,7 +166,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               Target URL
             </label>
             <div
-              className="flex items-center gap-2 text-xs"
+              className="flex items-center gap-2 text-xs flex-wrap"
               style={{ color: 'var(--phantom-gray)' }}
             >
               <span>Quick pick:</span>
@@ -169,7 +179,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
                     const valid = checkUrlValid(preset.url);
                     onUrlChange?.(preset.url, valid);
                   }}
-                  className="px-3 py-1 rounded border hover:border-[var(--candle-primary)] transition-colors"
+                  className="min-h-[44px] min-w-[44px] px-3.5 py-2 rounded border hover:border-[var(--candle-primary)] transition-colors inline-flex items-center justify-center text-xs"
                   style={{
                     background: 'rgba(28, 21, 35, 0.5)',
                     borderColor: 'rgba(255, 121, 31, 0.15)',
@@ -187,13 +197,15 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
             className={`relative flex items-center rounded-lg border-2 transition-all duration-200 ${
               isUrlValid
                 ? 'border-[var(--candle-primary)] shadow-[0_0_20px_rgba(255,121,31,0.2)]'
-                : 'border-[rgba(255,121,31,0.15)] focus-within:border-[var(--candle-primary)]'
+                : error
+                  ? 'border-red-500 shadow-[0_0_20px_rgba(220,38,38,0.2)]'
+                  : 'border-[rgba(255,121,31,0.15)] focus-within:border-[var(--candle-primary)]'
             }`}
             style={{ background: 'rgba(10, 7, 17, 0.8)' }}
           >
             <input
               id="target-url"
-              type="text"
+              type="url"
               value={url}
               onChange={handleUrlInputChange}
               onFocus={() => onFocusChange?.(true)}
@@ -201,6 +213,9 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               placeholder="http://localhost:3000 or https://your-site.com"
               disabled={isRunning}
               required
+              aria-required="true"
+              aria-invalid={error || (!isUrlValid && url.length > 0) ? 'true' : 'false'}
+              aria-describedby={error ? 'url-error' : undefined}
               className="w-full py-3.5 px-4 bg-transparent text-sm font-mono focus:outline-none"
               style={{ color: 'var(--ghost-white)' }}
             />
@@ -222,6 +237,18 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               )}
             </div>
           </div>
+
+          {/* Explicit visible error message for Form Resilience and screen readers */}
+          {error && (
+            <p
+              id="url-error"
+              role="alert"
+              className="mt-2 text-xs text-red-400 flex items-center gap-1.5 font-mono"
+            >
+              <span aria-hidden="true">⚠</span>
+              <span>{error}</span>
+            </p>
+          )}
         </div>
 
         {/* Profile Selection */}
@@ -231,7 +258,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
             style={{ borderBottom: '1px solid rgba(255, 121, 31, 0.1)' }}
           >
             <div>
-              <h3 className="font-semibold text-lg" style={{ color: 'var(--ghost-white)' }}>
+              <h2 className="font-semibold text-lg" style={{ color: 'var(--ghost-white)' }}>
                 Testing Rites
                 <span
                   className="ml-3 text-xs font-normal px-2 py-0.5 rounded"
@@ -243,7 +270,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
                 >
                   {selectedProfiles.length} / {AVAILABLE_PROFILES.length} selected
                 </span>
-              </h3>
+              </h2>
               <p style={{ fontSize: 13, color: 'var(--phantom-gray)', marginTop: 2 }}>
                 Choose which failure conditions to test
               </p>
@@ -260,7 +287,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-2 transition-colors ${
+                className={`min-h-[44px] min-w-[44px] px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-2 transition-colors ${
                   viewMode === 'grid'
                     ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
                     : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)]'
@@ -272,7 +299,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-2 transition-colors ${
+                className={`min-h-[44px] min-w-[44px] px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-2 transition-colors ${
                   viewMode === 'list'
                     ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
                     : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)]'
