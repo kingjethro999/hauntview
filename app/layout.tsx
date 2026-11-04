@@ -6,6 +6,7 @@ import './haunting.css';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { Toaster } from 'sonner';
+import NextTopLoader from 'nextjs-toploader';
 import { AtmosphereLayer } from './components/features/AtmosphereLayer';
 import { HauntingEffects } from './components/features/HauntingEffects';
 
@@ -88,6 +89,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to main content
         </a>
+        <NextTopLoader
+          color="#ff791f"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #ff791f,0 0 5px #ff791f"
+          zIndex={99999}
+          showForHashAnchor={true}
+        />
         <AtmosphereLayer />
         <HauntingEffects />
         <Suspense fallback={<div className="h-16 bg-[#0a0711]" />}>

@@ -26,6 +26,7 @@ export default function ManualPage() {
   const [activeTab, setActiveTab] = useState<ClientTab>('kiro');
   const [copiedMd, setCopiedMd] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const handleCopyPageAsMd = async () => {
     try {
@@ -39,6 +40,12 @@ export default function ManualPage() {
 
   useEffect(() => {
     const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress =
+        docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+      setScrollProgress(progress);
+
       const sections = ['overview', 'clients', 'kiro-power', 'transports', 'tools', 'local-setup'];
       const scrollPosition = window.scrollY + 160;
 
@@ -56,11 +63,27 @@ export default function ManualPage() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <div className="min-h-screen py-8 md:py-12 bg-[#060309] text-[#d9d3e0]">
+      {/* On-Page Reading Scroll Progress Bar */}
+      <div
+        className="fixed top-0 left-0 z-[60] h-[3px] pointer-events-none transition-all duration-75 ease-out"
+        style={{
+          width: `${scrollProgress}%`,
+          background: 'linear-gradient(90deg, #ff791f 0%, #ffaa55 100%)',
+          boxShadow: '0 0 10px #ff791f, 0 0 5px #ff791f',
+        }}
+        role="progressbar"
+        aria-valuenow={Math.round(scrollProgress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Documentation reading scroll progress"
+      />
+
       {/* Draggable wandering ghost companion */}
       <FloatingDraggableGhost />
 
@@ -74,9 +97,16 @@ export default function ManualPage() {
             <div className="space-y-6">
               {/* Navigation Group 1: Getting Started */}
               <div>
-                <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#ff791f]/80 mb-2.5 font-semibold px-2">
-                  Getting Started
-                </h4>
+                <div className="flex items-center justify-between mb-2.5 px-2">
+                  <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#ff791f]/80 font-semibold">
+                    Getting Started
+                  </h4>
+                  {scrollProgress > 0 && (
+                    <span className="text-[10px] font-mono text-[#ff791f]/90 bg-[#ff791f]/10 px-1.5 py-0.5 rounded border border-[#ff791f]/20">
+                      {Math.round(scrollProgress)}% read
+                    </span>
+                  )}
+                </div>
                 <nav className="space-y-1">
                   <a
                     href="#overview"
