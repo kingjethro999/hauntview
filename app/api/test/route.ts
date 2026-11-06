@@ -7,6 +7,7 @@ import { HauntViewEngine } from '@/src/engine';
 import { TestReport } from '@/src/types';
 import { ReportStore } from '@/src/core/report-store';
 import { saveTestReportToDb } from '@/src/lib/server/database';
+import { validateTargetUrl } from '@/src/lib/server/url-safety';
 
 interface TestApiResponse {
   success: boolean;
@@ -34,13 +35,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
+    const urlValidation = validateTargetUrl(url, { allowLocal: true });
+    if (!urlValidation.valid) {
+      return NextResponse.json(
+        { error: `URL safety error: ${urlValidation.error}` },
+        { status: 400 }
+      );
+    }
+    const safeUrl = urlValidation.normalizedUrl || url;
+
     // Initialize engine
     const engine = new HauntViewEngine();
     await engine.initialize();
 
     // Execute tests
     const report = await engine.executeTests({
-      url,
+      url: safeUrl,
       profiles,
       includeScreenshots: true,
     });
