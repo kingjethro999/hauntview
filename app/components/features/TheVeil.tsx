@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import Image from 'next/image';
 import {
   ArrowsRightLeftIcon,
   SparklesIcon,
@@ -197,7 +198,13 @@ export const TheVeil: React.FC<TheVeilProps> = ({
               style={{ background: 'rgba(28, 21, 35, 0.5)' }}
             >
               {livingSrc ? (
-                <img src={livingSrc} alt={livingLabel} className="w-full h-full object-contain" />
+                <Image
+                  src={livingSrc}
+                  alt={livingLabel || 'Living page'}
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
               ) : (
                 <SpiritPlate type="living" />
               )}
@@ -216,10 +223,12 @@ export const TheVeil: React.FC<TheVeilProps> = ({
               style={{ background: 'rgba(28, 21, 35, 0.5)' }}
             >
               {apparitionSrc ? (
-                <img
+                <Image
                   src={apparitionSrc}
-                  alt={apparitionLabel}
-                  className="w-full h-full object-contain"
+                  alt={apparitionLabel || 'Apparition plate'}
+                  fill
+                  unoptimized
+                  className="object-contain"
                 />
               ) : (
                 <SpiritPlate type="apparition" />
@@ -243,7 +252,13 @@ export const TheVeil: React.FC<TheVeilProps> = ({
             style={{ background: 'rgba(28, 21, 35, 0.5)' }}
           >
             {diffSrc ? (
-              <img src={diffSrc} alt="Ectoplasm diff" className="w-full h-full object-contain" />
+              <Image
+                src={diffSrc}
+                alt="Ectoplasm diff"
+                fill
+                unoptimized
+                className="object-contain"
+              />
             ) : (
               <EctoplasmPlate />
             )}
@@ -257,7 +272,13 @@ export const TheVeil: React.FC<TheVeilProps> = ({
           >
             <div className="absolute inset-0 flex items-center justify-center">
               {livingSrc ? (
-                <img src={livingSrc} alt={livingLabel} className="w-full h-full object-contain" />
+                <Image
+                  src={livingSrc}
+                  alt={livingLabel || 'Living page'}
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
               ) : (
                 <SpiritPlate type="living" />
               )}
@@ -267,10 +288,12 @@ export const TheVeil: React.FC<TheVeilProps> = ({
               style={{ opacity: position / 100 }}
             >
               {apparitionSrc ? (
-                <img
+                <Image
                   src={apparitionSrc}
-                  alt={apparitionLabel}
-                  className="w-full h-full object-contain"
+                  alt={apparitionLabel || 'Apparition plate'}
+                  fill
+                  unoptimized
+                  className="object-contain"
                 />
               ) : (
                 <SpiritPlate type="apparition" />
@@ -310,10 +333,12 @@ export const TheVeil: React.FC<TheVeilProps> = ({
           {/* Living page (left) */}
           <div className="absolute inset-0 w-full h-full flex items-center justify-center">
             {livingSrc ? (
-              <img
+              <Image
                 src={livingSrc}
-                alt={livingLabel}
-                className="w-full h-full object-contain pointer-events-none"
+                alt={livingLabel || 'Living page'}
+                fill
+                unoptimized
+                className="object-contain pointer-events-none"
               />
             ) : (
               <SpiritPlate type="living" />
@@ -326,10 +351,12 @@ export const TheVeil: React.FC<TheVeilProps> = ({
             style={{ clipPath: `inset(0 0 0 ${position}%)` }}
           >
             {apparitionSrc ? (
-              <img
+              <Image
                 src={apparitionSrc}
-                alt={apparitionLabel}
-                className="w-full h-full object-contain"
+                alt={apparitionLabel || 'Apparition plate'}
+                fill
+                unoptimized
+                className="object-contain"
               />
             ) : (
               <SpiritPlate type="apparition" />

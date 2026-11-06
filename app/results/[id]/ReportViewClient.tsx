@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { TestReport, Finding, ProfileResult } from '@/src/types';
 import { Container } from '../../components/layout/Container';
 import { ExecutiveSummary } from '../../components/features/ExecutiveSummary';
@@ -269,9 +270,12 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                 {/* Display Screenshot Plate if captured */}
                 {apparitionSrc && (
                   <div className="max-w-4xl mx-auto rounded border border-[#46334b] overflow-hidden bg-[#0a0711] mb-6">
-                    <img
+                    <Image
                       src={apparitionSrc}
                       alt={selectedProfile.profileName}
+                      width={1280}
+                      height={800}
+                      unoptimized
                       className="w-full h-auto max-h-[500px] object-contain mx-auto"
                     />
                   </div>

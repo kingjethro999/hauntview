@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { HomeIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 export function Navbar() {
@@ -50,7 +51,7 @@ export function Navbar() {
             className="px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-[rgba(255,121,31,0.08)]"
             style={{ color: 'var(--phantom-gray)' }}
           >
-            <img
+            <Image
               src="/scroll-icon.svg"
               alt="Scroll"
               width={20}
