@@ -7,10 +7,11 @@
 import { McpServer } from '@modelcontextprotocol/server';
 import { StdioServerTransport } from '@modelcontextprotocol/server/stdio';
 import { registerHauntViewTools } from './register-tools';
+import { VERSION } from '../version';
 
 const server = new McpServer({
   name: 'hauntview',
-  version: '0.1.0',
+  version: VERSION,
 });
 
 // Register all 6 test suite and analysis tools

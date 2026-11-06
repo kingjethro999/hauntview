@@ -205,6 +205,18 @@ if (!fileExists('docs/DEVPOST_STORY.md')) {
 }
 pass('docs/DEVPOST_STORY.md exists');
 
+// 12. Version consistency across all carriers
+try {
+  const { checkVersion } = await import('./check-version.mjs');
+  const result = checkVersion(ROOT);
+  if (!result.valid) {
+    fail('Version consistency verified', result.errors.join('; '));
+  }
+  pass(`Version consistency verified across carriers (${result.expectedVersion})`);
+} catch (err) {
+  fail('Version consistency verified', err.message);
+}
+
 // ─── all passed ───────────────────────────────────────────────────────────────
 
 console.log('\n  All checks passed. Ready for Devpost submission.\n');

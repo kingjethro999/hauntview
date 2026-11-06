@@ -8,6 +8,7 @@ import { TestReport } from '@/src/types';
 import { ReportStore } from '@/src/core/report-store';
 import { saveTestReportToDb } from '@/src/lib/server/database';
 import { validateTargetUrl } from '@/src/lib/server/url-safety';
+import { VERSION } from '@/src/version';
 
 interface TestApiResponse {
   success: boolean;
@@ -111,7 +112,7 @@ export async function GET() {
     return NextResponse.json({
       status: 'ready',
       stats,
-      version: '0.1.0',
+      version: VERSION,
     });
   } catch (error) {
     console.error('Error getting test status:', error);

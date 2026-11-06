@@ -6,11 +6,12 @@
 
 import { McpServer, createMcpHandler } from '@modelcontextprotocol/server';
 import { registerHauntViewTools } from '@/src/mcp/register-tools';
+import { VERSION } from '@/src/version';
 
 function createServerInstance(): McpServer {
   const server = new McpServer({
     name: 'hauntview',
-    version: '0.1.0',
+    version: VERSION,
   });
   registerHauntViewTools(server);
   return server;

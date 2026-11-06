@@ -21,6 +21,10 @@ export function Footer() {
             <span>© 2026 HauntView</span>
             <span>·</span>
             <span>Kiroween 2026 Hackathon</span>
+            <span>·</span>
+            <span className="font-mono text-xs text-[#ff791f]">
+              {process.env.NEXT_PUBLIC_APP_VERSION || 'v0.1.0'}
+            </span>
           </div>
           <div className="text-xs" style={{ color: 'var(--phantom-gray)' }}>
             Spirit Photography Web Testing Engine

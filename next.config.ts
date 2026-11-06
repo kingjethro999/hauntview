@@ -1,6 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import type { NextConfig } from 'next';
 
+const versionFilePath = path.join(process.cwd(), 'VERSION');
+const appVersion = fs.existsSync(versionFilePath)
+  ? fs.readFileSync(versionFilePath, 'utf8').trim()
+  : 'v0.1.0';
+
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_APP_VERSION: appVersion,
+  },
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
