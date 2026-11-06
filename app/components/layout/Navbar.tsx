@@ -15,50 +15,53 @@ export function Navbar() {
         height: 64,
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-full flex items-center justify-between gap-2">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
           <div>
-            <span className="font-semibold text-lg" style={{ color: 'var(--ghost-white)' }}>
+            <span
+              className="font-semibold text-base sm:text-lg"
+              style={{ color: 'var(--ghost-white)' }}
+            >
               HauntView
             </span>
-            <span className="text-xs block" style={{ color: 'var(--phantom-gray)' }}>
-              Spirit Photography Testing
+            <span className="text-[10px] sm:text-xs block" style={{ color: 'var(--phantom-gray)' }}>
+              Spirit Photography
             </span>
           </div>
         </Link>
 
         {/* Navigation */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1">
           <Link
             href="/"
-            className="px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-[rgba(255,121,31,0.08)]"
+            className="px-2.5 sm:px-3.5 md:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all hover:bg-[rgba(255,121,31,0.08)] flex items-center"
             style={{ color: 'var(--ghost-white)' }}
           >
-            <HomeIcon className="w-4 h-4 inline mr-2" />
-            Parlour
+            <HomeIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 flex-shrink-0" />
+            <span>Parlour</span>
           </Link>
           <Link
             href="/crypt"
-            className="px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-[rgba(255,121,31,0.08)]"
+            className="px-2.5 sm:px-3.5 md:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all hover:bg-[rgba(255,121,31,0.08)] flex items-center"
             style={{ color: 'var(--phantom-gray)' }}
           >
-            <DocumentTextIcon className="w-4 h-4 inline mr-2" />
-            The Crypt
+            <DocumentTextIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 flex-shrink-0" />
+            <span>The Crypt</span>
           </Link>
           <Link
             href="/docs"
-            className="px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-[rgba(255,121,31,0.08)]"
+            className="px-2.5 sm:px-3.5 md:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all hover:bg-[rgba(255,121,31,0.08)] flex items-center"
             style={{ color: 'var(--phantom-gray)' }}
           >
             <Image
               src="/scroll-icon.svg"
               alt="Scroll"
-              width={20}
-              height={20}
-              className="w-5 h-5 inline mr-2 brightness-0 invert"
+              width={16}
+              height={16}
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 flex-shrink-0 brightness-0 invert"
             />
-            Scroll
+            <span>Scroll</span>
           </Link>
         </div>
       </div>

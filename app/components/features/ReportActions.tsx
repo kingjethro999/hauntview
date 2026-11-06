@@ -30,14 +30,14 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-[6px] border border-[#46334b] bg-[#1c1629]/70 backdrop-blur-sm print:hidden">
+    <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-[6px] border border-[#46334b] bg-[#1c1629]/70 backdrop-blur-sm print:hidden">
       <Link href="/">
         <Button variant="ghost" size="sm" icon={<ArrowLeftIcon className="w-4 h-4" />}>
           The Parlour · New Séance
         </Button>
       </Link>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
         <Button
           variant="outline"
           size="sm"

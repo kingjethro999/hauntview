@@ -137,15 +137,15 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
   return (
     <Card
       variant="ghostly"
-      className="p-8 space-y-8"
+      className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8"
       style={{
         borderColor: 'rgba(255, 121, 31, 0.15)',
         background: 'rgba(28, 21, 35, 0.6)',
       }}
     >
-      <form onSubmit={handleSubmit} className="space-y-8" noValidate={false}>
+      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8" noValidate={false}>
         {/* Step Guide for Cognitive Accessibility */}
-        <div className="flex items-center gap-2 text-xs font-mono text-[var(--candle-primary)] bg-[rgba(255,121,31,0.08)] px-3 py-1.5 rounded border border-[rgba(255,121,31,0.2)]">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono text-[var(--candle-primary)] bg-[rgba(255,121,31,0.08)] px-2.5 sm:px-3 py-1.5 rounded border border-[rgba(255,121,31,0.2)]">
           <span>Guide:</span>
           <span>Step 1 Enter Target URL</span>
           <span>·</span>
@@ -156,7 +156,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
 
         {/* URL Input Section */}
         <div>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
             <label
               htmlFor="target-url"
               className="text-sm font-semibold flex items-center gap-2"
@@ -166,7 +166,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               Target URL
             </label>
             <div
-              className="flex items-center gap-2 text-xs flex-wrap"
+              className="flex items-center gap-1.5 sm:gap-2 text-xs flex-wrap"
               style={{ color: 'var(--phantom-gray)' }}
             >
               <span>Quick pick:</span>
@@ -179,7 +179,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
                     const valid = checkUrlValid(preset.url);
                     onUrlChange?.(preset.url, valid);
                   }}
-                  className="min-h-[44px] min-w-[44px] px-3.5 py-2 rounded border hover:border-[var(--candle-primary)] transition-colors inline-flex items-center justify-center text-xs"
+                  className="min-h-[44px] min-w-[44px] px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded border hover:border-[var(--candle-primary)] transition-colors inline-flex items-center justify-center text-xs"
                   style={{
                     background: 'rgba(28, 21, 35, 0.5)',
                     borderColor: 'rgba(255, 121, 31, 0.15)',
@@ -216,12 +216,12 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               aria-required="true"
               aria-invalid={error || (!isUrlValid && url.length > 0) ? 'true' : 'false'}
               aria-describedby={error ? 'url-error' : undefined}
-              className="w-full py-3.5 px-4 bg-transparent text-sm font-mono focus:outline-none"
+              className="w-full py-3 sm:py-3.5 px-3 sm:px-4 bg-transparent text-xs sm:text-sm font-mono focus:outline-none"
               style={{ color: 'var(--ghost-white)' }}
             />
 
             {/* Validation indicator */}
-            <div className="pr-4 flex items-center">
+            <div className="pr-3 sm:pr-4 flex items-center flex-shrink-0">
               {isUrlValid ? (
                 <div
                   className="flex items-center gap-1.5 text-xs font-medium"
@@ -252,16 +252,19 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
         </div>
 
         {/* Profile Selection */}
-        <div className="space-y-5">
+        <div className="space-y-4 sm:space-y-5">
           <div
-            className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 gap-3"
+            className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 sm:pb-4 gap-3"
             style={{ borderBottom: '1px solid rgba(255, 121, 31, 0.1)' }}
           >
             <div>
-              <h2 className="font-semibold text-lg" style={{ color: 'var(--ghost-white)' }}>
-                Testing Rites
+              <h2
+                className="font-semibold text-base sm:text-lg flex flex-wrap items-center gap-2"
+                style={{ color: 'var(--ghost-white)' }}
+              >
+                <span>Testing Rites</span>
                 <span
-                  className="ml-3 text-xs font-normal px-2 py-0.5 rounded"
+                  className="text-xs font-normal px-2 py-0.5 rounded"
                   style={{
                     color: 'var(--candle-primary)',
                     background: 'rgba(255, 121, 31, 0.08)',
@@ -271,14 +274,17 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
                   {selectedProfiles.length} / {AVAILABLE_PROFILES.length} selected
                 </span>
               </h2>
-              <p style={{ fontSize: 13, color: 'var(--phantom-gray)', marginTop: 2 }}>
+              <p
+                className="text-xs sm:text-[13px]"
+                style={{ color: 'var(--phantom-gray)', marginTop: 2 }}
+              >
                 Choose which failure conditions to test
               </p>
             </div>
 
             {/* View mode toggle */}
             <div
-              className="inline-flex rounded-lg p-1"
+              className="inline-flex self-start sm:self-auto rounded-lg p-1"
               style={{
                 background: 'rgba(28, 21, 35, 0.5)',
                 border: '1px solid rgba(255, 121, 31, 0.15)',
@@ -287,7 +293,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`min-h-[44px] min-w-[44px] px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-2 transition-colors ${
+                className={`min-h-[40px] sm:min-h-[44px] min-w-[40px] sm:min-w-[44px] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-md text-xs font-medium flex items-center gap-1.5 sm:gap-2 transition-colors ${
                   viewMode === 'grid'
                     ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
                     : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)]'
@@ -299,7 +305,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`min-h-[44px] min-w-[44px] px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-2 transition-colors ${
+                className={`min-h-[40px] sm:min-h-[44px] min-w-[40px] sm:min-w-[44px] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-md text-xs font-medium flex items-center gap-1.5 sm:gap-2 transition-colors ${
                   viewMode === 'list'
                     ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
                     : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)]'

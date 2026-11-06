@@ -104,21 +104,21 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
   ];
 
   return (
-    <div className="py-8 md:py-12 space-y-8">
+    <div className="py-6 sm:py-8 md:py-12 space-y-6 sm:space-y-8">
       <Container size="lg">
         {/* Folio Action Bar */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <ReportActions report={report} />
         </div>
 
         {/* Wisp Ghost Folio Host Banner */}
-        <div className="mb-6 p-4 rounded-[6px] border border-[#46334b] bg-[#1c1629]/60 backdrop-blur-sm flex items-center gap-4">
+        <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-[6px] border border-[#46334b] bg-[#1c1629]/60 backdrop-blur-sm flex items-center gap-3 sm:gap-4">
           <div className="flex-shrink-0">
             <WispGhost state={wispState} size="sm" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-display font-semibold text-sm text-[#ff791f]">
+              <span className="font-display font-semibold text-xs sm:text-sm text-[#ff791f]">
                 Wisp • Séance Host
               </span>
               <Badge
@@ -143,12 +143,12 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
         </div>
 
         {/* Executive Summary Folio with Wax Seal */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <ExecutiveSummary report={report} />
         </div>
 
         {/* Grimoire Tab Navigation */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-[#46334b] pb-3 mb-6">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 border-b border-[#46334b] pb-3 mb-6">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -157,7 +157,7 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                 setActiveTab(tab.id as 'findings' | 'apparitions' | 'profiles' | 'raw')
               }
               className={`
-                flex items-center gap-2 px-4 py-2 rounded-[6px] text-xs font-semibold transition-all cursor-pointer
+                flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-[6px] text-xs font-semibold transition-all cursor-pointer
                 ${
                   activeTab === tab.id
                     ? 'bg-[#1c1629] text-[#ff791f] border border-[#ff791f]/60 shadow-[0_2px_12px_rgba(255,121,31,0.2)]'

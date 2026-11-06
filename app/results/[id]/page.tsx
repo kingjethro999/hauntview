@@ -1,12 +1,7 @@
 import React, { Suspense } from 'react';
-import Link from 'next/link';
 import { ReportStore } from '@/src/core/report-store';
-import { ReportViewClient } from './ReportViewClient';
-import { Container } from '../../components/layout/Container';
-import { EmptyState } from '../../components/ui/EmptyState';
-import { Button } from '../../components/ui/Button';
+import { ReportDetailClient } from './ReportDetailClient';
 import { Spinner } from '../../components/ui/Spinner';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -14,28 +9,14 @@ interface PageProps {
 
 async function ReportContent({ params }: PageProps) {
   const { id } = await params;
-  const report = await ReportStore.getReport(id);
-
-  if (!report) {
-    return (
-      <div className="py-20">
-        <Container size="sm">
-          <EmptyState
-            icon={<ExclamationCircleIcon className="w-10 h-10 text-[#dc2626]" />}
-            title="Report Not Found"
-            description={`Could not find test report with ID "${id}". It may have expired or was generated in a separate process.`}
-            action={
-              <Link href="/">
-                <Button variant="primary">Launch New Test Run</Button>
-              </Link>
-            }
-          />
-        </Container>
-      </div>
-    );
+  let report = null;
+  try {
+    report = await ReportStore.getReport(id);
+  } catch {
+    // If server file reading fails, fallback to client
   }
 
-  return <ReportViewClient report={report} />;
+  return <ReportDetailClient id={id} initialReport={report} />;
 }
 
 export default function ReportDetailPage(props: PageProps) {

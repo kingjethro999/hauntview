@@ -343,7 +343,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
 
   if (viewMode === 'list') {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {Object.entries(groupedProfiles).map(([category, profiles]) => {
           const isCollapsed = collapsed[category] ?? true;
           const selectedCount = profiles.filter((p) => selectedProfiles.includes(p.id)).length;
@@ -351,30 +351,33 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
           return (
             <div
               key={category}
-              className="rounded-lg border border-[#46334b]/40 bg-[#140d1e]/40 p-3"
+              className="rounded-lg border border-[#46334b]/40 bg-[#140d1e]/40 p-2.5 sm:p-3"
             >
               <div
                 onClick={() => toggleCollapse(category)}
-                className="flex items-center justify-between cursor-pointer select-none py-1"
+                className="flex items-center justify-between cursor-pointer select-none py-1 gap-2"
               >
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded" style={{ background: getCategoryColor(category) }}>
+                <div className="flex items-center gap-2 flex-wrap min-w-0">
+                  <div
+                    className="p-1 sm:p-1.5 rounded flex-shrink-0"
+                    style={{ background: getCategoryColor(category) }}
+                  >
                     {getCategoryIcon(category)}
                   </div>
                   <span
-                    className="text-xs font-semibold uppercase tracking-wider"
+                    className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider"
                     style={{ color: 'var(--phantom-gray)' }}
                   >
                     {category}
                   </span>
-                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
+                  <span className="text-[10px] sm:text-xs font-mono px-1.5 sm:px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
                     {selectedCount}/{profiles.length} selected
                   </span>
                 </div>
                 <button
                   type="button"
                   aria-label={isCollapsed ? `Expand ${category}` : `Collapse ${category}`}
-                  className="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-colors"
+                  className="min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-colors flex-shrink-0"
                 >
                   {isCollapsed ? (
                     <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />
@@ -385,11 +388,11 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
               </div>
 
               {!isCollapsed && (
-                <div className="space-y-2 mt-3 pt-2 border-t border-[#46334b]/30">
+                <div className="space-y-2 mt-2 sm:mt-3 pt-2 border-t border-[#46334b]/30">
                   {profiles.map((profile) => (
                     <label
                       key={profile.id}
-                      className="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all hover:border-[var(--candle-primary)]"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-3 p-2.5 sm:p-3 rounded-lg border cursor-pointer transition-all hover:border-[var(--candle-primary)]"
                       style={{
                         background: selectedProfiles.includes(profile.id)
                           ? getCategoryColor(category)
@@ -399,20 +402,25 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                           : 'rgba(255, 121, 31, 0.1)',
                       }}
                     >
-                      <input
-                        type="checkbox"
-                        checked={selectedProfiles.includes(profile.id)}
-                        onChange={() => toggleProfile(profile.id)}
-                        className="accent-[var(--candle-primary)] w-4 h-4"
-                      />
-                      <div
-                        className="flex items-center gap-2"
-                        style={{ color: 'var(--ghost-white)' }}
-                      >
-                        {getCategoryIcon(category)}
-                        <span className="text-sm font-medium">{profile.name}</span>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <input
+                          type="checkbox"
+                          checked={selectedProfiles.includes(profile.id)}
+                          onChange={() => toggleProfile(profile.id)}
+                          className="accent-[var(--candle-primary)] w-4 h-4 flex-shrink-0"
+                        />
+                        <div
+                          className="flex items-center gap-2 min-w-0"
+                          style={{ color: 'var(--ghost-white)' }}
+                        >
+                          {getCategoryIcon(category)}
+                          <span className="text-xs sm:text-sm font-medium">{profile.name}</span>
+                        </div>
                       </div>
-                      <span className="text-xs ml-auto" style={{ color: 'var(--phantom-gray)' }}>
+                      <span
+                        className="text-[11px] sm:text-xs pl-6 sm:pl-0 sm:ml-auto"
+                        style={{ color: 'var(--phantom-gray)' }}
+                      >
                         {profile.description}
                       </span>
                     </label>
@@ -428,7 +436,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
 
   // Grid view
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5">
       {Object.entries(groupedProfiles).map(([category, profiles]) => {
         const isCollapsed = collapsed[category] ?? true;
         const selectedCount = profiles.filter((p) => selectedProfiles.includes(p.id)).length;
@@ -436,24 +444,27 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
         return (
           <div
             key={category}
-            className="rounded-lg border border-[#46334b]/40 bg-[#140d1e]/30 p-3.5 transition-all"
+            className="rounded-lg border border-[#46334b]/40 bg-[#140d1e]/30 p-2.5 sm:p-3.5 transition-all"
           >
             {/* Collapsible Category Header */}
             <div
               onClick={() => toggleCollapse(category)}
-              className="flex items-center justify-between cursor-pointer select-none"
+              className="flex items-center justify-between cursor-pointer select-none gap-2"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded" style={{ background: getCategoryColor(category) }}>
+              <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap min-w-0">
+                <div
+                  className="p-1 sm:p-1.5 rounded flex-shrink-0"
+                  style={{ background: getCategoryColor(category) }}
+                >
                   {getCategoryIcon(category)}
                 </div>
                 <div
-                  className="text-xs font-semibold uppercase tracking-wider"
+                  className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider"
                   style={{ color: 'var(--phantom-gray)' }}
                 >
                   {category}
                 </div>
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
+                <span className="text-[10px] sm:text-xs font-mono px-1.5 sm:px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
                   {selectedCount}/{profiles.length} selected
                 </span>
               </div>
@@ -462,7 +473,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
               <button
                 type="button"
                 aria-label={isCollapsed ? `Expand ${category} rites` : `Collapse ${category} rites`}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-transform"
+                className="min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-transform flex-shrink-0"
               >
                 {isCollapsed ? (
                   <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />
@@ -474,13 +485,13 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
 
             {/* Profile Tiles Grid (hidden when collapsed) */}
             {!isCollapsed && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-3 pt-3 border-t border-[#46334b]/30">
+              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 mt-3 pt-3 border-t border-[#46334b]/30">
                 {profiles.map((profile) => (
                   <button
                     key={profile.id}
                     type="button"
                     onClick={() => toggleProfile(profile.id)}
-                    className="relative p-4 rounded-lg border text-left transition-all hover:border-[var(--candle-primary)] group"
+                    className="relative p-3 sm:p-4 rounded-lg border text-left transition-all hover:border-[var(--candle-primary)] group"
                     style={{
                       background: selectedProfiles.includes(profile.id)
                         ? getCategoryColor(category)
@@ -492,20 +503,23 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                   >
                     {selectedProfiles.includes(profile.id) && (
                       <div
-                        className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                        className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
                         style={{ background: getCategoryBorderColor(category) }}
                       >
                         <CheckIcon className="w-3 h-3" style={{ color: 'var(--ghost-white)' }} />
                       </div>
                     )}
                     <div
-                      className="flex items-center gap-2 mb-2"
+                      className="flex items-center gap-2 mb-1.5 sm:mb-2 pr-6"
                       style={{ color: 'var(--ghost-white)' }}
                     >
                       {getCategoryIcon(category)}
-                      <span className="text-sm font-medium">{profile.name}</span>
+                      <span className="text-xs sm:text-sm font-medium">{profile.name}</span>
                     </div>
-                    <p className="text-xs leading-snug" style={{ color: 'var(--phantom-gray)' }}>
+                    <p
+                      className="text-[11px] sm:text-xs leading-snug"
+                      style={{ color: 'var(--phantom-gray)' }}
+                    >
                       {profile.description}
                     </p>
                   </button>

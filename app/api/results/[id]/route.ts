@@ -97,3 +97,31 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     );
   }
 }
+
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    const report: TestReport = body.report;
+
+    if (!report || report.id !== id) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid report payload' },
+        { status: 400 }
+      );
+    }
+
+    await ReportStore.saveReport(report);
+    try {
+      const { saveTestReportToDb } = await import('@/src/lib/server/database');
+      saveTestReportToDb(report);
+    } catch {
+      // Ignore database save failure
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Failed to sync report:', error);
+    return NextResponse.json({ success: false, error: 'Failed to sync report' }, { status: 500 });
+  }
+}
