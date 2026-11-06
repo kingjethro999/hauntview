@@ -103,8 +103,8 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ report }) =>
         <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-[#b9acbf]/60 pointer-events-none" />
 
         <div className="flex items-center gap-4">
-          {/* Stamped Wax Seal */}
-          <WaxSeal status={sealStatus} size="md" className="flex-shrink-0" />
+          {/* Stamped Wax Seal (hidden on mobile) */}
+          <WaxSeal status={sealStatus} size="md" className="hidden sm:inline-flex flex-shrink-0" />
 
           <div>
             <div className="flex flex-wrap items-center gap-2.5">

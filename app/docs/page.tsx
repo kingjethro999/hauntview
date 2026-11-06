@@ -296,7 +296,7 @@ export default function ManualPage() {
                 {/* Reading time badge */}
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#120a1c] border border-[#46334b]/50 text-xs text-[#b9acbf] font-mono">
                   <ClockIcon className="w-3.5 h-3.5 text-[#ff791f]" />
-                  <span>6 min read</span>
+                  <span>6 mins</span>
                 </div>
 
                 {/* "Copy page as Markdown" Button */}
@@ -309,12 +309,12 @@ export default function ManualPage() {
                   {copiedMd ? (
                     <>
                       <CheckIcon className="w-4 h-4 text-[#9aff9a]" />
-                      <span className="text-[#9aff9a] font-medium">Copied as MD!</span>
+                      <span className="text-[#9aff9a] font-medium">Copied!</span>
                     </>
                   ) : (
                     <>
                       <DocumentDuplicateIcon className="w-4 h-4 text-[#ff791f]" />
-                      <span>Copy page as MD</span>
+                      <span>Copy</span>
                     </>
                   )}
                 </button>

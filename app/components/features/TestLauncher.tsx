@@ -8,7 +8,7 @@ import { ProfileSelector, AVAILABLE_PROFILES } from './ProfileSelector';
 import { PlanchetteProgress } from './PlanchetteProgress';
 import {
   RocketLaunchIcon,
-  HomeModernIcon,
+  Squares2X2Icon,
   ListBulletIcon,
   GlobeAltIcon,
 } from '@heroicons/react/24/outline';
@@ -299,7 +299,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
                     : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)]'
                 }`}
               >
-                <HomeModernIcon className="w-3.5 h-3.5" />
+                <Squares2X2Icon className="w-3.5 h-3.5" />
                 <span>Grid</span>
               </button>
               <button
