@@ -21,11 +21,12 @@ import { ensureBrowsersInstalled } from './browsers';
 export interface CliRunOptions {
   output?: string;
   outDir?: string;
-  profiles?: string;
+  profiles?: string | string[];
   concurrency?: boolean;
   concurrencyAmount?: string;
   yes?: boolean;
   interactive?: boolean;
+  [key: string]: unknown;
 }
 
 /**
@@ -247,7 +248,9 @@ export async function runHaunt(targetUrl: string, options: CliRunOptions): Promi
   await engine.initialize();
 
   const requestedProfiles = options.profiles
-    ? options.profiles.split(',').map((p) => p.trim())
+    ? Array.isArray(options.profiles)
+      ? options.profiles
+      : options.profiles.split(',').map((p) => p.trim())
     : undefined;
 
   const tracker = new TerminalProgressTracker();

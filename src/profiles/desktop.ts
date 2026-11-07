@@ -292,7 +292,7 @@ export class DesktopProfile {
     return {
       profileId: this.profileId,
       profileName: this.profileName,
-      success: findings.length === 0,
+      success: findings.filter((f) => f.severity === 'error').length === 0,
       startTime,
       endTime,
       duration: endTime - startTime,

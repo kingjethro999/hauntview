@@ -84,7 +84,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         style={{ background: '#100d13', color: 'var(--bone-white)' }}
       >
         <a
-          href="#main-content"
+          id="skip-link"
+          href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[var(--pumpkin-fire)] focus:text-[var(--midnight-veil)] focus:font-semibold focus:rounded-md focus:shadow-lg focus:outline-none"
         >
           Skip to main content
@@ -107,11 +108,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Suspense fallback={<div className="h-16 bg-[var(--midnight-veil)]" />}>
           <Navbar />
         </Suspense>
-        <main
-          id="main-content"
-          tabIndex={-1}
-          className="flex-1 flex flex-col w-full focus:outline-none"
-        >
+        <main id="main" tabIndex={-1} className="flex-1 flex flex-col w-full focus:outline-none">
           {children}
         </main>
         <Footer />

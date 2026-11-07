@@ -18,6 +18,16 @@ npm install -g hauntview
 # Run testing rites against any URL
 haunt https://example.com
 
+# Run specific profiles directly via flags
+haunt https://example.com --mobile --desktop --offline --broken-links
+
+# Run an entire category of tests via shortcuts
+haunt https://example.com --a11y
+haunt https://example.com --resilience
+
+# Run profiles by comma-separated tags
+haunt https://example.com --tag mobile,resilience
+
 # Configure default export format, destination, and concurrency
 haunt setup
 
@@ -89,7 +99,7 @@ Then ask Kiro in chat:
 - **Phase 2** ✅ All 25 testing profiles implemented and verified with Jest unit tests.
 - **Phase 3** ✅ Official CLI (`haunt` / `hauntview`), interactive setup wizard, doctor diagnostic, and opt-in profile concurrency.
 - **Phase 4** ✅ Comprehensive documentation, auto-versioning pre-commit hook, and architecture references.
-- **Current Test Suite:** **34 Jest test suites, 169 tests — 100% passing.**
+- **Current Test Suite:** **39 Jest test suites, 211 tests — 100% passing.**
 
 ---
 

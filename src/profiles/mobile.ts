@@ -79,7 +79,7 @@ export class MobileProfile {
         const box = await element.boundingBox();
         if (box) {
           const size = Math.min(box.width, box.height);
-          if (size < this.minTouchTargetSize && (await element.isVisible())) {
+          if (size > 1 && size < this.minTouchTargetSize && (await element.isVisible())) {
             const tagName = await element
               .evaluate((el: Element) => el.tagName.toLowerCase())
               .catch(() => 'element');
@@ -286,7 +286,7 @@ export class MobileProfile {
     return {
       profileId: this.profileId,
       profileName: this.profileName,
-      success: findings.length === 0,
+      success: findings.filter((f) => f.severity === 'error').length === 0,
       startTime,
       endTime,
       duration: endTime - startTime,

@@ -298,7 +298,9 @@ export class AccessibilityScreenReaderProfile {
       }
 
       // Check for skip to main link
-      const skipLink = await page.locator('a[href="#main"], a[href="#content"]').count();
+      const skipLink = await page
+        .locator('a[href="#main"], a[href="#content"], a[href="#main-content"], a[href^="#main"]')
+        .count();
       if (skipLink === 0) {
         const canonical = buildFinding({
           ruleId: 'accessibility.skip-link-missing',
@@ -307,8 +309,11 @@ export class AccessibilityScreenReaderProfile {
           confidence: 'observed',
           title: 'Missing skip-to-main-content link',
           summary:
-            'No skip link targeting #main or #content was found. Keyboard and screen reader users must tab through the entire header/navigation on every page.',
-          where: { selector: 'a[href="#main"], a[href="#content"]', url },
+            'No skip link targeting #main, #main-content, or #content was found. Keyboard and screen reader users must tab through the entire header/navigation on every page.',
+          where: {
+            selector: 'a[href="#main"], a[href="#content"], a[href="#main-content"]',
+            url,
+          },
           evidence: [
             {
               kind: 'metric',

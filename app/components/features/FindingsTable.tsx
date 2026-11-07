@@ -125,7 +125,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
               type="button"
               onClick={() => setSelectedSeverity(sev)}
               className={`
-                px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer flex items-center gap-1.5
+                min-h-[48px] px-3.5 py-2 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer flex items-center gap-1.5
                 ${
                   selectedSeverity === sev
                     ? 'bg-[var(--witchcraft-violet)] text-[var(--bone-white)] shadow-[0_2px_8px_rgba(74,43,138,0.4)]'
@@ -295,7 +295,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                             e.stopPropagation();
                             onExorcise(finding);
                           }}
-                          className="px-2.5 py-1 rounded-[4px] bg-[var(--pumpkin-fire)]/15 border border-[var(--pumpkin-fire)]/50 text-[var(--pumpkin-fire)] hover:bg-[var(--pumpkin-fire)] hover:text-[var(--midnight-veil)] font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                          className="min-h-[48px] px-3 py-2 rounded-[4px] bg-[var(--pumpkin-fire)]/15 border border-[var(--pumpkin-fire)]/50 text-[var(--pumpkin-fire)] hover:bg-[var(--pumpkin-fire)] hover:text-[var(--midnight-veil)] font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
                         >
                           <SparklesIcon className="w-3.5 h-3.5" />
                           <span>Fix with Kiro</span>

@@ -132,7 +132,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
           <button
             type="button"
             onClick={() => setMode('slider')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors ${
+            className={`min-h-[48px] px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors ${
               mode === 'slider'
                 ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
                 : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] hover:bg-[rgba(255,121,31,0.08)]'
@@ -145,7 +145,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
           <button
             type="button"
             onClick={() => setMode('ectoplasm')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors ${
+            className={`min-h-[48px] px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors ${
               mode === 'ectoplasm'
                 ? 'bg-[var(--ectoplasm-green)] text-[var(--midnight-veil)]'
                 : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] hover:bg-[rgba(154,255,154,0.08)]'
@@ -158,7 +158,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
           <button
             type="button"
             onClick={() => setMode('side-by-side')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors ${
+            className={`min-h-[48px] px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors ${
               mode === 'side-by-side'
                 ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
                 : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] hover:bg-[rgba(255,121,31,0.08)]'
@@ -171,7 +171,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
           <button
             type="button"
             onClick={() => setMode('onion-skin')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors ${
+            className={`min-h-[48px] px-3.5 py-2 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors ${
               mode === 'onion-skin'
                 ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
                 : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] hover:bg-[rgba(255,121,31,0.08)]'

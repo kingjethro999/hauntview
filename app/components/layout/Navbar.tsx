@@ -53,7 +53,10 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
+        <Link
+          href="/"
+          className="flex items-center gap-2 group flex-shrink-0 min-h-[48px] min-w-[48px]"
+        >
           <div>
             <span
               className="font-semibold text-lg tracking-tight"
@@ -94,7 +97,7 @@ export function Navbar() {
           onClick={() => setIsOpen((prev) => !prev)}
           aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
           aria-expanded={isOpen}
-          className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 rounded-lg text-[var(--ghost-white)] hover:text-[var(--candle-primary)] hover:bg-[rgba(255,121,31,0.08)] transition-colors focus:outline-none"
+          className="md:hidden min-w-[48px] min-h-[48px] flex items-center justify-center p-2 rounded-lg text-[var(--ghost-white)] hover:text-[var(--candle-primary)] hover:bg-[rgba(255,121,31,0.08)] transition-colors focus:outline-none"
         >
           {isOpen ? (
             <XMarkIcon className="w-6 h-6 text-[var(--candle-primary)]" />
@@ -114,7 +117,7 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center min-h-[44px] px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                className={`flex items-center min-h-[48px] px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-[rgba(255,121,31,0.15)] text-[var(--candle-primary)] font-semibold border border-[rgba(255,121,31,0.3)]'
                     : 'text-[var(--ghost-white)] hover:bg-[rgba(255,121,31,0.08)] hover:text-[var(--candle-primary)]'

@@ -46,7 +46,7 @@ export const AtmosphereToggle: React.FC = () => {
     <button
       type="button"
       onClick={cycleAtmosphere}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-serif border border-[var(--tombstone-gray)] bg-[var(--ghost-mist)]/80 text-[var(--bone-white)] hover:border-[var(--pumpkin-fire)] hover:text-[var(--pumpkin-fire)] transition-colors cursor-pointer select-none"
+      className="inline-flex items-center gap-1.5 min-h-[48px] min-w-[48px] px-3 py-2 rounded-[6px] text-xs font-serif border border-[var(--tombstone-gray)] bg-[var(--ghost-mist)]/80 text-[var(--bone-white)] hover:border-[var(--pumpkin-fire)] hover:text-[var(--pumpkin-fire)] transition-colors cursor-pointer select-none"
       title="Toggle haunting ambient effects (Off, Subtle, Full)"
       aria-label={labels[current]}
     >

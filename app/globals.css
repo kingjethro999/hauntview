@@ -212,6 +212,7 @@ h6 {
   Warm glow, press depth, ember animation
 ───────────────────────────────────────────── */
 .btn-candle {
+  background-color: var(--pumpkin-fire);
   background: linear-gradient(180deg, #ff8a35 0%, var(--pumpkin-fire) 100%);
   color: #1a0c06;
   font-weight: 600;

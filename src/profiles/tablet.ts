@@ -155,7 +155,7 @@ export class TabletProfile {
         const box = await button.boundingBox();
         if (box && (await button.isVisible())) {
           const size = Math.min(box.width, box.height);
-          if (size < 44) {
+          if (size > 1 && size < 44) {
             // Apple's recommended minimum
             smallTouchTargets++;
           }

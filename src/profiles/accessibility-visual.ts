@@ -41,17 +41,37 @@ export class AccessibilityVisualProfile {
           return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
         }
 
-        function getContrast(rgb1: string, rgb2: string): number {
-          const parse = (rgb: string) => {
-            const match = rgb.match(/\d+/g);
-            return match
-              ? [parseInt(match[0], 10), parseInt(match[1], 10), parseInt(match[2], 10)]
-              : [0, 0, 0];
-          };
-          const [r1, g1, b1] = parse(rgb1);
-          const [r2, g2, b2] = parse(rgb2);
-          const l1 = getLuminance(r1, g1, b1);
-          const l2 = getLuminance(r2, g2, b2);
+        function parseRgba(str: string): [number, number, number, number] {
+          const match = str.match(
+            /rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/
+          );
+          if (!match) return [0, 0, 0, 1];
+          return [
+            parseInt(match[1], 10),
+            parseInt(match[2], 10),
+            parseInt(match[3], 10),
+            match[4] !== undefined ? parseFloat(match[4]) : 1,
+          ];
+        }
+
+        function composite(
+          fgRgba: [number, number, number, number],
+          bgRgb: [number, number, number]
+        ): [number, number, number] {
+          const [r, g, b, a] = fgRgba;
+          return [
+            Math.round(r * a + bgRgb[0] * (1 - a)),
+            Math.round(g * a + bgRgb[1] * (1 - a)),
+            Math.round(b * a + bgRgb[2] * (1 - a)),
+          ];
+        }
+
+        function getContrast(
+          rgb1: [number, number, number],
+          rgb2: [number, number, number]
+        ): number {
+          const l1 = getLuminance(rgb1[0], rgb1[1], rgb1[2]);
+          const l2 = getLuminance(rgb2[0], rgb2[1], rgb2[2]);
           const lighter = Math.max(l1, l2);
           const darker = Math.min(l1, l2);
           return (lighter + 0.05) / (darker + 0.05);
@@ -61,25 +81,47 @@ export class AccessibilityVisualProfile {
           'p, span, a, button, label, h1, h2, h3, h4, h5, h6'
         );
 
-        function getEffectiveBg(element: Element): string {
+        function getEffectiveBg(element: Element): [number, number, number] {
+          const layers: [number, number, number, number][] = [];
           let current: Element | null = element;
           while (current) {
-            const bg = window.getComputedStyle(current).backgroundColor;
-            if (bg && bg !== 'transparent' && !bg.match(/rgba\([^)]+,\s*0\)/)) {
-              return bg;
+            const style = window.getComputedStyle(current);
+            const bg = style.backgroundColor;
+            if (bg && bg !== 'transparent') {
+              const rgba = parseRgba(bg);
+              if (rgba[3] > 0) {
+                layers.unshift(rgba);
+                if (rgba[3] >= 0.99) break;
+              }
+            }
+            const bgImg = style.backgroundImage;
+            if (bgImg && bgImg.includes('gradient')) {
+              const m = bgImg.match(/rgba?\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+(?:\s*,\s*[\d.]+)?\s*\)/);
+              if (m) {
+                const rgba = parseRgba(m[0]);
+                if (rgba[3] > 0) {
+                  layers.unshift(rgba);
+                  if (rgba[3] >= 0.99) break;
+                }
+              }
             }
             current = current.parentElement;
           }
-          return 'rgb(10, 7, 17)';
+          let acc: [number, number, number] = [10, 7, 17];
+          for (const layer of layers) {
+            acc = composite(layer, acc);
+          }
+          return acc;
         }
 
         for (const el of textElements) {
           const style = window.getComputedStyle(el);
-          const bgColor = getEffectiveBg(el);
-          const color = style.color;
+          const bgRgb = getEffectiveBg(el);
+          const fgRgba = parseRgba(style.color);
+          const fgRgb: [number, number, number] = [fgRgba[0], fgRgba[1], fgRgba[2]];
 
-          if (bgColor && color && (el as HTMLElement).offsetHeight > 0) {
-            const contrast = getContrast(color, bgColor);
+          if ((el as HTMLElement).offsetHeight > 0 && (el.textContent?.trim().length ?? 0) > 0) {
+            const contrast = getContrast(fgRgb, bgRgb);
 
             // WCAG AA: 4.5:1 for normal text, 3:1 for large text
             if (contrast < 4.5) {
@@ -192,12 +234,12 @@ export class AccessibilityVisualProfile {
       // Check for background images with text
       const bgImageText = await page.evaluate(() => {
         let count = 0;
-        const elements = document.querySelectorAll(
-          '[style*="background-image"], [style*="background"]'
-        );
+        const allElements = document.querySelectorAll('*');
 
-        for (const el of elements) {
-          if (el.textContent?.trim().length ?? 0 > 0) {
+        for (const el of allElements) {
+          const style = window.getComputedStyle(el);
+          const bgImg = style.backgroundImage || '';
+          if (bgImg.includes('url(') && (el.textContent?.trim().length ?? 0) > 0) {
             count++;
           }
         }

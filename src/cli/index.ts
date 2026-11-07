@@ -11,6 +11,7 @@ import { runHaunt } from './runner';
 import { runSetup } from './setup';
 import { runDoctor } from './doctor';
 import { runSelfUpdate } from './self-update';
+import { registerProfileOptions, resolveProfilesFromCliOptions } from './profile-flags';
 
 const program = new Command();
 
@@ -20,6 +21,9 @@ program
     'HauntView — Local-first website resilience, accessibility, and failure-mode testing engine'
   )
   .version(VERSION, '-v, --version', 'Output current HauntView version');
+
+// Register direct profile flags and category tags (--mobile, --desktop, --a11y, --tag, etc.)
+registerProfileOptions(program);
 
 // Default run command: haunt <url>
 program
@@ -58,7 +62,13 @@ program
       return;
     }
 
-    await runHaunt(url, options);
+    const resolvedProfiles = resolveProfilesFromCliOptions(options);
+    const runOptions = {
+      ...options,
+      profiles: resolvedProfiles,
+    };
+
+    await runHaunt(url, runOptions);
   });
 
 // Setup command: haunt setup

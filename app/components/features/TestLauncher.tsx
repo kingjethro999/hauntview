@@ -179,7 +179,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
                     const valid = checkUrlValid(preset.url);
                     onUrlChange?.(preset.url, valid);
                   }}
-                  className="min-h-[44px] min-w-[44px] px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded border hover:border-[var(--candle-primary)] transition-colors inline-flex items-center justify-center text-xs"
+                  className="min-h-[48px] min-w-[48px] px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded border hover:border-[var(--candle-primary)] transition-colors inline-flex items-center justify-center text-xs"
                   style={{
                     background: 'rgba(28, 21, 35, 0.5)',
                     borderColor: 'rgba(255, 121, 31, 0.15)',
@@ -216,7 +216,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               aria-required="true"
               aria-invalid={error || (!isUrlValid && url.length > 0) ? 'true' : 'false'}
               aria-describedby={error ? 'url-error' : undefined}
-              className="w-full py-3 sm:py-3.5 px-3 sm:px-4 bg-transparent text-xs sm:text-sm font-mono focus:outline-none"
+              className="w-full min-h-[48px] py-3 sm:py-3.5 px-3 sm:px-4 bg-transparent text-xs sm:text-sm font-mono focus:outline-none"
               style={{ color: 'var(--ghost-white)' }}
             />
 
@@ -293,7 +293,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`min-h-[40px] sm:min-h-[44px] min-w-[40px] sm:min-w-[44px] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-md text-xs font-medium flex items-center gap-1.5 sm:gap-2 transition-colors ${
+                className={`min-h-[48px] min-w-[48px] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-md text-xs font-medium flex items-center gap-1.5 sm:gap-2 transition-colors ${
                   viewMode === 'grid'
                     ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
                     : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)]'
@@ -305,7 +305,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`min-h-[40px] sm:min-h-[44px] min-w-[40px] sm:min-w-[44px] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-md text-xs font-medium flex items-center gap-1.5 sm:gap-2 transition-colors ${
+                className={`min-h-[48px] min-w-[48px] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-md text-xs font-medium flex items-center gap-1.5 sm:gap-2 transition-colors ${
                   viewMode === 'list'
                     ? 'bg-[var(--candle-primary)] text-[#1a0c06]'
                     : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)]'

@@ -4,7 +4,7 @@
 import { Command } from "commander";
 
 // src/version.ts
-var VERSION = "0.1.6";
+var VERSION = "0.1.7";
 
 // src/cli/runner.ts
 import * as fs8 from "fs";
@@ -2891,7 +2891,7 @@ var MobileProfile = class {
         const box = await element.boundingBox();
         if (box) {
           const size = Math.min(box.width, box.height);
-          if (size < this.minTouchTargetSize && await element.isVisible()) {
+          if (size > 1 && size < this.minTouchTargetSize && await element.isVisible()) {
             const tagName = await element.evaluate((el) => el.tagName.toLowerCase()).catch(() => "element");
             const elementId = await element.getAttribute("id");
             const classAttr = await element.getAttribute("class");
@@ -3077,7 +3077,7 @@ var MobileProfile = class {
     return {
       profileId: this.profileId,
       profileName: this.profileName,
-      success: findings.length === 0,
+      success: findings.filter((f) => f.severity === "error").length === 0,
       startTime,
       endTime,
       duration: endTime - startTime,
@@ -3341,7 +3341,7 @@ var DesktopProfile = class {
     return {
       profileId: this.profileId,
       profileName: this.profileName,
-      success: findings.length === 0,
+      success: findings.filter((f) => f.severity === "error").length === 0,
       startTime,
       endTime,
       duration: endTime - startTime,
@@ -4093,7 +4093,7 @@ var TabletProfile = class {
         const box = await button.boundingBox();
         if (box && await button.isVisible()) {
           const size = Math.min(box.width, box.height);
-          if (size < 44) {
+          if (size > 1 && size < 44) {
             smallTouchTargets++;
           }
         }
@@ -4853,7 +4853,7 @@ var AccessibilityScreenReaderProfile = class {
           })
         );
       }
-      const skipLink = await page.locator('a[href="#main"], a[href="#content"]').count();
+      const skipLink = await page.locator('a[href="#main"], a[href="#content"], a[href="#main-content"], a[href^="#main"]').count();
       if (skipLink === 0) {
         const canonical = buildFinding({
           ruleId: "accessibility.skip-link-missing",
@@ -4861,8 +4861,11 @@ var AccessibilityScreenReaderProfile = class {
           severity: "warning",
           confidence: "observed",
           title: "Missing skip-to-main-content link",
-          summary: "No skip link targeting #main or #content was found. Keyboard and screen reader users must tab through the entire header/navigation on every page.",
-          where: { selector: 'a[href="#main"], a[href="#content"]', url },
+          summary: "No skip link targeting #main, #main-content, or #content was found. Keyboard and screen reader users must tab through the entire header/navigation on every page.",
+          where: {
+            selector: 'a[href="#main"], a[href="#content"], a[href="#main-content"]',
+            url
+          },
           evidence: [
             {
               kind: "metric",
@@ -5326,15 +5329,29 @@ var AccessibilityVisualProfile = class {
           });
           return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
         }
+        function parseRgba(str) {
+          const match = str.match(
+            /rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/
+          );
+          if (!match) return [0, 0, 0, 1];
+          return [
+            parseInt(match[1], 10),
+            parseInt(match[2], 10),
+            parseInt(match[3], 10),
+            match[4] !== void 0 ? parseFloat(match[4]) : 1
+          ];
+        }
+        function composite(fgRgba, bgRgb) {
+          const [r, g, b, a] = fgRgba;
+          return [
+            Math.round(r * a + bgRgb[0] * (1 - a)),
+            Math.round(g * a + bgRgb[1] * (1 - a)),
+            Math.round(b * a + bgRgb[2] * (1 - a))
+          ];
+        }
         function getContrast(rgb1, rgb2) {
-          const parse = (rgb) => {
-            const match = rgb.match(/\d+/g);
-            return match ? [parseInt(match[0], 10), parseInt(match[1], 10), parseInt(match[2], 10)] : [0, 0, 0];
-          };
-          const [r1, g1, b1] = parse(rgb1);
-          const [r2, g2, b2] = parse(rgb2);
-          const l1 = getLuminance(r1, g1, b1);
-          const l2 = getLuminance(r2, g2, b2);
+          const l1 = getLuminance(rgb1[0], rgb1[1], rgb1[2]);
+          const l2 = getLuminance(rgb2[0], rgb2[1], rgb2[2]);
           const lighter = Math.max(l1, l2);
           const darker = Math.min(l1, l2);
           return (lighter + 0.05) / (darker + 0.05);
@@ -5343,22 +5360,44 @@ var AccessibilityVisualProfile = class {
           "p, span, a, button, label, h1, h2, h3, h4, h5, h6"
         );
         function getEffectiveBg(element) {
+          const layers = [];
           let current = element;
           while (current) {
-            const bg = window.getComputedStyle(current).backgroundColor;
-            if (bg && bg !== "transparent" && !bg.match(/rgba\([^)]+,\s*0\)/)) {
-              return bg;
+            const style = window.getComputedStyle(current);
+            const bg = style.backgroundColor;
+            if (bg && bg !== "transparent") {
+              const rgba = parseRgba(bg);
+              if (rgba[3] > 0) {
+                layers.unshift(rgba);
+                if (rgba[3] >= 0.99) break;
+              }
+            }
+            const bgImg = style.backgroundImage;
+            if (bgImg && bgImg.includes("gradient")) {
+              const m = bgImg.match(/rgba?\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+(?:\s*,\s*[\d.]+)?\s*\)/);
+              if (m) {
+                const rgba = parseRgba(m[0]);
+                if (rgba[3] > 0) {
+                  layers.unshift(rgba);
+                  if (rgba[3] >= 0.99) break;
+                }
+              }
             }
             current = current.parentElement;
           }
-          return "rgb(10, 7, 17)";
+          let acc = [10, 7, 17];
+          for (const layer of layers) {
+            acc = composite(layer, acc);
+          }
+          return acc;
         }
         for (const el of textElements) {
           const style = window.getComputedStyle(el);
-          const bgColor = getEffectiveBg(el);
-          const color = style.color;
-          if (bgColor && color && el.offsetHeight > 0) {
-            const contrast = getContrast(color, bgColor);
+          const bgRgb = getEffectiveBg(el);
+          const fgRgba = parseRgba(style.color);
+          const fgRgb = [fgRgba[0], fgRgba[1], fgRgba[2]];
+          if (el.offsetHeight > 0 && (el.textContent?.trim().length ?? 0) > 0) {
+            const contrast = getContrast(fgRgb, bgRgb);
             if (contrast < 4.5) {
               issues.push({
                 text: el.textContent?.substring(0, 50),
@@ -5446,11 +5485,11 @@ var AccessibilityVisualProfile = class {
       }
       const bgImageText = await page.evaluate(() => {
         let count = 0;
-        const elements = document.querySelectorAll(
-          '[style*="background-image"], [style*="background"]'
-        );
-        for (const el of elements) {
-          if (el.textContent?.trim().length ?? 0 > 0) {
+        const allElements = document.querySelectorAll("*");
+        for (const el of allElements) {
+          const style = window.getComputedStyle(el);
+          const bgImg = style.backgroundImage || "";
+          if (bgImg.includes("url(") && (el.textContent?.trim().length ?? 0) > 0) {
             count++;
           }
         }
@@ -9981,7 +10020,7 @@ async function runHaunt(targetUrl, options) {
   }
   const engine = new HauntViewEngine();
   await engine.initialize();
-  const requestedProfiles = options.profiles ? options.profiles.split(",").map((p) => p.trim()) : void 0;
+  const requestedProfiles = options.profiles ? Array.isArray(options.profiles) ? options.profiles : options.profiles.split(",").map((p) => p.trim()) : void 0;
   const tracker = new TerminalProgressTracker();
   const report = await engine.executeTests({
     url: cleanUrl,
@@ -10267,11 +10306,129 @@ function runSelfUpdate() {
   }
 }
 
+// src/cli/profile-flags.ts
+var TAG_GROUPS = {
+  a11y: ["a11y-screenreader", "a11y-keyboard", "a11y-visual", "a11y-cognitive"],
+  accessibility: ["a11y-screenreader", "a11y-keyboard", "a11y-visual", "a11y-cognitive"],
+  i18n: ["i18n-rtl", "i18n-cjk", "i18n-mixed"],
+  resilience: ["offline", "broken-links", "network-resilience", "form-resilience"],
+  devices: [
+    "mobile",
+    "tablet",
+    "desktop",
+    "mobile-iphone15",
+    "mobile-android",
+    "tablet-ipad",
+    "desktop-1080p",
+    "desktop-4k"
+  ],
+  browsers: ["browser-webkit", "browser-firefox", "browser-edge", "browser-legacy"],
+  faults: ["image-failure", "font-failure", "js-disabled", "reduced-motion"],
+  security: ["security-hygiene"]
+};
+var PROFILE_FLAGS = {
+  mobile: "mobile",
+  desktop: "desktop",
+  tablet: "tablet",
+  offline: "offline",
+  brokenLinks: "broken-links",
+  networkResilience: "network-resilience",
+  formResilience: "form-resilience",
+  imageFailure: "image-failure",
+  fontFailure: "font-failure",
+  jsDisabled: "js-disabled",
+  reducedMotion: "reduced-motion",
+  performance: "performance",
+  securityHygiene: "security-hygiene",
+  security: "security-hygiene",
+  consoleErrors: "console-errors",
+  a11yVisual: "a11y-visual",
+  a11yKeyboard: "a11y-keyboard",
+  a11yScreenreader: "a11y-screenreader",
+  a11yCognitive: "a11y-cognitive",
+  i18nRtl: "i18n-rtl",
+  i18nCjk: "i18n-cjk",
+  i18nMixed: "i18n-mixed",
+  browserWebkit: "browser-webkit",
+  webkit: "browser-webkit",
+  browserFirefox: "browser-firefox",
+  firefox: "browser-firefox",
+  browserEdge: "browser-edge",
+  edge: "browser-edge",
+  browserLegacy: "browser-legacy",
+  mobileIphone15: "mobile-iphone15",
+  mobileAndroid: "mobile-android",
+  tabletIpad: "tablet-ipad",
+  desktop1080p: "desktop-1080p",
+  desktop4k: "desktop-4k"
+};
+function registerProfileOptions(command) {
+  return command.option(
+    "--tag <tags>",
+    "Run profiles matching specified tag or category (comma-separated: a11y, devices, resilience, browsers, i18n, faults)"
+  ).option("--tags <tags>", "Alias for --tag").option(
+    "--a11y, --accessibility",
+    "Run all accessibility profiles (screenreader, keyboard, visual, cognitive)"
+  ).option("--i18n", "Run all internationalization profiles (RTL, CJK, Mixed)").option("--devices", "Run all responsive device viewport profiles (mobile, tablet, desktop)").option(
+    "--browsers",
+    "Run all browser engine compatibility profiles (WebKit, Firefox, Edge, Legacy)"
+  ).option(
+    "--resilience",
+    "Run all resilience profiles (offline, broken-links, network-resilience, form-resilience)"
+  ).option(
+    "--faults",
+    "Run all environmental fault injection profiles (images, fonts, JS disabled, reduced motion)"
+  ).option("--mobile", "Run canonical mobile viewport profile (390x844)").option("--desktop", "Run canonical desktop viewport profile (1280x800)").option("--tablet", "Run canonical tablet viewport profile (820x1180)").option("--offline", "Run offline service worker and cache resilience profile").option("--broken-links", "Run broken same-origin link crawl profile").option("--network-resilience", "Run network failure / fetch drop resilience profile").option("--form-resilience", "Run empty & invalid form submission resilience profile").option("--performance", "Run Core Web Vitals and performance budget profile").option("--security-hygiene", "Run HTTP security hygiene headers profile").option("--security", "Alias for --security-hygiene").option("--image-failure", "Run image blocking and missing alt/dimensions profile").option("--font-failure", "Run font blocking and layout shift profile").option("--js-disabled", "Run JavaScript disabled noscript profile").option("--reduced-motion", "Run prefers-reduced-motion animation compliance profile").option("--console-errors", "Run console error and uncaught exception capture profile").option("--a11y-visual", "Run visual contrast and color accessibility profile").option("--a11y-keyboard", "Run keyboard navigation and focus trapping profile").option("--a11y-screenreader", "Run screenreader and ARIA accessibility profile").option("--a11y-cognitive", "Run cognitive readability and motion profile").option("--i18n-rtl", "Run RTL language layout profile").option("--i18n-cjk", "Run CJK font and word-break profile").option("--i18n-mixed", "Run mixed script rendering profile").option("--browser-webkit", "Run WebKit rendering engine profile").option("--webkit", "Alias for --browser-webkit").option("--browser-firefox", "Run Firefox rendering engine profile").option("--firefox", "Alias for --browser-firefox").option("--browser-edge", "Run Microsoft Edge rendering engine profile").option("--edge", "Alias for --browser-edge").option("--browser-legacy", "Run legacy browser support profile").option("--mobile-iphone15", "Run iPhone 15 Pro viewport profile (390x844)").option("--mobile-android", "Run Galaxy S23 viewport profile (360x800)").option("--tablet-ipad", "Run iPad Pro viewport profile (1024x1366)").option("--desktop-1080p", "Run standard 1080p viewport profile (1920x1080)").option("--desktop-4k", "Run 4K UHD viewport profile (3840x2160)");
+}
+function resolveProfilesFromCliOptions(options) {
+  const selected = /* @__PURE__ */ new Set();
+  if (options.profiles) {
+    const rawList = Array.isArray(options.profiles) ? options.profiles : String(options.profiles).split(",");
+    for (const item of rawList) {
+      const trimmed = item.trim();
+      if (trimmed) selected.add(trimmed);
+    }
+  }
+  const rawTags = [options.tag, options.tags].filter(Boolean);
+  for (const tagStr of rawTags) {
+    const parts = String(tagStr).split(",");
+    for (const part of parts) {
+      const normalized = part.trim().toLowerCase();
+      if (TAG_GROUPS[normalized]) {
+        for (const pid of TAG_GROUPS[normalized]) {
+          selected.add(pid);
+        }
+      } else if (PROFILE_FLAGS[normalized]) {
+        selected.add(PROFILE_FLAGS[normalized]);
+      } else if (normalized) {
+        selected.add(normalized);
+      }
+    }
+  }
+  for (const [tag, profiles] of Object.entries(TAG_GROUPS)) {
+    if (options[tag] === true) {
+      for (const pid of profiles) {
+        selected.add(pid);
+      }
+    }
+  }
+  for (const [optKey, pid] of Object.entries(PROFILE_FLAGS)) {
+    if (options[optKey] === true) {
+      selected.add(pid);
+    }
+  }
+  if (selected.size === 0) {
+    return void 0;
+  }
+  return Array.from(selected);
+}
+
 // src/cli/index.ts
 var program = new Command();
 program.name("haunt").description(
   "HauntView \u2014 Local-first website resilience, accessibility, and failure-mode testing engine"
 ).version(VERSION, "-v, --version", "Output current HauntView version");
+registerProfileOptions(program);
 program.argument("[url]", "Target website URL to test (e.g. http://localhost:3000, https://example.com)").option("-o, --output <formats>", "Output formats (comma-separated: zip, html, md, json)").option(
   "-d, --out-dir <path>",
   "Export destination directory (defaults to current directory or saved setting)"
@@ -10295,7 +10452,12 @@ program.argument("[url]", "Target website URL to test (e.g. http://localhost:300
     await runSetup(options);
     return;
   }
-  await runHaunt(url, options);
+  const resolvedProfiles = resolveProfilesFromCliOptions(options);
+  const runOptions = {
+    ...options,
+    profiles: resolvedProfiles
+  };
+  await runHaunt(url, runOptions);
 });
 program.command("setup").description(
   "Interactive setup wizard to configure global defaults (export formats, destination, concurrency)"

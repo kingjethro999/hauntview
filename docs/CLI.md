@@ -54,25 +54,83 @@ haunt https://example.com
 
 ### Non-Interactive / CI Flags
 
-For automation, CI pipelines, or non-TTY environments:
+For automation, CI pipelines, or running specific profiles:
 
 ```bash
+# Run specific profiles via direct flags
+haunt https://example.com --mobile --desktop --offline --broken-links
+
+# Run an entire category via shortcut flags
+haunt https://example.com --a11y
+haunt https://example.com --resilience
+
+# Run profiles via comma-separated tags or profile IDs
+haunt https://example.com --tag mobile,resilience
+haunt https://example.com --tags devices,faults
+
+# CI full run with custom outputs and concurrency
 haunt https://example.com \
   --output zip,html \
   --out-dir ./reports \
-  --profiles mobile,js-disabled,offline,security-hygiene \
   --concurrency \
   --concurrency-amount 2 \
   --yes
 ```
 
-#### Available Flags
+#### Profile Selection Flags & Category Tags
+
+You can filter which profiles execute by specifying direct flags, category shortcuts, or `--tag`:
+
+| Category / Flag                 | Description                            | Included Profiles                                                                                                |
+| :------------------------------ | :------------------------------------- | :--------------------------------------------------------------------------------------------------------------- |
+| `--tag <tags>`, `--tags <tags>` | Comma-separated tags or profile IDs    | User-specified tags (e.g. `a11y,resilience,mobile`)                                                              |
+| `--a11y`, `--accessibility`     | All accessibility testing rites        | `a11y-screenreader`, `a11y-keyboard`, `a11y-visual`, `a11y-cognitive`                                            |
+| `--resilience`                  | All resilience & recovery rites        | `offline`, `broken-links`, `network-resilience`, `form-resilience`                                               |
+| `--devices`                     | All responsive device viewports        | `mobile`, `tablet`, `desktop`, `mobile-iphone15`, `mobile-android`, `tablet-ipad`, `desktop-1080p`, `desktop-4k` |
+| `--browsers`                    | All browser engine compatibility rites | `browser-webkit`, `browser-firefox`, `browser-edge`, `browser-legacy`                                            |
+| `--i18n`                        | All internationalization rites         | `i18n-rtl`, `i18n-cjk`, `i18n-mixed`                                                                             |
+| `--faults`                      | Environmental fault injection rites    | `image-failure`, `font-failure`, `js-disabled`, `reduced-motion`                                                 |
+
+##### Direct Profile Flags
+
+- `--mobile`: Canonical mobile viewport (390×844)
+- `--desktop`: Canonical desktop viewport (1280×800)
+- `--tablet`: Canonical tablet viewport (820×1180)
+- `--offline`: Offline service worker & cache resilience
+- `--broken-links`: Probes same-origin anchor hrefs for 404/410/5xx errors
+- `--network-resilience`: Aborts fetch/XHR requests to test graceful degradation
+- `--form-resilience`: Tests empty/invalid form submission feedback
+- `--performance`: Core Web Vitals (FCP, LCP, CLS, FID)
+- `--security-hygiene`, `--security`: HTTP security response headers
+- `--image-failure`: Missing alt tags and layout shift when images fail
+- `--font-failure`: Font blocking layout shift detection
+- `--js-disabled`: No-JS degradation and `<noscript>` fallbacks
+- `--reduced-motion`: `prefers-reduced-motion` compliance
+- `--console-errors`: Uncaught exceptions and runtime console errors
+- `--a11y-visual`: Color contrast (WCAG AA 4.5:1) & high-contrast mode
+- `--a11y-keyboard`: Focus order, trap detection, keyboard accessibility
+- `--a11y-screenreader`: ARIA roles, skip-link, heading hierarchy
+- `--a11y-cognitive`: Reading level, complex sentence density, clutter
+- `--i18n-rtl`: Right-to-left layout and mirrored UI
+- `--i18n-cjk`: Chinese/Japanese/Korean glyph rendering & word break
+- `--i18n-mixed`: Mixed script rendering
+- `--browser-webkit`, `--webkit`: WebKit engine rendering
+- `--browser-firefox`, `--firefox`: Firefox engine rendering
+- `--browser-edge`, `--edge`: Microsoft Edge compatibility
+- `--browser-legacy`: Legacy browser CSS & JS compatibility
+- `--mobile-iphone15`: iPhone 15 Pro viewport (390×844, 3x DPR)
+- `--mobile-android`: Samsung Galaxy S23 viewport (360×800, 2x DPR)
+- `--tablet-ipad`: iPad Pro 12.9" viewport (1024×1366, 2x DPR)
+- `--desktop-1080p`: Standard 1080p desktop (1920×1080)
+- `--desktop-4k`: 4K UHD desktop (3840×2160)
+
+#### General CLI Flags
 
 | Flag                       | Short | Description                                            | Default                        |
 | :------------------------- | :---- | :----------------------------------------------------- | :----------------------------- |
 | `--output <formats>`       | `-o`  | Comma-separated list of formats (`zip`, `html`, `md`)  | From saved config (`zip,html`) |
 | `--out-dir <path>`         | `-d`  | Output directory (supports `.`, absolute, `~`)         | From saved config (`.`)        |
-| `--profiles <ids>`         | `-p`  | Comma-separated profile IDs to execute                 | All 25 profiles                |
+| `--profiles <ids>`         | `-p`  | Comma-separated profile IDs to execute                 | All 29 profiles                |
 | `--concurrency`            | `-c`  | Enable concurrent profile execution                    | From saved config              |
 | `--no-concurrency`         |       | Force sequential profile execution                     | False                          |
 | `--concurrency-amount <n>` | `-a`  | Worker concurrency pool size (subject to hardware cap) | From saved config (`2`)        |

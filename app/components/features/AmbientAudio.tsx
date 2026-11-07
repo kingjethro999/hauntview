@@ -146,7 +146,7 @@ export const AmbientAudio: React.FC = () => {
       title={
         isPlaying ? 'Mute ambient parlour tone' : 'Synthesize ambient parlour tone (Web Audio)'
       }
-      className={`px-2.5 py-1 rounded-[6px] text-xs font-serif transition-colors flex items-center gap-1.5 cursor-pointer ${
+      className={`min-h-[48px] min-w-[48px] px-3 py-2 rounded-[6px] text-xs font-serif transition-colors flex items-center gap-1.5 cursor-pointer ${
         isPlaying
           ? 'bg-[var(--pumpkin-fire)] text-[var(--midnight-veil)] font-bold shadow-[0_0_8px_rgba(255,121,31,0.4)]'
           : 'bg-[var(--midnight-veil)] text-[var(--spirit-smoke)] hover:text-[var(--bone-white)] border border-[var(--tombstone-gray)]'

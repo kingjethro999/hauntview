@@ -377,7 +377,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                 <button
                   type="button"
                   aria-label={isCollapsed ? `Expand ${category}` : `Collapse ${category}`}
-                  className="min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-colors flex-shrink-0"
+                  className="min-w-[48px] min-h-[48px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-colors flex-shrink-0"
                 >
                   {isCollapsed ? (
                     <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />
@@ -473,7 +473,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
               <button
                 type="button"
                 aria-label={isCollapsed ? `Expand ${category} rites` : `Collapse ${category} rites`}
-                className="min-w-[40px] sm:min-w-[44px] min-h-[40px] sm:min-h-[44px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-transform flex-shrink-0"
+                className="min-w-[48px] min-h-[48px] flex items-center justify-center p-2 rounded text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] transition-transform flex-shrink-0"
               >
                 {isCollapsed ? (
                   <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />
