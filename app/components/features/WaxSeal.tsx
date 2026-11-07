@@ -81,7 +81,7 @@ export const WaxSeal: React.FC<WaxSealProps> = ({
 
   return (
     <div
-      className={`relative inline-flex flex-col items-center justify-center select-none group ${className}`}
+      className={`relative hidden sm:inline-flex flex-col items-center justify-center select-none group ${className}`}
       title={`Grimoire Wax Seal: ${defaultText}`}
     >
       <svg

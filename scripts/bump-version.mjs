@@ -21,8 +21,8 @@ export const ROOT_DIR = path.resolve(SCRIPT_DIR, '..');
 
 /**
  * Calculates the next version string based on HauntView rollover rules.
- * @param {string} currentVersion - e.g. "0.1.0" or "v0.1.0"
- * @returns {string} - next numeric SemVer e.g. "0.1.1"
+ * @param {string} currentVersion - e.g. "0.0.1" or "v0.0.1"
+ * @returns {string} - next numeric SemVer e.g. "0.0.1"
  */
 export function nextVersion(currentVersion) {
   if (!currentVersion || typeof currentVersion !== 'string') {
@@ -153,13 +153,13 @@ export function syncVersionToCarriers(newVersion, root = ROOT_DIR) {
  */
 export function runBump(root = ROOT_DIR) {
   const versionFile = path.join(root, 'VERSION');
-  let currentRaw = '0.1.0';
+  let currentRaw = '0.0.0';
   if (fs.existsSync(versionFile)) {
     currentRaw = fs.readFileSync(versionFile, 'utf8').trim();
   } else {
     const rootPkg = path.join(root, 'package.json');
     if (fs.existsSync(rootPkg)) {
-      currentRaw = JSON.parse(fs.readFileSync(rootPkg, 'utf8')).version || '0.1.0';
+      currentRaw = JSON.parse(fs.readFileSync(rootPkg, 'utf8')).version || '0.0.0';
     }
   }
 

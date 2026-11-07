@@ -1,9 +1,26 @@
 {
   "name": "hauntview",
-  "version": "0.1.3",
-  "private": true,
+  "version": "0.0.4",
   "type": "module",
   "description": "Local-first website resilience, accessibility, failure-mode and visual regression testing with Playwright and MCP.",
+  "bin": {
+    "haunt": "dist/cli.js",
+    "hauntview": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "src/core",
+    "!src/core/__tests__",
+    "src/engine.ts",
+    "src/profiles",
+    "!src/profiles/__tests__",
+    "src/reports",
+    "src/types",
+    "src/version.ts",
+    "VERSION",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=22.12.0",
     "npm": ">=10.0.0"
@@ -11,7 +28,8 @@
   "scripts": {
     "dev": "node init && next dev --hostname 127.0.0.1",
     "postinstall": "node scripts/postinstall.mjs",
-    "build": "node init && next build",
+    "build:cli": "node scripts/build-cli.mjs",
+    "build": "node init && node scripts/build-cli.mjs && next build",
     "start": "node init && next start --hostname 0.0.0.0",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -49,12 +67,14 @@
   "dependencies": {
     "@axe-core/playwright": "^4.14.0",
     "@heroicons/react": "^2.2.0",
+    "@inquirer/prompts": "^8.7.5",
     "@modelcontextprotocol/server": "^2.4.0",
     "@sparticuz/chromium": "^153.0.0",
     "@types/jszip": "^3.4.1",
     "better-sqlite3": "^13.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "commander": "^15.0.0",
     "ipaddr.js": "^2.5.0",
     "jszip": "^3.10.2",
     "lucide-react": "^1.69.0",
@@ -81,6 +101,7 @@
     "@types/pngjs": "^6.0.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "eslint-config-next": "16.4.3",
     "eslint-config-prettier": "^10.1.8",

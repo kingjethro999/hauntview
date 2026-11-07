@@ -68,18 +68,18 @@ describe('Workspace-wide sync and checkVersion — Section 0.75.2 & 0.75.4', () 
 
   beforeEach(() => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hauntview-version-test-'));
-    fs.writeFileSync(path.join(tempDir, 'VERSION'), 'v0.1.0\n');
+    fs.writeFileSync(path.join(tempDir, 'VERSION'), 'v0.0.1\n');
     fs.writeFileSync(
       path.join(tempDir, 'package.json'),
-      JSON.stringify({ name: 'hauntview', version: '0.1.0' }, null, 2)
+      JSON.stringify({ name: 'hauntview', version: '0.0.1' }, null, 2)
     );
     fs.mkdirSync(path.join(tempDir, 'power'), { recursive: true });
     fs.writeFileSync(
       path.join(tempDir, 'power', 'plugin.json'),
-      JSON.stringify({ name: 'hauntview', version: '0.1.0' }, null, 2)
+      JSON.stringify({ name: 'hauntview', version: '0.0.1' }, null, 2)
     );
     fs.mkdirSync(path.join(tempDir, 'src'), { recursive: true });
-    fs.writeFileSync(path.join(tempDir, 'src', 'version.ts'), "export const VERSION = '0.1.0';\n");
+    fs.writeFileSync(path.join(tempDir, 'src', 'version.ts'), "export const VERSION = '0.0.1';\n");
   });
 
   afterEach(() => {
@@ -106,7 +106,7 @@ describe('Workspace-wide sync and checkVersion — Section 0.75.2 & 0.75.4', () 
   });
 
   it('synchronizes bumped version across all carriers correctly', () => {
-    const updated = syncVersionToCarriers('0.1.1', tempDir);
+    const updated = syncVersionToCarriers('0.0.2', tempDir);
     expect(updated).toContain('VERSION');
     expect(updated).toContain('package.json');
     expect(updated).toContain(path.join('power', 'plugin.json'));
@@ -114,21 +114,21 @@ describe('Workspace-wide sync and checkVersion — Section 0.75.2 & 0.75.4', () 
 
     const check = checkVersion(tempDir);
     expect(check.valid).toBe(true);
-    expect(check.expectedVersion).toBe('v0.1.1');
+    expect(check.expectedVersion).toBe('v0.0.2');
 
     const pkg = JSON.parse(fs.readFileSync(path.join(tempDir, 'package.json'), 'utf8'));
-    expect(pkg.version).toBe('0.1.1');
+    expect(pkg.version).toBe('0.0.2');
     const versionFile = fs.readFileSync(path.join(tempDir, 'VERSION'), 'utf8').trim();
-    expect(versionFile).toBe('v0.1.1');
+    expect(versionFile).toBe('v0.0.2');
   });
 
   it('runs end-to-end bump and increments version on disk', () => {
     const res = runBump(tempDir);
-    expect(res.previousVersion).toBe('v0.1.0');
-    expect(res.nextVersion).toBe('0.1.1');
+    expect(res.previousVersion).toBe('v0.0.1');
+    expect(res.nextVersion).toBe('0.0.2');
 
     const check = checkVersion(tempDir);
     expect(check.valid).toBe(true);
-    expect(check.expectedVersion).toBe('v0.1.1');
+    expect(check.expectedVersion).toBe('v0.0.2');
   });
 });

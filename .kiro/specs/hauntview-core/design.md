@@ -1237,7 +1237,7 @@ npm run dev
 
 # Health check endpoint
 GET /api/health
-Response: { status: 'ok', version: '0.1.0', mcp_enabled: boolean }
+Response: { status: 'ok', version: '0.0.3', mcp_enabled: boolean }
 
 # Start with MCP server
 HAUNTVIEW_MCP_ENABLED=true npm run dev

@@ -338,7 +338,7 @@ export default function ManualPage() {
             <section id="overview" className="space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(255,121,31,0.12)] text-[#ff791f] border border-[rgba(255,121,31,0.3)]">
-                  Kiro Hackathon Edition · v0.1.0
+                  Kiro Hackathon Edition · v0.0.3
                 </span>
                 <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(154,255,154,0.12)] text-[#9aff9a] border border-[rgba(154,255,154,0.3)]">
                   Hosted Service Active
