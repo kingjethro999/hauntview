@@ -4,7 +4,7 @@
 import { Command } from "commander";
 
 // src/version.ts
-var VERSION = "0.0.6";
+var VERSION = "0.0.8";
 
 // src/cli/runner.ts
 import * as fs8 from "fs";
@@ -2660,6 +2660,29 @@ async function executeWithConcurrency(tasks, concurrencyLimit, options) {
   return results;
 }
 
+// src/profiles/navigation.ts
+async function navigateResilient(page, url, options = {}) {
+  const timeout = options.timeout ?? 15e3;
+  const settleTimeout = options.settleTimeout ?? 2500;
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout });
+  if (typeof page.waitForLoadState === "function") {
+    let timer;
+    try {
+      await Promise.race([
+        page.waitForLoadState("load", { timeout: settleTimeout }),
+        new Promise((resolve3) => {
+          timer = setTimeout(resolve3, settleTimeout);
+        })
+      ]);
+    } catch {
+    } finally {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    }
+  }
+}
+
 // src/profiles/mobile.ts
 var MobileProfile = class {
   // WCAG recommended
@@ -2675,8 +2698,7 @@ var MobileProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
-      await page.waitForLoadState("domcontentloaded");
+      await navigateResilient(page, url);
       const viewportMeta = await page.locator('meta[name="viewport"]').count();
       if (viewportMeta === 0) {
         findings.push({
@@ -2810,8 +2832,7 @@ var DesktopProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
-      await page.waitForLoadState("domcontentloaded");
+      await navigateResilient(page, url);
       const clsValue = await page.evaluate(() => {
         return new Promise((resolve3) => {
           let cls = 0;
@@ -2963,8 +2984,7 @@ var Desktop4KProfile = class {
     const findings = [];
     const viewportWidth = context?.viewport?.width ?? 3840;
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
-      await page.waitForLoadState("domcontentloaded");
+      await navigateResilient(page, url);
       const imageQualityIssues = await page.evaluate(() => {
         const images = Array.from(document.querySelectorAll("img"));
         let upscaledImages = 0;
@@ -3206,8 +3226,7 @@ var ConsoleErrorsProfile = class {
           location: "request-failed"
         });
       });
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
-      await page.waitForLoadState("domcontentloaded");
+      await navigateResilient(page, url);
       await page.waitForTimeout(2e3);
       const swErrors = await page.evaluate(() => {
         return new Promise((resolve3) => {
@@ -3328,8 +3347,7 @@ var TabletProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
-      await page.waitForLoadState("domcontentloaded");
+      await navigateResilient(page, url);
       const viewportContent = await page.locator('meta[name="viewport"]').getAttribute("content");
       if (!viewportContent?.includes("viewport-fit")) {
         findings.push({
@@ -3471,7 +3489,7 @@ var PerformanceProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const vitals = await page.evaluate(() => {
         return new Promise((resolve3) => {
           const vitalsData = {
@@ -3652,7 +3670,7 @@ var AccessibilityScreenReaderProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const langAttr = await page.locator("html").getAttribute("lang");
       if (!langAttr) {
         findings.push({
@@ -3846,7 +3864,7 @@ var AccessibilityKeyboardProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const positiveTabindex = await page.evaluate(() => {
         const elements = Array.from(document.querySelectorAll("[tabindex]"));
         return elements.filter(
@@ -4025,7 +4043,7 @@ var AccessibilityVisualProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const contrastIssues = await page.evaluate(() => {
         const issues = [];
         function getLuminance(r, g, b) {
@@ -4223,7 +4241,7 @@ var AccessibilityCognitiveProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const complexity = await page.evaluate(() => {
         const elements = document.querySelectorAll("*");
         return {
@@ -4439,7 +4457,7 @@ var I18nRTLProfile = class {
       await page.addInitScript(() => {
         Object.defineProperty(navigator, "language", { value: "ar-SA", writable: false });
       });
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const dir = await page.locator("html").getAttribute("dir");
       if (!dir || dir !== "rtl") {
         findings.push({
@@ -4626,7 +4644,7 @@ var I18nCJKProfile = class {
       await page.addInitScript(() => {
         Object.defineProperty(navigator, "language", { value: "ja-JP", writable: false });
       });
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const lang = await page.locator("html").getAttribute("lang");
       if (!lang?.startsWith("ja")) {
         findings.push({
@@ -4800,7 +4818,7 @@ var I18nMixedProfile = class {
       await page.addInitScript(() => {
         Object.defineProperty(navigator, "language", { value: "hi-IN", writable: false });
       });
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const lang = await page.locator("html").getAttribute("lang");
       if (!lang?.startsWith("hi")) {
         findings.push({
@@ -5009,8 +5027,7 @@ var BrowserFirefoxProfile = class {
     };
     page.on("console", onConsole);
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
-      await page.waitForLoadState("domcontentloaded");
+      await navigateResilient(page, url);
       const cssPrefixIssues = await page.evaluate(() => {
         const issues = [];
         let hasWebkitScrollbar = false;
@@ -5202,8 +5219,7 @@ var BrowserEdgeProfile = class {
     };
     page.on("console", onConsole);
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
-      await page.waitForLoadState("domcontentloaded");
+      await navigateResilient(page, url);
       const forcedColorsAudit = await page.evaluate(() => {
         let svgIconsWithoutFillOrCurrentColor = 0;
         let forcedColorsAdjustNone = 0;
@@ -5347,8 +5363,7 @@ var BrowserLegacyProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
-      await page.waitForLoadState("domcontentloaded");
+      await navigateResilient(page, url);
       const xUaCompatible = await page.locator('meta[http-equiv="X-UA-Compatible"]').getAttribute("content", { timeout: 2e3 }).catch(() => null);
       if (!xUaCompatible || !xUaCompatible.includes("IE=edge")) {
         findings.push({
@@ -5596,7 +5611,7 @@ var ImageFailureProfile = class {
           route.continue();
         }
       });
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       await page.screenshot({ fullPage: false });
       const captureId = `image-failure-${Date.now()}`;
       const evalResult = await page.evaluate(() => {
@@ -5758,7 +5773,7 @@ var FontFailureProfile = class {
         }
       });
       const baselineHeight = 0;
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const postNavHeight = await page.evaluate(() => document.body.scrollHeight);
       const screenshotBuffer = await page.screenshot({ fullPage: false });
       void screenshotBuffer;
@@ -6006,7 +6021,7 @@ var ReducedMotionProfile = class {
     });
     const page = await context.newPage();
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const captureId = `reduced-motion-${Date.now()}`;
       if (screenshotManager) {
         try {
@@ -6122,7 +6137,7 @@ var OfflineProfile = class {
     });
     const page = await context.newPage();
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const swRegistered = await page.evaluate(async () => {
         if (!("serviceWorker" in navigator)) return false;
         try {
@@ -6275,7 +6290,7 @@ var BrokenLinksProfile = class {
     const startTime = Date.now();
     const findings = [];
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const pageOrigin = new URL(url).origin;
       const hrefs = await page.evaluate((origin) => {
         const anchors = Array.from(document.querySelectorAll("a[href]"));
@@ -6480,7 +6495,7 @@ var NetworkResilienceProfile = class {
           baselineApiUrls.push(req.url());
         }
       });
-      await baselinePage.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(baselinePage, url);
     } finally {
       await baselineContext.close();
     }
@@ -6520,7 +6535,7 @@ var NetworkResilienceProfile = class {
           route.continue();
         }
       });
-      await failPage.goto(url, { waitUntil: "networkidle", timeout: 3e4 }).catch(() => {
+      await navigateResilient(failPage, url).catch(() => {
       });
       const captureId = `network-resilience-${Date.now()}`;
       if (screenshotManager) {
@@ -6685,7 +6700,7 @@ var SecurityHygieneProfile = class {
           mixedContentDetected = true;
         }
       });
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       for (const rule of HEADER_RULES) {
         if (rule.httpsOnly && !isHttps) continue;
         const headerValue = responseHeaders[rule.name];
@@ -6821,7 +6836,7 @@ var FormResilienceProfile = class {
     });
     const page = await context.newPage();
     try {
-      await page.goto(url, { waitUntil: "networkidle", timeout: 3e4 });
+      await navigateResilient(page, url);
       const formData = await page.evaluate(() => {
         return Array.from(document.querySelectorAll("form")).map((form, idx) => {
           const sel = form.id ? `form#${form.id}` : `form:nth-of-type(${idx + 1})`;
@@ -7115,8 +7130,17 @@ var HauntViewEngine = class {
       );
     }
     const profileResults = [];
+    const totalProfiles = executionOrder.length;
+    let completedProfiles = 0;
     if (!resolved.concurrency || resolved.concurrencyAmount <= 1) {
       for (const profile of executionOrder) {
+        options.onProgress?.({
+          completed: completedProfiles,
+          total: totalProfiles,
+          profileId: profile.id,
+          profileName: profile.name,
+          status: "start"
+        });
         try {
           const context = this.profileManager.createExecutionContext(profile.id);
           if (!context) continue;
@@ -7128,12 +7152,40 @@ var HauntViewEngine = class {
             finding.isClassified = true;
           }
           this.profileManager.recordExecution(profile.id, result.duration);
+          completedProfiles++;
+          options.onProgress?.({
+            completed: completedProfiles,
+            total: totalProfiles,
+            profileId: profile.id,
+            profileName: profile.name,
+            durationMs: result.duration,
+            status: result.success ? "done" : "fail",
+            findingsCount: result.findings.length
+          });
         } catch (error) {
           console.error(`Error executing profile ${profile.id}:`, error);
+          completedProfiles++;
+          options.onProgress?.({
+            completed: completedProfiles,
+            total: totalProfiles,
+            profileId: profile.id,
+            profileName: profile.name,
+            durationMs: 0,
+            status: "fail",
+            findingsCount: 0,
+            error: error instanceof Error ? error.message : String(error)
+          });
         }
       }
     } else {
       const tasks = executionOrder.map((profile) => async () => {
+        options.onProgress?.({
+          completed: completedProfiles,
+          total: totalProfiles,
+          profileId: profile.id,
+          profileName: profile.name,
+          status: "start"
+        });
         const context = this.profileManager.createExecutionContext(profile.id);
         if (!context) return null;
         const result = await this.executeProfile(profile.id, options.url, context);
@@ -7143,12 +7195,33 @@ var HauntViewEngine = class {
           finding.isClassified = true;
         }
         this.profileManager.recordExecution(profile.id, result.duration);
+        completedProfiles++;
+        options.onProgress?.({
+          completed: completedProfiles,
+          total: totalProfiles,
+          profileId: profile.id,
+          profileName: profile.name,
+          durationMs: result.duration,
+          status: result.success ? "done" : "fail",
+          findingsCount: result.findings.length
+        });
         return result;
       });
       const rawResults = await executeWithConcurrency(tasks, resolved.concurrencyAmount, {
         onFailure: (index, error) => {
           const profile = executionOrder[index];
           console.error(`Error executing profile ${profile.id}:`, error);
+          completedProfiles++;
+          options.onProgress?.({
+            completed: completedProfiles,
+            total: totalProfiles,
+            profileId: profile.id,
+            profileName: profile.name,
+            durationMs: 0,
+            status: "fail",
+            findingsCount: 0,
+            error: error instanceof Error ? error.message : String(error)
+          });
           const failedResult = {
             profileId: profile.id,
             profileName: profile.name,
@@ -7700,10 +7773,6 @@ function clampConcurrencyAmount(requested, recommendation) {
   };
 }
 
-// src/cli/config.ts
-import * as fs6 from "fs";
-import * as path6 from "path";
-
 // src/core/platform.ts
 import * as os3 from "os";
 import * as path5 from "path";
@@ -7971,6 +8040,8 @@ function getPlatformTroubleshootingAdvice() {
 }
 
 // src/cli/config.ts
+import * as fs6 from "fs";
+import * as path6 from "path";
 var DEFAULT_CLI_CONFIG = {
   defaultFormats: ["zip", "html"],
   exportDir: ".",
@@ -8161,6 +8232,79 @@ function ensureBrowsersInstalled(options) {
 }
 
 // src/cli/runner.ts
+var TerminalProgressTracker = class {
+  constructor() {
+    this.spinnerIdx = 0;
+    this.timer = null;
+    this.activeProfiles = /* @__PURE__ */ new Map();
+    this.completed = 0;
+    this.total = 0;
+    this.isTTY = Boolean(process.stdout.isTTY);
+    const caps = getTerminalCapabilities();
+    this.supportsUnicode = caps.supportsUnicode;
+    this.glyphs = getAdaptiveGlyphs();
+    this.spinnerFrames = this.supportsUnicode ? ["\u280B", "\u2819", "\u2839", "\u2838", "\u283C", "\u2834", "\u2826", "\u2827", "\u2807", "\u280F"] : ["-", "\\", "|", "/"];
+  }
+  start(total) {
+    this.total = total;
+    this.completed = 0;
+    if (this.isTTY) {
+      this.timer = setInterval(() => this.render(), 100);
+      this.timer.unref();
+    }
+  }
+  update(event) {
+    if (event.status === "start") {
+      this.activeProfiles.set(event.profileId, Date.now());
+      if (this.isTTY) {
+        this.render();
+      }
+    } else {
+      this.activeProfiles.delete(event.profileId);
+      this.completed = event.completed;
+      this.clearLine();
+      const glyph = event.status === "done" ? this.glyphs.tick : this.glyphs.cross;
+      const durSec = event.durationMs !== void 0 ? `${(event.durationMs / 1e3).toFixed(1)}s` : "";
+      const findingsSummary = event.findingsCount !== void 0 ? event.findingsCount === 1 ? "1 finding" : `${event.findingsCount} findings` : "";
+      const details = [durSec, findingsSummary].filter(Boolean).join(", ");
+      const padIndex = String(event.completed).padStart(2);
+      const padTotal = String(event.total);
+      console.log(
+        `  ${glyph} [${padIndex}/${padTotal}] ${event.profileId}${details ? ` (${details})` : ""}`
+      );
+      if (this.isTTY && this.completed < this.total) {
+        this.render();
+      }
+    }
+  }
+  finish() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+    this.clearLine();
+  }
+  clearLine() {
+    if (this.isTTY) {
+      process.stdout.write("\r\x1B[2K");
+    }
+  }
+  render() {
+    if (!this.isTTY || this.total === 0) return;
+    const pct = Math.floor(this.completed / this.total * 100);
+    const barWidth = 18;
+    const filled = Math.min(barWidth, Math.round(barWidth * this.completed / this.total));
+    const fillChar = this.supportsUnicode ? "\u2588" : "#";
+    const emptyChar = this.supportsUnicode ? "\u2591" : "-";
+    const bar = fillChar.repeat(filled) + emptyChar.repeat(barWidth - filled);
+    const spinner = this.spinnerFrames[this.spinnerIdx++ % this.spinnerFrames.length];
+    const running = Array.from(this.activeProfiles.keys()).join(", ") || "preparing rites...";
+    const statusLine = `  [${bar}] ${this.completed}/${this.total} (${pct}%) ${spinner} Running: ${running}`;
+    const cols = process.stdout.columns || 80;
+    const truncated = statusLine.length > cols - 2 ? statusLine.slice(0, Math.max(10, cols - 5)) + "..." : statusLine;
+    process.stdout.write(`\r\x1B[2K${truncated}`);
+  }
+};
 async function runHaunt(targetUrl, options) {
   const urlValidation = validateTargetUrl(targetUrl, { allowLocal: true });
   if (!urlValidation.valid) {
@@ -8191,38 +8335,34 @@ async function runHaunt(targetUrl, options) {
       else if (t === "zip" || t === "bundle") chosenFormats.push("zip");
       else if (t === "json") chosenFormats.push("json");
     }
-  }
-  if (chosenFormats.length === 0) {
-    const isInteractive = Boolean(process.stdin.isTTY && !options.yes);
-    if (isInteractive) {
-      try {
-        chosenFormats = await checkbox({
-          message: "What output would you like to generate?",
-          choices: [
-            {
-              name: "Zip (Complete archive: HTML, Markdown, screenshots, evidence plates)",
-              value: "zip",
-              checked: config.defaultFormats.includes("zip")
-            },
-            {
-              name: "HTML (Interactive standalone spectral executive report plate)",
-              value: "html",
-              checked: config.defaultFormats.includes("html")
-            },
-            {
-              name: "Markdown (Dev-ready GitHub Flavored markdown summary)",
-              value: "markdown",
-              checked: config.defaultFormats.includes("markdown")
-            }
-          ],
-          validate: (choices) => choices.length > 0 ? true : "Please select at least one format."
-        });
-      } catch {
-        chosenFormats = config.defaultFormats;
-      }
-    } else {
+  } else if (options.interactive) {
+    try {
+      chosenFormats = await checkbox({
+        message: "What output would you like to generate?",
+        choices: [
+          {
+            name: "Zip (Complete archive: HTML, Markdown, screenshots, evidence plates)",
+            value: "zip",
+            checked: config.defaultFormats.includes("zip")
+          },
+          {
+            name: "HTML (Interactive standalone spectral executive report plate)",
+            value: "html",
+            checked: config.defaultFormats.includes("html")
+          },
+          {
+            name: "Markdown (Dev-ready GitHub Flavored markdown summary)",
+            value: "markdown",
+            checked: config.defaultFormats.includes("markdown")
+          }
+        ],
+        validate: (choices) => choices.length > 0 ? true : "Please select at least one format."
+      });
+    } catch {
       chosenFormats = config.defaultFormats;
     }
+  } else {
+    chosenFormats = config.defaultFormats && config.defaultFormats.length > 0 ? config.defaultFormats : DEFAULT_CLI_CONFIG.defaultFormats;
   }
   const rawConcurrencyAmount = options.concurrencyAmount ? parseInt(options.concurrencyAmount, 10) : void 0;
   const resolved = resolveConcurrency(
@@ -8248,21 +8388,27 @@ async function runHaunt(targetUrl, options) {
 \u{1F47B} Haunting ${cleanUrl}...`);
   if (effectiveConcurrency) {
     console.log(
-      `\u26A1 Concurrency active: running up to ${finalConcurrencyAmount} profiles simultaneously.`
+      `\u26A1 Concurrency active: running up to ${finalConcurrencyAmount} profiles simultaneously.
+`
     );
   } else {
-    console.log("\u23F3 Running profiles sequentially (safe mode).");
+    console.log("\u23F3 Running profiles sequentially (safe mode).\n");
   }
   const engine = new HauntViewEngine();
   await engine.initialize();
   const requestedProfiles = options.profiles ? options.profiles.split(",").map((p) => p.trim()) : void 0;
+  const tracker = new TerminalProgressTracker();
   const report = await engine.executeTests({
     url: cleanUrl,
     profiles: requestedProfiles,
     concurrency: effectiveConcurrency,
     concurrencyAmount: finalConcurrencyAmount,
-    includeScreenshots: true
+    includeScreenshots: true,
+    onProgress: (update) => {
+      tracker.update(update);
+    }
   });
+  tracker.finish();
   try {
     saveTestReportToDb(report);
   } catch {
@@ -8474,6 +8620,64 @@ ${glyphs.warn} Some browsers are missing. Run \`haunt <url>\` to trigger first-r
   console.log();
 }
 
+// src/cli/self-update.ts
+import { execSync as execSync2, spawnSync } from "node:child_process";
+function detectPackageManager() {
+  for (const pm of ["npm", "pnpm", "yarn"]) {
+    const result = spawnSync(pm, ["--version"], { encoding: "utf8" });
+    if (result.status === 0) return pm;
+  }
+  return "npm";
+}
+function fetchLatestVersion() {
+  try {
+    const raw = execSync2("npm view hauntview version", {
+      encoding: "utf8",
+      timeout: 1e4,
+      stdio: ["ignore", "pipe", "ignore"]
+    });
+    return raw.trim();
+  } catch {
+    return null;
+  }
+}
+function runSelfUpdate() {
+  console.log(`
+\u{1F47B} HauntView self-update`);
+  console.log(`   Current version: ${VERSION}`);
+  process.stdout.write("   Checking npm registry...");
+  const latest = fetchLatestVersion();
+  if (latest === null) {
+    console.log(" (registry unreachable)\n");
+    console.warn(
+      "\u2717 Could not reach the npm registry. Check your internet connection and try again."
+    );
+    process.exit(1);
+  }
+  console.log(` latest is ${latest}`);
+  if (latest === VERSION) {
+    console.log("\n\u2713 You are already on the latest version. Nothing to do.\n");
+    return;
+  }
+  const pm = detectPackageManager();
+  const installCmd = pm === "yarn" ? "yarn global add hauntview" : `${pm} install -g hauntview`;
+  console.log(`
+   Updating ${VERSION} \u2192 ${latest} using ${pm}...`);
+  console.log(`   Running: ${installCmd}
+`);
+  try {
+    execSync2(installCmd, { stdio: "inherit" });
+    console.log(`
+\u2713 HauntView updated to ${latest}. Run 'haunt --version' to confirm.
+`);
+  } catch {
+    console.error("\n\u2717 Update failed. You may need to run with elevated privileges:");
+    console.error(`     sudo ${installCmd}
+`);
+    process.exit(1);
+  }
+}
+
 // src/cli/index.ts
 var program = new Command();
 program.name("haunt").description(
@@ -8485,7 +8689,7 @@ program.argument("[url]", "Target website URL to test (e.g. http://localhost:300
 ).option(
   "-p, --profiles <ids>",
   "Comma-separated profile IDs to execute (default: all optimal profiles)"
-).option("-c, --concurrency", "Enable concurrent profile execution").option("--no-concurrency", "Force sequential profile execution").option("-a, --concurrency-amount <n>", "Maximum profiles running simultaneously (default: 2)").option("-y, --yes", "Non-interactive mode, skip prompts and use saved defaults").action(async (url, options) => {
+).option("-c, --concurrency", "Enable concurrent profile execution").option("--no-concurrency", "Force sequential profile execution").option("-a, --concurrency-amount <n>", "Maximum profiles running simultaneously (default: 2)").option("-i, --interactive", "Prompt for output formats interactively").option("-y, --yes", "Non-interactive mode, skip prompts and use saved defaults").action(async (url, options) => {
   if (!url) {
     program.help();
     return;
@@ -8501,6 +8705,9 @@ program.command("doctor").description(
   "Verify system environment, hardware capability heuristics, and Playwright browser installations"
 ).action(() => {
   runDoctor();
+});
+program.command("self-update").description("Update HauntView to the latest version published on npm").action(() => {
+  runSelfUpdate();
 });
 program.parseAsync(process.argv).catch((err) => {
   console.error(`

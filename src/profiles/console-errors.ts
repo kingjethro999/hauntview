@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 interface ConsoleMessage {
   type: 'log' | 'warn' | 'error' | 'info' | 'debug';
@@ -58,9 +59,8 @@ export class ConsoleErrorsProfile {
         });
       });
 
-      // Navigate to page
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForLoadState('domcontentloaded');
+      // Navigate to page safely without stalling on streaming/websockets
+      await navigateResilient(page, url);
 
       // Allow time for async console messages
       await page.waitForTimeout(2000);

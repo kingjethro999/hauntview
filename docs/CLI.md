@@ -48,14 +48,8 @@ haunt https://example.com
 
 1. **URL Validation:** Validates the target URL. Local addresses (`http://localhost:*`, `http://127.0.0.1:*`) are permitted. Private network addresses (RFC 1918) are blocked by default unless `HAUNT_ALLOW_PRIVATE=1` is exported.
 2. **First-Run Verification:** Confirms required Playwright browsers (Chromium, Firefox, WebKit) are present. If missing, prompts to install them automatically.
-3. **Output Format Selection:** Presents a multi-select prompt (`Zip`, `HTML`, `MD`) with your saved defaults pre-selected:
-   ```text
-   ? Select report output formats: (Press <space> to select, <a> to toggle all, <i> to invert selection, <enter> to proceed)
-   ❯◉ Zip (bundle HTML, Markdown, and screenshot plates)
-    ◉ HTML (standalone interactive report)
-    ◯ Markdown (clean issue summary)
-   ```
-4. **Execution:** Runs the rites with animated terminal progress indicators.
+3. **Format Selection:** Automatically uses your saved `defaultFormats` from `haunt setup` without interrupting you. Pass `-i` / `--interactive` to prompt for formats on the fly, or specify `-o html,md,zip`.
+4. **Live Progress Loader:** Runs the rites with a real-time progress bar, live profile timer, completed count, and adaptive spinner (Unicode on modern terminals, clean ASCII on legacy consoles).
 5. **Artifact Generation:** Writes reports to the export directory and outputs the full paths and a findings breakdown.
 
 ### Non-Interactive / CI Flags

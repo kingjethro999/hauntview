@@ -7,6 +7,7 @@ import { Browser } from 'playwright';
 import { ScreenshotManager } from '../core/screenshot-manager';
 import { buildFinding } from '../types/finding-utils';
 import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
+import { navigateResilient } from './navigation';
 
 export class ReducedMotionProfile {
   private profileId: string;
@@ -42,7 +43,7 @@ export class ReducedMotionProfile {
     const page = await context.newPage();
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       const captureId = `reduced-motion-${Date.now()}`;
       if (screenshotManager) {

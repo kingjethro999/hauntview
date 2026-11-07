@@ -25,7 +25,7 @@ export class I18nMixedProfile {
         Object.defineProperty(navigator, 'language', { value: 'hi-IN', writable: false });
       });
 
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       // Check for lang attribute
       const lang = await page.locator('html').getAttribute('lang');

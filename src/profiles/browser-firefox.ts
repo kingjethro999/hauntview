@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class BrowserFirefoxProfile {
   private profileId: string;
@@ -32,8 +33,7 @@ export class BrowserFirefoxProfile {
     page.on('console', onConsole);
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForLoadState('domcontentloaded');
+      await navigateResilient(page, url);
 
       // 1. Check for webkit-only CSS properties missing standard Firefox/Gecko equivalents
       const cssPrefixIssues = await page.evaluate(() => {

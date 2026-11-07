@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class BrowserLegacyProfile {
   private profileId: string;
@@ -23,8 +24,7 @@ export class BrowserLegacyProfile {
     const findings: Finding[] = [];
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForLoadState('domcontentloaded');
+      await navigateResilient(page, url);
 
       // 1. Check for X-UA-Compatible meta tag
       const xUaCompatible = await page

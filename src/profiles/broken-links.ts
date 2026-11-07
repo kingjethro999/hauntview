@@ -8,6 +8,7 @@ import pLimit from 'p-limit';
 import { sanitizeUntrusted } from '../types/contracts';
 import { buildFinding } from '../types/finding-utils';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 const CONCURRENCY = 5;
 const TIMEOUT_MS = 8000;
@@ -66,7 +67,7 @@ export class BrokenLinksProfile {
     const findings: Finding[] = [];
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       const pageOrigin = new URL(url).origin;
 

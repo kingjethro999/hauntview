@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class BrowserEdgeProfile {
   private profileId: string;
@@ -31,8 +32,7 @@ export class BrowserEdgeProfile {
     page.on('console', onConsole);
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForLoadState('domcontentloaded');
+      await navigateResilient(page, url);
 
       // 1. Windows High Contrast & forced-colors compatibility (Edge specialty)
       const forcedColorsAudit = await page.evaluate(() => {

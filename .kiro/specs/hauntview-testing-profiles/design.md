@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design document specifies the implementation approach for HauntView's 16 testing profiles. Each profile uses Playwright browser automation to detect specific issues in web applications and report findings with evidence (screenshots, metrics, error messages). The design establishes:
+This design document specifies the implementation approach for HauntView's 27 testing profiles. Each profile uses Playwright browser automation to detect specific issues in web applications and report findings with evidence (screenshots, metrics, error messages). The design establishes:
 
 1. **Common infrastructure** shared by all profiles
 2. **Profile-specific algorithms** for detecting issues
@@ -2630,7 +2630,7 @@ async function detectReducedMotionIssues(
 
 #### Objective
 
-Run all 15 profiles sequentially, maintain state, report progress, aggregate findings, and generate comprehensive report.
+Run all 27 profiles sequentially (or a user-selected subset), maintain state, report progress, aggregate findings, and generate comprehensive report.
 
 #### Orchestration Logic
 
@@ -3038,7 +3038,7 @@ describe('Mobile Responsive Profile', () => {
 
 ```typescript
 describe('Full Test Orchestrator', () => {
-  test('Executes all 15 profiles', async () => {
+  test('Executes all 27 profiles', async () => {
     const report = await executeFullTest(testUrl);
 
     expect(report.profileResults).toHaveLength(15);

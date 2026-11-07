@@ -7,6 +7,7 @@ import { Page } from 'playwright';
 import { sanitizeUntrusted } from '../types/contracts';
 import { buildFinding } from '../types/finding-utils';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class ImageFailureProfile {
   private profileId: string;
@@ -31,7 +32,7 @@ export class ImageFailureProfile {
         }
       });
 
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       // Capture screenshot as evidence
       await page.screenshot({ fullPage: false });

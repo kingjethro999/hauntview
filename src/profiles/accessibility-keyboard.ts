@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class AccessibilityKeyboardProfile {
   private profileId: string;
@@ -20,7 +21,7 @@ export class AccessibilityKeyboardProfile {
     const findings: Finding[] = [];
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       // Check for positive tabindex values
       const positiveTabindex = await page.evaluate(() => {

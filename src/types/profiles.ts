@@ -149,6 +149,20 @@ export interface ClassificationResult {
 }
 
 /**
+ * Progress event emitted during test suite execution
+ */
+export interface TestProgressUpdate {
+  completed: number;
+  total: number;
+  profileId: string;
+  profileName: string;
+  durationMs?: number;
+  status: 'start' | 'done' | 'fail';
+  findingsCount?: number;
+  error?: string;
+}
+
+/**
  * Test execution options
  */
 export interface TestExecutionOptions {
@@ -161,6 +175,7 @@ export interface TestExecutionOptions {
   headless?: boolean;
   concurrency?: boolean;
   concurrencyAmount?: number;
+  onProgress?: (update: TestProgressUpdate) => void;
 }
 
 /**

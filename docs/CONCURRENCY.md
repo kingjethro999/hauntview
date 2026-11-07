@@ -92,7 +92,7 @@ Because concurrent workers finish in non-deterministic time depending on page co
 
 ## 5. Hosted Environment Guard (`hauntview.onrender.com`)
 
-HauntView's public demonstration instance is hosted on Render's free tier with strict container resource limits: **0.5 vCPU and 512 MB RAM**. Running multiple concurrent headless browser instances in this environment triggers immediate out-of-memory container restarts.
+HauntView's public demonstration instance is hosted on Render's **$7/month Starter plan** with container resource limits: **0.5 CPU and 512 MB RAM** (Render's free tier provides only 0.1 CPU, so we use the paid Starter plan to provide dedicated 0.5 CPU). Running multiple concurrent headless browser instances in this constrained container triggers immediate out-of-memory container restarts.
 
 To ensure uptime and stability:
 

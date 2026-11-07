@@ -170,7 +170,7 @@ To prevent system freezing or OOM conditions, HauntView calculates safe hardware
 
 ### ⚠️ Hosted Service Notice (`hauntview.onrender.com`)
 
-HauntView's public demo instance runs on Render's free tier with **0.5 vCPU and 512 MB RAM**. Concurrency is strictly **disabled** on the hosted instance to protect container stability. Requests to `/api/test` with concurrency enabled are rejected with HTTP 400. Full 25-rite runs take ~70 seconds on Render. For fast concurrent testing (~25s), please [install the CLI](#option-1-official-cli-haunt) or run locally via MCP.
+HauntView's public demo instance runs on Render's **$7/month Starter plan with 0.5 vCPU and 512 MB RAM** (Render's free tier provides only 0.1 CPU, so we use the paid Starter tier to provide dedicated 0.5 CPU). Concurrency is strictly **disabled** on the hosted instance to protect container stability. Requests to `/api/test` with concurrency enabled are rejected with HTTP 400. Full 25-rite runs take ~70 seconds on Render. For fast concurrent testing (~20s), please [install the CLI](#option-1-official-cli-haunt) or run locally via MCP.
 
 See [`docs/CONCURRENCY.md`](file:///home/japheth/Desktop/hauntview/docs/CONCURRENCY.md) for full details.
 

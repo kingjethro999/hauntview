@@ -49,6 +49,13 @@ export function getCliConfigFile(): string {
 }
 
 /**
+ * Checks whether user configuration file has been initialized via `haunt setup`.
+ */
+export function isConfigInitialized(): boolean {
+  return fs.existsSync(getCliConfigFile());
+}
+
+/**
  * Loads CLI config, falling back to defaults if missing or corrupted.
  */
 export function loadCliConfig(): CliConfig {

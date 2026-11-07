@@ -7,6 +7,7 @@ import { Browser } from 'playwright';
 import { ScreenshotManager } from '../core/screenshot-manager';
 import { buildFinding } from '../types/finding-utils';
 import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
+import { navigateResilient } from './navigation';
 
 export class OfflineProfile {
   private profileId: string;
@@ -41,7 +42,7 @@ export class OfflineProfile {
 
     try {
       // Online navigation first
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       // Check service worker registration while online
       const swRegistered = await page.evaluate(async () => {

@@ -2,11 +2,51 @@
 
 ## HauntView Testing Profiles Overview
 
-HauntView provides 16 distinct automated testing profiles that verify critical aspects of web application behavior, resilience, and accessibility. Each profile performs genuine checks using Playwright browser automation and reports specific, actionable findings. This document specifies exactly what each profile tests, how it executes, what findings it discovers, and how results are reported—providing complete detail for implementation without prescribing implementation approach.
+HauntView provides 27 distinct automated testing profiles that verify critical aspects of web application behavior, resilience, and accessibility. Each profile performs genuine checks using Playwright browser automation and reports specific, actionable findings. This document specifies exactly what each profile tests, how it executes, what findings it discovers, and how results are reported—providing complete detail for implementation without prescribing implementation approach.
 
-HauntView provides 16 distinct automated testing profiles that verify critical aspects of web application behavior, resilience, and accessibility. Each profile performs genuine checks using Playwright browser automation and reports specific, actionable findings. This document specifies exactly what each profile tests, how it executes, what findings it discovers, and how results are reported—providing complete detail for implementation without prescribing implementation approach.
+The profiles are organized into five categories:
 
-The 16 profiles range from responsive design validation (Mobile, Tablet, Desktop) to resilience testing (Network, Offline, Form Validation) to security and performance checks (Security Hygiene, Performance). Users can run individual profiles or execute the Full Test suite, which runs all 15 profiles sequentially and aggregates results.
+### Device & Viewport Profiles (4)
+
+- Mobile — 320px, 375px, 428px viewports
+- Tablet — 768px, 1024px viewports
+- Desktop — 1280px viewport
+- Desktop 4K — 3840px ultra-wide viewport
+
+### Accessibility Profiles (4)
+
+- Accessibility: Screen Reader — ARIA, semantic HTML, assistive technology compatibility
+- Accessibility: Keyboard — tab navigation, focus management, keyboard-only operation
+- Accessibility: Visual — color contrast, font size, visual impairment simulation
+- Accessibility: Cognitive — complexity, readability, cognitive load analysis
+
+### Browser Compatibility Profiles (3)
+
+- Browser: Firefox — Gecko engine rendering
+- Browser: Edge — Blink/Chromium edge cases
+- Browser: Legacy — deprecated CSS, outdated JavaScript API usage
+
+### Internationalization Profiles (3)
+
+- i18n: RTL — right-to-left languages (Arabic, Hebrew)
+- i18n: CJK — Chinese, Japanese, Korean character rendering
+- i18n: Mixed — bidirectional text, multilingual content
+
+### Core Resilience & Security Profiles (13)
+
+- Image Failure — layout with blocked images, alt text verification
+- Font Failure — fallback font rendering, custom font blocking
+- JavaScript Disabled — progressive enhancement, SSR verification
+- Reduced Motion — respects prefers-reduced-motion, animation safety
+- Console Errors — JavaScript errors, failed network requests
+- Offline — service worker, cached content, offline indicators
+- Broken Links — 404 detection, link validation
+- Network Resilience — slow 3G/4G simulation, packet loss, high latency
+- Performance — Core Web Vitals (FCP, LCP, CLS, TTFB)
+- Security Hygiene — HTTPS, security headers, mixed content detection
+- Form Resilience — validation, error handling, submission flows
+
+Users can run individual profiles or execute the Full Test suite (rite ID: `full`), which runs all available profiles and aggregates results.
 
 ## Introduction
 
@@ -548,17 +588,27 @@ The 16 profiles range from responsive design validation (Mobile, Tablet, Desktop
 
 #### Acceptance Criteria
 
-1. WHEN the Full Test Profile executes, THE Test Engine SHALL run all 15 individual profiles sequentially:
+1. WHEN the Full Test Profile executes, THE Test Engine SHALL run all 27 individual profiles sequentially:
    - Mobile Responsive Test
    - Tablet Responsive Test
    - Desktop Responsive Test
+   - Desktop 4K Test
+   - Accessibility: Screen Reader Test
+   - Accessibility: Keyboard Test
+   - Accessibility: Visual Test
+   - Accessibility: Cognitive Test
+   - Browser: Firefox Test
+   - Browser: Edge Test
+   - Browser: Legacy Test
+   - i18n: RTL Test
+   - i18n: CJK Test
+   - i18n: Mixed (Bidirectional) Test
    - Image Failure Test
    - Font Failure Test
    - JavaScript Disabled Test
    - Network Resilience Test
    - Offline Test
    - Console Errors Test
-   - Accessibility Test
    - Broken Links Test
    - Form Resilience Test
    - Security Hygiene Test
@@ -567,7 +617,7 @@ The 16 profiles range from responsive design validation (Mobile, Tablet, Desktop
 2. THE Full Test Profile SHALL maintain consistent state between profile runs (same target URL, consistent timing)
 3. THE Test Engine SHALL report progress indicating which profile is executing
 4. THE Test Engine SHALL continue executing remaining profiles even if one profile fails
-5. THE Test Engine SHALL aggregate all findings from all 15 profiles
+5. THE Test Engine SHALL aggregate all findings from all 27 profiles
 6. WHEN Full Test execution completes, THE Test Report SHALL include:
    - Summary showing which profiles executed successfully
    - Summary of all findings from all profiles
@@ -797,3 +847,188 @@ A testing profile is considered successfully executed when:
 7. **Large Pages**: Websites with extreme content may timeout or consume excessive memory
 8. **Streaming Content**: Video or audio streams may not be fully tested
 9. **WebSocket Connections**: Real-time communication tested only for presence, not functionality
+
+---
+
+### Requirement 17: Desktop 4K Test Profile
+
+**User Story:** As a developer, I want to verify my web application displays correctly at ultra-wide 4K resolutions (3840×2160), so that I can ensure layouts scale appropriately on high-DPI and large-format monitors.
+
+#### Acceptance Criteria
+
+1. WHEN the Desktop 4K Test executes, THE Test Engine SHALL render the target website at a 3840×2160 viewport with deviceScaleFactor 1
+2. THE Test Engine SHALL capture a full-page screenshot at 4K resolution
+3. THE Test Engine SHALL verify that content scales to use available horizontal space and does not appear as a narrow column
+4. WHEN max-width constraints cause content to occupy less than 50% of the viewport width, THE Test Profile SHALL report a finding indicating underutilization
+5. WHEN bitmap images appear blurry (non-responsive, fixed pixel dimensions), THE Test Profile SHALL report findings recommending SVG or `srcset`
+6. WHEN text or layout elements break at 4K widths, THE Test Profile SHALL report Critical findings
+7. THE Test Report SHALL include a screenshot and space-utilization ratio metric
+8. THE Test Profile SHALL classify findings as:
+   - Critical: Layout broken or unreadable at 4K
+   - Warning: Significant whitespace/underutilization or blurry raster images
+   - Info: Layout correctly scales to ultra-wide viewport
+
+---
+
+### Requirement 18: Accessibility — Screen Reader Profile
+
+**User Story:** As a developer, I want to verify my application is compatible with screen reader technology, so that users who rely on assistive technologies can access all content and functionality.
+
+#### Acceptance Criteria
+
+1. WHEN the Screen Reader Accessibility Test executes, THE Test Engine SHALL use axe-core to audit the page for ARIA and screen reader compatibility violations
+2. THE Test Engine SHALL verify landmark regions exist: `<main>`, `<nav>`, `<header>`, `<footer>`, `<aside>`
+3. THE Test Engine SHALL verify that every `<img>` has either `alt` text or `role="presentation"`
+4. THE Test Engine SHALL verify interactive elements have accessible names (aria-label, aria-labelledby, or visible text)
+5. THE Test Engine SHALL verify heading hierarchy is sequential (no skipped levels, exactly one `<h1>`)
+6. THE Test Engine SHALL verify live regions (`role="status"`, `aria-live`) exist for dynamic content
+7. WHEN axe-core reports critical or serious impact violations, THE Test Profile SHALL report `serious` severity findings
+8. WHEN axe-core reports moderate impact violations, THE Test Profile SHALL report `warning` severity findings
+9. WHEN axe-core reports minor impact violations, THE Test Profile SHALL report `info` severity findings
+10. THE Test Report SHALL include: axe violation count by impact, landmark structure map, and heading tree
+11. All page-originated strings in findings MUST be wrapped as `UntrustedText { untrusted: true; text: string }` (truncated to 300 chars)
+
+---
+
+### Requirement 19: Accessibility — Keyboard Profile
+
+**User Story:** As a developer, I want to verify every interactive element is reachable and operable by keyboard alone, so that users who cannot use a pointer device can navigate the full application.
+
+#### Acceptance Criteria
+
+1. WHEN the Keyboard Accessibility Test executes, THE Test Engine SHALL enumerate all focusable elements via Tab traversal
+2. THE Test Engine SHALL verify every focusable element has a visible focus indicator
+3. THE Test Engine SHALL detect focus traps that do not release on Escape (excluding intentional modal dialogs)
+4. THE Test Engine SHALL verify that elements are reachable in a logical tab order
+5. WHEN an interactive element (button, link, input) is not keyboard-reachable, THE Test Profile SHALL report a `serious` finding
+6. WHEN focus indicators are absent (outline: none with no alternative), THE Test Profile SHALL report a `warning` finding
+7. WHEN tab order is illogical (tabindex values > 0 causing reordering), THE Test Profile SHALL report an `info` finding
+8. THE Test Engine SHALL capture a screenshot highlighting the last focused element in traversal
+9. THE Test Report SHALL include: total focusable element count, elements without focus indicators, and tab order issues
+
+---
+
+### Requirement 20: Accessibility — Visual Profile
+
+**User Story:** As a developer, I want to simulate common visual impairments and verify the page remains usable, so that users with low vision or color blindness can access content.
+
+#### Acceptance Criteria
+
+1. WHEN the Visual Accessibility Test executes, THE Test Engine SHALL check color contrast ratios for all text/background combinations using axe-core
+2. THE Test Engine SHALL verify that body text meets WCAG AA contrast (4.5:1 for normal text, 3:1 for large text)
+3. THE Test Engine SHALL verify that information is not conveyed by color alone (severity chips, status indicators must also have icons or labels)
+4. THE Test Engine SHALL simulate `forced-colors: active` mode and capture a screenshot
+5. WHEN contrast fails WCAG AA, THE Test Profile SHALL report `serious` severity findings with element selectors
+6. WHEN UI states differ only by hue (e.g., red vs. green with no other differentiation), THE Test Profile SHALL report `warning` findings
+7. THE Test Engine SHALL verify minimum font size (≥ 16px for body text)
+8. WHEN body text falls below 16px, THE Test Profile SHALL report `warning` severity
+9. THE Test Report SHALL include: contrast failure list with computed ratios, forced-colors screenshot, and font size survey
+
+---
+
+### Requirement 21: Accessibility — Cognitive Profile
+
+**User Story:** As a developer, I want to detect content patterns that increase cognitive load, so that users with cognitive disabilities can understand and use my application without undue effort.
+
+#### Acceptance Criteria
+
+1. WHEN the Cognitive Accessibility Test executes, THE Test Engine SHALL measure DOM element count, nesting depth, and animation count
+2. WHEN DOM element count exceeds 500, THE Test Profile SHALL report a `warning` finding
+3. WHEN maximum nesting depth exceeds 15 levels, THE Test Profile SHALL report an `info` finding
+4. WHEN more than 10 animated elements are detected, THE Test Profile SHALL report an `info` finding
+5. WHEN `audio[autoplay]` or `video[autoplay]` elements are found, THE Test Profile SHALL report a `warning` finding
+6. THE Test Engine SHALL check forms for fields with missing labels and forms with more than 15 fields
+7. WHEN form fields exceed 15 or labels are missing, THE Test Profile SHALL report `info` findings
+8. THE Test Engine SHALL estimate reading complexity via average word length; report `info` when average exceeds 7 characters
+9. WHEN paragraphs exceed 100 words, THE Test Profile SHALL report `info` findings
+10. All page-originated text (body content, form labels) extracted for analysis MUST be wrapped as `UntrustedText` before appearing in findings
+
+---
+
+### Requirement 22: Browser Compatibility — Firefox Profile
+
+**User Story:** As a developer, I want to verify my web application renders and behaves correctly in Firefox (Gecko engine), so that I can support users who prefer Mozilla Firefox.
+
+#### Acceptance Criteria
+
+1. WHEN the Firefox Compatibility Test executes, THE Test Engine SHALL launch a Firefox (Playwright `firefox`) browser context
+2. THE Test Engine SHALL capture a full-page screenshot in Firefox
+3. THE Test Engine SHALL detect JavaScript errors specific to the Firefox environment
+4. THE Test Engine SHALL verify layout does not differ materially from Chromium baseline
+5. WHEN layout pixel differences exceed 5% of the viewport area, THE Test Profile SHALL report a `warning` finding with a diff overlay
+6. WHEN JavaScript errors occur only in Firefox (not in the Chromium baseline run), THE Test Profile SHALL report `serious` findings
+7. THE Test Report SHALL include: Firefox screenshot, error log, and any visual diff overlay
+
+---
+
+### Requirement 23: Browser Compatibility — Edge Profile
+
+**User Story:** As a developer, I want to verify my web application renders correctly in Microsoft Edge (Blink engine with Edge-specific APIs), so that I can support enterprise users on the Edge browser.
+
+#### Acceptance Criteria
+
+1. WHEN the Edge Compatibility Test executes, THE Test Engine SHALL launch a Chromium context with Edge user agent header set
+2. THE Test Engine SHALL capture a full-page screenshot
+3. THE Test Engine SHALL detect Edge-specific rendering issues (IE compatibility mode artifacts, Fluent UI conflicts)
+4. WHEN errors occur that do not appear in the standard Chromium baseline, THE Test Profile SHALL report `warning` findings
+5. THE Test Report SHALL include: Edge screenshot and error log
+
+---
+
+### Requirement 24: Browser Compatibility — Legacy Profile
+
+**User Story:** As a developer, I want to detect deprecated API usage and unsupported CSS features, so that I can understand breakage risk for users on older browser versions.
+
+#### Acceptance Criteria
+
+1. WHEN the Legacy Browser Test executes, THE Test Engine SHALL scan JavaScript bundle files for deprecated API calls (document.write, synchronous XMLHttpRequest, -webkit- vendor prefixes without standard equivalents)
+2. THE Test Engine SHALL detect CSS properties that lack broad legacy browser support
+3. WHEN deprecated APIs are detected, THE Test Profile SHALL report `warning` findings listing the API and its modern replacement
+4. WHEN vendor-prefixed CSS has no unprefixed fallback, THE Test Profile SHALL report `info` findings
+5. THE Test Report SHALL include: list of deprecated APIs found, affected file references, and migration recommendations
+
+---
+
+### Requirement 25: i18n — RTL Profile
+
+**User Story:** As a developer, I want to verify my web application renders correctly in right-to-left (RTL) languages such as Arabic and Hebrew, so that international users receive a correct mirrored layout.
+
+#### Acceptance Criteria
+
+1. WHEN the RTL Test executes, THE Test Engine SHALL set `dir="rtl"` on `<html>` and apply an Arabic locale via Playwright context options
+2. THE Test Engine SHALL capture a full-page screenshot
+3. THE Test Engine SHALL verify that layout direction is mirrored (flex-direction, text-align, margins)
+4. WHEN no `[dir="rtl"]` CSS rules are present, THE Test Profile SHALL report a `warning` finding
+5. WHEN text overflows or overlaps in RTL mode, THE Test Profile SHALL report `serious` findings
+6. WHEN logical CSS properties (`margin-inline-start`, `padding-inline-end`) are absent and physical properties are used instead, THE Test Profile SHALL report `info` findings recommending logical property adoption
+7. THE Test Report SHALL include: RTL screenshot and a list of directional layout issues
+
+---
+
+### Requirement 26: i18n — CJK Profile
+
+**User Story:** As a developer, I want to verify my web application renders Chinese, Japanese, and Korean characters correctly, so that East Asian language users see proper typography and layout.
+
+#### Acceptance Criteria
+
+1. WHEN the CJK Test executes, THE Test Engine SHALL set a Chinese Simplified locale (`zh-CN`) and inject a sample CJK content string into the page title and first heading
+2. THE Test Engine SHALL capture a full-page screenshot
+3. THE Test Engine SHALL verify that CJK characters render (no tofu/replacement character boxes)
+4. WHEN tofu characters appear, THE Test Profile SHALL report `serious` findings indicating missing CJK font coverage
+5. THE Test Engine SHALL check that `word-break: break-all` or `overflow-wrap: anywhere` is applied to containers that hold long CJK strings
+6. THE Test Report SHALL include: CJK screenshot and a font coverage assessment
+
+---
+
+### Requirement 27: i18n — Mixed (Bidirectional) Profile
+
+**User Story:** As a developer, I want to verify my web application handles pages that mix LTR and RTL content (e.g., English and Arabic on the same page), so that bidirectional text renders without overlap or reflow issues.
+
+#### Acceptance Criteria
+
+1. WHEN the Mixed i18n Test executes, THE Test Engine SHALL inject both LTR (English) and RTL (Arabic) text into the document to simulate bidirectional content
+2. THE Test Engine SHALL verify `unicode-bidi` and `direction` CSS properties are set appropriately on mixed-direction containers
+3. THE Test Engine SHALL capture screenshots of the bidirectional content
+4. WHEN bidirectional text causes horizontal overflow or text overlap, THE Test Profile SHALL report `serious` findings
+5. WHEN `<bdi>` or `dir` attributes are absent on inline mixed-direction spans, THE Test Profile SHALL report `info` findings
+6. THE Test Report SHALL include: bidirectional screenshot and a list of isolation issues

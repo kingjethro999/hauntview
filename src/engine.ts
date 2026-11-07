@@ -183,10 +183,19 @@ export class HauntViewEngine {
     }
 
     const profileResults: ProfileResult[] = [];
+    const totalProfiles = executionOrder.length;
+    let completedProfiles = 0;
 
     if (!resolved.concurrency || resolved.concurrencyAmount <= 1) {
       // Sequential execution (original path)
       for (const profile of executionOrder) {
+        options.onProgress?.({
+          completed: completedProfiles,
+          total: totalProfiles,
+          profileId: profile.id,
+          profileName: profile.name,
+          status: 'start',
+        });
         try {
           const context = this.profileManager.createExecutionContext(profile.id);
           if (!context) continue;
@@ -202,13 +211,42 @@ export class HauntViewEngine {
           }
 
           this.profileManager.recordExecution(profile.id, result.duration);
+          completedProfiles++;
+          options.onProgress?.({
+            completed: completedProfiles,
+            total: totalProfiles,
+            profileId: profile.id,
+            profileName: profile.name,
+            durationMs: result.duration,
+            status: result.success ? 'done' : 'fail',
+            findingsCount: result.findings.length,
+          });
         } catch (error) {
           console.error(`Error executing profile ${profile.id}:`, error);
+          completedProfiles++;
+          options.onProgress?.({
+            completed: completedProfiles,
+            total: totalProfiles,
+            profileId: profile.id,
+            profileName: profile.name,
+            durationMs: 0,
+            status: 'fail',
+            findingsCount: 0,
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
     } else {
       // Concurrent execution with bounded pool and deterministic result ordering
       const tasks = executionOrder.map((profile) => async () => {
+        options.onProgress?.({
+          completed: completedProfiles,
+          total: totalProfiles,
+          profileId: profile.id,
+          profileName: profile.name,
+          status: 'start',
+        });
+
         const context = this.profileManager.createExecutionContext(profile.id);
         if (!context) return null;
 
@@ -221,6 +259,16 @@ export class HauntViewEngine {
         }
 
         this.profileManager.recordExecution(profile.id, result.duration);
+        completedProfiles++;
+        options.onProgress?.({
+          completed: completedProfiles,
+          total: totalProfiles,
+          profileId: profile.id,
+          profileName: profile.name,
+          durationMs: result.duration,
+          status: result.success ? 'done' : 'fail',
+          findingsCount: result.findings.length,
+        });
         return result;
       });
 
@@ -228,6 +276,17 @@ export class HauntViewEngine {
         onFailure: (index, error) => {
           const profile = executionOrder[index];
           console.error(`Error executing profile ${profile.id}:`, error);
+          completedProfiles++;
+          options.onProgress?.({
+            completed: completedProfiles,
+            total: totalProfiles,
+            profileId: profile.id,
+            profileName: profile.name,
+            durationMs: 0,
+            status: 'fail',
+            findingsCount: 0,
+            error: error instanceof Error ? error.message : String(error),
+          });
           const failedResult: ProfileResult = {
             profileId: profile.id,
             profileName: profile.name,

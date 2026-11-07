@@ -9,6 +9,7 @@ import { ScreenshotManager } from '../core/screenshot-manager';
 import { sanitizeUntrusted } from '../types/contracts';
 import { buildFinding } from '../types/finding-utils';
 import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
+import { navigateResilient } from './navigation';
 
 const PAYMENT_AUTOCOMPLETE = new Set(['payment', 'cc-number', 'cc-csc', 'cc-exp', 'cc-name']);
 
@@ -65,7 +66,7 @@ export class FormResilienceProfile {
     const page = await context.newPage();
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       // Collect form outer HTML for payment-field detection (evaluate in page)
       const formData = await page.evaluate(() => {

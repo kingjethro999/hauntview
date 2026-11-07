@@ -8,6 +8,7 @@ import { ScreenshotManager } from '../core/screenshot-manager';
 import { sanitizeUntrusted } from '../types/contracts';
 import { buildFinding } from '../types/finding-utils';
 import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
+import { navigateResilient } from './navigation';
 
 export class NetworkResilienceProfile {
   private profileId: string;
@@ -47,7 +48,7 @@ export class NetworkResilienceProfile {
           baselineApiUrls.push(req.url());
         }
       });
-      await baselinePage.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(baselinePage, url);
     } finally {
       await baselineContext.close();
     }
@@ -94,7 +95,7 @@ export class NetworkResilienceProfile {
         }
       });
 
-      await failPage.goto(url, { waitUntil: 'networkidle', timeout: 30000 }).catch(() => {
+      await navigateResilient(failPage, url).catch(() => {
         // navigation errors are noted via pageerror
       });
 

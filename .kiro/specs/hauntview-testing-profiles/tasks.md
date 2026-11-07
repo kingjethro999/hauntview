@@ -2,7 +2,7 @@
 
 ## Overview
 
-This implementation plan covers the complete development of HauntView's 16 automated testing profiles. The profiles are organized into 8 implementation phases, progressing from shared infrastructure through individual profile implementations, orchestration, and comprehensive testing. All code is implemented in TypeScript using Playwright for browser automation, with a focus on incremental validation and testability.
+This implementation plan covers the complete development of HauntView's 27 automated testing profiles. The profiles are organized into 8 implementation phases, progressing from shared infrastructure through individual profile implementations, orchestration, and comprehensive testing. All code is implemented in TypeScript using Playwright for browser automation, with a focus on incremental validation and testability.
 
 ---
 
@@ -1019,7 +1019,7 @@ This implementation plan covers the complete development of HauntView's 16 autom
 
 - [ ] 25.2 Implement profile registry
   - Create `getAvailableProfiles()` utility
-  - Return all 15 profiles in execution order
+  - Return all 27 profiles in execution order
   - Support profile filtering and selection
   - _Requirements: 16.0_
 

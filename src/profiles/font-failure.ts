@@ -7,6 +7,7 @@ import { Page } from 'playwright';
 import { sanitizeUntrusted } from '../types/contracts';
 import { buildFinding } from '../types/finding-utils';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 const FONT_URL_PATTERNS = [
   /\.woff2?(\?.*)?$/i,
@@ -54,7 +55,7 @@ export class FontFailureProfile {
       // Measure baseline scroll height before navigation
       const baselineHeight = 0; // no pre-nav baseline possible; compare post-nav
 
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       const postNavHeight = await page.evaluate(() => document.body.scrollHeight);
 

@@ -7,6 +7,7 @@ import { Page } from 'playwright';
 import { sanitizeUntrusted } from '../types/contracts';
 import { buildFinding } from '../types/finding-utils';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 interface HeaderRule {
   name: string;
@@ -96,7 +97,7 @@ export class SecurityHygieneProfile {
         }
       });
 
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       // Check each header rule
       for (const rule of HEADER_RULES) {

@@ -1,6 +1,6 @@
 {
   "name": "hauntview",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "type": "module",
   "description": "Local-first website resilience, accessibility, failure-mode and visual regression testing with Playwright and MCP.",
   "bin": {

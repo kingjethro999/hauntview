@@ -36,6 +36,7 @@ program
   .option('-c, --concurrency', 'Enable concurrent profile execution')
   .option('--no-concurrency', 'Force sequential profile execution')
   .option('-a, --concurrency-amount <n>', 'Maximum profiles running simultaneously (default: 2)')
+  .option('-i, --interactive', 'Prompt for output formats interactively')
   .option('-y, --yes', 'Non-interactive mode, skip prompts and use saved defaults')
   .action(async (url, options) => {
     if (!url) {

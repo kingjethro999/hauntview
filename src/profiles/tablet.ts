@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult, ProfileContext } from '../types';
+import { navigateResilient } from './navigation';
 
 export class TabletProfile {
   private profileId: string;
@@ -20,8 +21,7 @@ export class TabletProfile {
     const findings: Finding[] = [];
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForLoadState('domcontentloaded');
+      await navigateResilient(page, url);
 
       // Check for tablet-specific meta tags
       const viewportContent = await page.locator('meta[name="viewport"]').getAttribute('content');
