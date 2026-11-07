@@ -992,10 +992,13 @@ pnpm install
 # 3. Start local development server (Parlour UI at http://localhost:3000)
 pnpm dev
 
-# 4. Run test suites (27 suites, 108 tests)
+# 4. Run test suites (34 suites, 169 tests)
 pnpm test
 
-# 5. Run compliance presubmit checks
+# 5. Build CLI bundle
+pnpm run build:cli
+
+# 6. Run compliance presubmit checks
 pnpm run presubmit`}
               />
             </section>

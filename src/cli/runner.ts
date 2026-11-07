@@ -162,7 +162,6 @@ export async function runHaunt(targetUrl: string, options: CliRunOptions): Promi
       const generator = ReportFactory.createGenerator(fmt);
       const generated = await generator.generate(report, {
         format: fmt,
-        outputPath: '',
         includeScreenshots: true,
       });
 

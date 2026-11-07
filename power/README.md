@@ -27,7 +27,16 @@ Add the server entry to `.kiro/settings/mcp.json`:
 }
 ```
 
-### Method 3: Without Kiro
+### Method 3: Official CLI (`haunt`)
+
+Install globally via npm and run tests directly in your terminal or CI/CD pipelines:
+
+```bash
+npm install -g hauntview
+haunt http://localhost:3000
+```
+
+### Method 4: Local Web Dashboard
 
 Run the web dashboard locally:
 

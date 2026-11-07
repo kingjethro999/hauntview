@@ -4,7 +4,7 @@
 import { Command } from "commander";
 
 // src/version.ts
-var VERSION = "0.0.3";
+var VERSION = "0.0.4";
 
 // src/cli/runner.ts
 import * as fs7 from "fs";
@@ -7981,7 +7981,6 @@ async function runHaunt(targetUrl, options) {
       const generator = ReportFactory.createGenerator(fmt);
       const generated = await generator.generate(report, {
         format: fmt,
-        outputPath: "",
         includeScreenshots: true
       });
       const ext = fmt === "markdown" ? "md" : fmt;

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "hauntview",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Rehearse failure conditions against a website (mobile layout, blocked images and fonts, no JavaScript, offline, broken links, accessibility) and read evidence-backed findings.",
   "author": {
     "name": "HauntView",
