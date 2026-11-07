@@ -1,4 +1,5 @@
 import React from 'react';
+import { VERSION } from '../../../src/version';
 
 export function Footer() {
   return (
@@ -23,7 +24,7 @@ export function Footer() {
             <span>Kiroween 2026 Hackathon</span>
             <span>·</span>
             <span className="font-mono text-xs text-[var(--pumpkin-fire)]">
-              {process.env.NEXT_PUBLIC_APP_VERSION || 'v0.0.3'}
+              {process.env.NEXT_PUBLIC_APP_VERSION || `v${VERSION}`}
             </span>
           </div>
           <div className="text-xs" style={{ color: 'var(--phantom-gray)' }}>
