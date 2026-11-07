@@ -17,6 +17,7 @@ import {
   ProfileContext,
 } from './types';
 import { ReportFactory } from './reports/factory';
+import { resolveConcurrency, executeWithConcurrency } from './core/concurrency-resolver';
 import { MobileProfile } from './profiles/mobile';
 import { DesktopProfile } from './profiles/desktop';
 import { Desktop4KProfile } from './profiles/desktop-4k';
@@ -63,6 +64,7 @@ export class HauntViewEngine {
   private classifier: FindingClassifier;
   private screenshotManager: ScreenshotManager;
   private browsers: Map<string, Browser> = new Map();
+  private browserLaunchPromises: Map<string, Promise<Browser>> = new Map();
 
   constructor() {
     this.profileManager = new ProfileManager();
@@ -73,6 +75,63 @@ export class HauntViewEngine {
     });
     this.classifier = new FindingClassifier();
     this.screenshotManager = new ScreenshotManager('.hauntview/screenshots');
+  }
+
+  /**
+   * Thread-safe browser launcher/acquirer to avoid race conditions during concurrent runs
+   */
+  private async getOrLaunchBrowser(browserType: string): Promise<Browser> {
+    const existing = this.browsers.get(browserType);
+    if (existing && existing.isConnected()) {
+      return existing;
+    }
+
+    if (this.browserLaunchPromises.has(browserType)) {
+      return this.browserLaunchPromises.get(browserType)!;
+    }
+
+    const launchPromise = (async () => {
+      let launchedBrowser: Browser;
+      if (browserType === 'firefox') {
+        try {
+          launchedBrowser = await firefox.launch({ headless: true });
+        } catch {
+          const options = await getChromiumLaunchOptions();
+          launchedBrowser = await chromium.launch({
+            headless: true,
+            executablePath: options.executablePath,
+            args: options.args,
+          });
+        }
+      } else if (browserType === 'webkit') {
+        try {
+          launchedBrowser = await webkit.launch({ headless: true });
+        } catch {
+          const options = await getChromiumLaunchOptions();
+          launchedBrowser = await chromium.launch({
+            headless: true,
+            executablePath: options.executablePath,
+            args: options.args,
+          });
+        }
+      } else {
+        const options = await getChromiumLaunchOptions();
+        launchedBrowser = await chromium.launch({
+          headless: true,
+          executablePath: options.executablePath,
+          args: options.args,
+        });
+      }
+
+      this.browsers.set(browserType, launchedBrowser);
+      this.browserPool.registerBrowser(browserType, launchedBrowser);
+      return launchedBrowser;
+    })().finally(() => {
+      this.browserLaunchPromises.delete(browserType);
+    });
+
+    this.browserLaunchPromises.set(browserType, launchPromise);
+    return launchPromise;
   }
 
   /**
@@ -98,18 +157,46 @@ export class HauntViewEngine {
       executionOrder = executionOrder.filter((p) => options.profiles!.includes(p.id));
     }
 
+    // Resolve concurrency settings & apply hosted guards
+    const resolved = resolveConcurrency(options);
+    if (resolved.downgradedDueToHosted) {
+      console.warn(
+        '[engine] Hosted environment detected (Render / HAUNT_HOSTED); concurrency was requested but downgraded to sequential to protect host resources.'
+      );
+    }
+
     const profileResults: ProfileResult[] = [];
 
-    // Execute profiles (can be parallelized with concurrency control)
-    for (const profile of executionOrder) {
-      try {
+    if (!resolved.concurrency || resolved.concurrencyAmount <= 1) {
+      // Sequential execution (original path)
+      for (const profile of executionOrder) {
+        try {
+          const context = this.profileManager.createExecutionContext(profile.id);
+          if (!context) continue;
+
+          const result = await this.executeProfile(profile.id, options.url, context);
+          profileResults.push(result);
+
+          // Classify findings
+          for (const finding of result.findings) {
+            const classified = await this.classifier.classify(finding);
+            finding.canonicalHash = classified.canonical.canonicalHash;
+            finding.isClassified = true;
+          }
+
+          this.profileManager.recordExecution(profile.id, result.duration);
+        } catch (error) {
+          console.error(`Error executing profile ${profile.id}:`, error);
+        }
+      }
+    } else {
+      // Concurrent execution with bounded pool and deterministic result ordering
+      const tasks = executionOrder.map((profile) => async () => {
         const context = this.profileManager.createExecutionContext(profile.id);
-        if (!context) continue;
+        if (!context) return null;
 
         const result = await this.executeProfile(profile.id, options.url, context);
-        profileResults.push(result);
 
-        // Classify findings
         for (const finding of result.findings) {
           const classified = await this.classifier.classify(finding);
           finding.canonicalHash = classified.canonical.canonicalHash;
@@ -117,8 +204,40 @@ export class HauntViewEngine {
         }
 
         this.profileManager.recordExecution(profile.id, result.duration);
-      } catch (error) {
-        console.error(`Error executing profile ${profile.id}:`, error);
+        return result;
+      });
+
+      const rawResults = await executeWithConcurrency(tasks, resolved.concurrencyAmount, {
+        onFailure: (index, error) => {
+          const profile = executionOrder[index];
+          console.error(`Error executing profile ${profile.id}:`, error);
+          const failedResult: ProfileResult = {
+            profileId: profile.id,
+            profileName: profile.name,
+            success: false,
+            startTime: Date.now(),
+            endTime: Date.now(),
+            duration: 0,
+            findings: [],
+            screenshots: [],
+            error: {
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+            },
+            metadata: {
+              browserEngine: 'playwright',
+              browserVersion: 'unknown',
+              nodeVersion: process.version,
+            },
+          };
+          return failedResult;
+        },
+      });
+
+      for (const res of rawResults) {
+        if (res) {
+          profileResults.push(res);
+        }
       }
     }
 
@@ -151,41 +270,7 @@ export class HauntViewEngine {
       browserType = 'firefox';
     }
 
-    let browser = this.browsers.get(browserType);
-    if (!browser || !browser.isConnected()) {
-      if (browserType === 'firefox') {
-        try {
-          browser = await firefox.launch({ headless: true });
-        } catch {
-          const options = await getChromiumLaunchOptions();
-          browser = await chromium.launch({
-            headless: true,
-            executablePath: options.executablePath,
-            args: options.args,
-          });
-        }
-      } else if (browserType === 'webkit') {
-        try {
-          browser = await webkit.launch({ headless: true });
-        } catch {
-          const options = await getChromiumLaunchOptions();
-          browser = await chromium.launch({
-            headless: true,
-            executablePath: options.executablePath,
-            args: options.args,
-          });
-        }
-      } else {
-        const options = await getChromiumLaunchOptions();
-        browser = await chromium.launch({
-          headless: true,
-          executablePath: options.executablePath,
-          args: options.args,
-        });
-      }
-      this.browsers.set(browserType, browser);
-      this.browserPool.registerBrowser(browserType, browser);
-    }
+    const browser = await this.getOrLaunchBrowser(browserType);
 
     const page = await this.browserPool.acquirePage(browserType, context, browser);
 

@@ -38,7 +38,7 @@ const asyncConfig = createJestConfig(customJestConfig);
 const jestConfig = async () => {
   const config = await asyncConfig();
   config.transformIgnorePatterns = [
-    'node_modules/(?!(\\.pnpm|pixelmatch)/)',
+    'node_modules/(?!(\\.pnpm|pixelmatch|p-limit|yocto-queue)/)',
     '^.+\\.module\\.(css|sass|scss)$',
   ];
   return config;

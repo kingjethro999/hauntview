@@ -225,3 +225,14 @@ export interface HauntRun {
   /** Run-level failure — plain language, present only when status === 'failed'. */
   failure?: { code: string; message: string; hint: string };
 }
+
+// ---------------------------------------------------------------------------
+// Concurrency Options (Phase 1)
+// ---------------------------------------------------------------------------
+
+export const ConcurrencyOptionsSchema = z.object({
+  concurrency: z.boolean().default(false),
+  concurrencyAmount: z.number().int().min(1).default(2),
+});
+
+export type ConcurrencyOptions = z.infer<typeof ConcurrencyOptionsSchema>;

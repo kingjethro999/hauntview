@@ -159,6 +159,8 @@ export interface TestExecutionOptions {
   strictMode?: boolean;
   timeout?: number;
   headless?: boolean;
+  concurrency?: boolean;
+  concurrencyAmount?: number;
 }
 
 /**
