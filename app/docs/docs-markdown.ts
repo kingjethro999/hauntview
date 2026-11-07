@@ -1,168 +1,214 @@
 /**
- * Full Markdown export of the HauntView Developer Manual
- * Used by the "Copy page as Markdown" button for instant LLM context ingestion.
+ * app/docs/docs-markdown.ts
+ *
+ * Full Markdown export of the HauntView Developer Manual.
+ * Used by the "Copy page as Markdown" button for instant LLM and agent context ingestion.
  */
 
-export const HAUNTVIEW_DOCS_MARKDOWN = `# HauntView Developer Manual (Kiro Hackathon Project)
+import { VERSION } from '../../src/version';
+
+export const HAUNTVIEW_DOCS_MARKDOWN = `# HauntView Developer Manual (v${VERSION})
 
 > Deterministic failure-mode resilience, accessibility, and visual chaos testing engine with Model Context Protocol (MCP) and CLI integration.
-> Built for Kiro Hackathon · Primary Support for Kiro IDE & Kiro Powers.
+> Primary Support for Kiro IDE, Kiro Powers, and Terminal/CI Workflows.
 > Hosted Service: https://hauntview.onrender.com
 > GitHub: https://github.com/kingjethro999/hauntview
+> NPM Package: https://www.npmjs.com/package/hauntview
 > Protocol Version: Model Context Protocol (MCP) 2024-11-05
 
 ---
 
 ## 1. Overview
 
-HauntView equips autonomous AI coding agents in Kiro and terminal users with deterministic failure-mode resilience testing, responsive viewport audits, and accessibility defect detection across 25 automated testing profiles.
+HauntView photographs your website under 29 automated test profiles covering device compatibility, resilience, accessibility, internationalization, browser engines, performance, and environmental fault injection.
+
+Every finding carries empirical proof: DOM snippets, bounding boxes, console logs, or pixelmatch visual diff plates. HauntView refuses to flag any defect it cannot prove.
 
 ---
 
-## 2. Command-Line Interface (\`haunt\`)
+## 2. Command-Line Interface (\`haunt\` / \`hauntview\`)
 
-HauntView includes a standalone CLI compiled for Node 22:
+HauntView provides an official, zero-dependency command-line interface:
 
 \`\`\`bash
-# 1. Install globally via npm
+# Install globally via npm
 npm install -g hauntview
 
-# 2. Run testing rites against any target URL
-haunt https://example.com
+# Or run instantly with npx (zero permanent installation)
+npx hauntview https://example.com
+\`\`\`
 
-# 3. Configure default export formats, target directories, and concurrency
+### 2.1 Basic Execution
+
+\`\`\`bash
+# Run all 29 test rites against any target URL
+haunt http://localhost:3000
+haunt https://example.com
+\`\`\`
+
+### 2.2 Direct Profile Flags & Targeted Runs
+
+Run 1, 2, or 3 specific profiles directly without needing profile IDs or configuration:
+
+\`\`\`bash
+# Run specific profiles via direct flags
+haunt http://localhost:3000 --mobile --desktop --offline --broken-links
+
+# Run fault injection profiles
+haunt https://example.com --image-failure --font-failure --js-disabled
+
+# Run security and performance audits
+haunt https://example.com --performance --security-hygiene
+\`\`\`
+
+### 2.3 Category Shortcut Flags
+
+Run entire categories of tests with a single flag:
+
+| Shortcut Flag | Description | Included Profiles |
+| :--- | :--- | :--- |
+| \`--a11y\`, \`--accessibility\` | All accessibility audits | \`a11y-screenreader\`, \`a11y-keyboard\`, \`a11y-visual\`, \`a11y-cognitive\` |
+| \`--resilience\` | Resilience and degradation rites | \`offline\`, \`broken-links\`, \`network-resilience\`, \`form-resilience\` |
+| \`--devices\` | Responsive viewports | \`mobile\`, \`tablet\`, \`desktop\`, \`mobile-iphone15\`, \`mobile-android\`, \`tablet-ipad\`, \`desktop-1080p\`, \`desktop-4k\` |
+| \`--browsers\` | Browser engine compatibility | \`browser-webkit\`, \`browser-firefox\`, \`browser-edge\`, \`browser-legacy\` |
+| \`--i18n\` | Internationalization rites | \`i18n-rtl\`, \`i18n-cjk\`, \`i18n-mixed\` |
+| \`--faults\` | Environmental fault injection | \`image-failure\`, \`font-failure\`, \`js-disabled\`, \`reduced-motion\` |
+
+\`\`\`bash
+# Examples:
+haunt https://example.com --a11y
+haunt https://example.com --resilience
+haunt https://example.com --browsers
+\`\`\`
+
+### 2.4 Tag-Based Filtering
+
+\`\`\`bash
+# Comma-separated tags or profile IDs
+haunt https://example.com --tag mobile,resilience
+haunt https://example.com --tags devices,faults
+\`\`\`
+
+### 2.5 Non-Interactive & CI/CD Pipeline Automation
+
+\`\`\`bash
+haunt https://example.com \\
+  --output zip,html \\
+  --out-dir ./reports \\
+  --concurrency \\
+  --concurrency-amount 2 \\
+  --yes
+\`\`\`
+
+#### CLI Flags Reference
+
+| Flag | Short | Description | Default |
+| :--- | :--- | :--- | :--- |
+| \`--output <formats>\` | \`-o\` | Comma-separated formats (\`zip\`, \`html\`, \`md\`, \`json\`) | From saved config (\`zip,html\`) |
+| \`--out-dir <path>\` | \`-d\` | Destination directory (\`.\`, \`~\`, or absolute path) | From saved config (\`.\`) |
+| \`--profiles <ids>\` | \`-p\` | Comma-separated profile IDs to execute | All 29 profiles |
+| \`--concurrency\` | \`-c\` | Enable concurrent profile execution | From saved config |
+| \`--no-concurrency\` | | Force sequential profile execution | False |
+| \`--concurrency-amount <n>\` | \`-a\` | Worker pool concurrency limit | From saved config (\`2\`) |
+| \`--interactive\` | \`-i\` | Prompt for output formats interactively | False |
+| \`--yes\` | \`-y\` | Non-interactive mode, skip prompts | False |
+
+### 2.6 CLI Setup & Diagnostics
+
+\`\`\`bash
+# Interactive setup wizard to configure defaults
 haunt setup
 
-# 4. Diagnose environment, browser installations, and system capabilities
+# View currently saved configuration
+haunt setup --show
+
+# Reset configuration to factory defaults
+haunt setup --reset
+
+# System diagnostics (Node version, browsers, hardware capability)
 haunt doctor
+
+# Self-update to the latest version on npm
+haunt self-update
+# (Aliases: haunt update, haunt upgrade)
 \`\`\`
 
-### Non-Interactive / CI Flags
-\`\`\`bash
-haunt https://example.com --output zip,html --out-dir ./reports --concurrency -a 2 --yes
-\`\`\`
+### 2.7 Exit Codes
 
-- Exit code \`0\`: clean or warning/info findings only.
-- Exit code \`1\`: one or more \`error\` findings detected (ideal for CI test gates).
-- Exit code \`2\`: runtime or configuration error.
+- **\`0\`**: Success. All requested profiles executed and zero error-severity findings were discovered.
+- **\`1\`**: Test failure. One or more error-severity findings were discovered (ideal for CI test gates).
+- **\`2\`**: Fatal error. URL safety violation, unhandled exception, or missing permissions.
 
 ---
 
-## 3. Kiro Integration (Primary)
+## 3. The 29 Testing Profiles
 
-### Option A: Kiro IDE via Remote Endpoint (\`.kiro/settings/mcp.json\`)
-Zero-install setup. Direct connection to the hosted engine on Render:
+### Device Compatibility (8 Profiles)
+- **\`mobile\`**: Canonical mobile viewport (390×844, 48px touch target validation).
+- **\`desktop\`**: Canonical desktop viewport (1280×800).
+- **\`tablet\`**: Canonical tablet viewport (820×1180, 44px touch target validation).
+- **\`mobile-iphone15\`**: Apple iPhone 15 Pro (390×844 @3x DPR).
+- **\`mobile-android\`**: Samsung Galaxy S23 (360×800 @2x DPR).
+- **\`tablet-ipad\`**: Apple iPad Pro 12.9" (1024×1366 @2x DPR).
+- **\`desktop-1080p\`**: Standard 1080p Full HD viewport (1920×1080).
+- **\`desktop-4k\`**: High-resolution 4K UHD viewport (3840×2160).
 
-\`\`\`json
-{
-  "mcpServers": {
-    "hauntview": {
-      "url": "https://hauntview.onrender.com/api/mcp"
-    }
-  }
-}
-\`\`\`
+### Resilience & Fault Tolerance (4 Profiles)
+- **\`offline\`**: Loads page, severs network, inspects service worker and offline fallback.
+- **\`broken-links\`**: Crawls same-origin anchor hrefs (cap 100) for 404/410/5xx status codes.
+- **\`network-resilience\`**: Aborts all fetch and XHR requests; verifies page degrades gracefully.
+- **\`form-resilience\`**: Submits empty and invalid forms; checks for visible validation feedback.
 
-### Option B: Kiro IDE via Local Stdio Subprocess (\`.kiro/settings/mcp.json\`)
-Runs a local Node.js process with zero web bloat:
+### Accessibility Standards (4 Profiles)
+- **\`a11y-visual\`**: Evaluates color contrast (WCAG AA 4.5:1) with recursive alpha compositing.
+- **\`a11y-keyboard\`**: Validates tab sequence, visible focus rings, and detects focus traps.
+- **\`a11y-screenreader\`**: Audits ARIA roles, skip-to-main content links, and heading hierarchies.
+- **\`a11y-cognitive\`**: Checks reading complexity, visual clutter, and motion thresholds.
 
-\`\`\`json
-{
-  "mcpServers": {
-    "hauntview": {
-      "command": "node",
-      "args": ["--import", "tsx/esm", "src/mcp/server.ts"],
-      "env": {
-        "HAUNT_API_URL": "https://hauntview.onrender.com",
-        "NODE_ENV": "development"
-      }
-    }
-  }
-}
-\`\`\`
+### Internationalization (3 Profiles)
+- **\`i18n-rtl\`**: Right-to-Left Arabic (ar-SA) layout, mirrored navigation, and numeral formats.
+- **\`i18n-cjk\`**: Japanese (ja-JP) CJK font stack rendering and word-break boundary behavior.
+- **\`i18n-mixed\`**: Mixed script support (Hindi Devanagari + Latin numerals and punctuation).
+
+### Browser Engines (4 Profiles)
+- **\`browser-webkit\`**: Safari / WebKit engine compatibility.
+- **\`browser-firefox\`**: Mozilla Firefox Gecko engine rendering.
+- **\`browser-edge\`**: Microsoft Edge Chromium compatibility.
+- **\`browser-legacy\`**: Legacy browser CSS Custom Properties and Grid fallbacks.
+
+### Performance & Security (2 Profiles)
+- **\`performance\`**: Core Web Vitals (FCP < 1.8s, LCP < 2.5s, CLS < 0.1) and render-blocking scripts.
+- **\`security-hygiene\`**: HTTP headers audit (CSP, HSTS, X-Frame-Options, X-Content-Type-Options).
+
+### Environmental Chaos (4 Profiles)
+- **\`image-failure\`**: Blocks 100% of image requests; checks for missing alt attributes and layout shift.
+- **\`font-failure\`**: Blocks 100% of web fonts; verifies fallback font substitution and FOUT/FOIT.
+- **\`js-disabled\`**: Completely disables JavaScript execution; verifies meaningful content and <noscript>.
+- **\`reduced-motion\`**: Sets prefers-reduced-motion: reduce; flags unhalted CSS/JS animations.
 
 ---
 
-## 4. Installing as a Kiro Power
+## 4. Kiro Integration (Primary IDE)
 
-HauntView ships a fully packaged Kiro Power in the \`power/\` directory:
-
-1. Open Kiro IDE and navigate to the **Powers** panel.
-2. Click **Import Power from GitHub**.
-3. Enter repository URL: \`https://github.com/kingjethro999/hauntview\`
-4. Click **Install**.
+### 4.1 Option A: Install as a Kiro Power (Recommended)
+1. In Kiro IDE, open the **Powers** sidebar and click **Add Custom Power**.
+2. Select **Import power from GitHub**.
+3. Paste repository URL: \`https://github.com/kingjethro999/hauntview\`
+4. Confirm installation.
 
 ### Included Kiro Agent Skills:
-- **\`haunt-a-website\`**: Scans target website across failure profiles and returns structured defect plates.
-- **\`exorcise-findings\`**: Reads diagnostic findings, inspects source code, and applies patches to fix root causes.
-- **\`setup\`**: Verifies local environment, dependencies, and configuration.
+- **\`haunt-a-website\`**: Automatically activated when asking Kiro to test a website or check for failure modes.
+- **\`exorcise-findings\`**: Automatically activated when asking Kiro to fix or patch findings discovered in reports.
+- **\`setup\`**: Configures environment, Playwright browsers, and local defaults.
 
-### Included Kiro Hooks:
-- **\`spec-to-code-quality-gate.json\`**: Blocks spec completion until HauntView passes without critical omens.
-- **\`run-tests-on-task-completion.json\`**: Automatically audits the application whenever a task completes.
-- **\`format-lint-on-save.json\`**: Automatically runs linters on modified files.
-
----
-
-## 5. Profile Concurrency & Hardware Limits
-
-HauntView features an opt-in bounded worker pool for parallel rite execution:
-- **Sequential:** ~70–80 seconds for 25 profiles.
-- **Concurrent:** ~25–30 seconds with 2–4 workers.
-
-### Hardware Capability Heuristic
-- \`cpuBound = floor(logicalCores / 2)\`
-- \`ramBound = floor(totalMemoryGb / 2)\`
-- \`maxConcurrency = min(cpuBound, ramBound, 8)\`
-- If \`maxConcurrency < 2\`, concurrency is disabled to prevent memory starvation and system freeze.
-
-### Hosted Environment Notice
-The hosted demo instance (\`hauntview.onrender.com\`) runs on 0.5 vCPU and 512 MB RAM. Concurrency is strictly disabled there to protect container stability. For concurrent testing, install the CLI (\`npm i -g hauntview\`) or run locally.
-
----
-
-## 6. Dual Storage Architecture
-
-- **Web UI:** History is persisted per browser in \`localStorage\` via Zustand (\`crypt-store.ts\`). This ensures complete privacy on public/shared instances with zero cross-tenant leakage. Reports rehydrate on server restart. A "Clear History" button purges local state.
-- **Headless (CLI/MCP/REST):** Stored in server-side SQLite at \`.hauntview/data/hauntview.db\`. CLI exports standalone Zip, HTML, and Markdown bundles directly to disk.
-
----
-
-## 7. Other AI Coding Agents
-
-### Claude Code CLI
-\`\`\`bash
-claude mcp add --transport sse hauntview https://hauntview.onrender.com/api/mcp
-\`\`\`
-
-### Cursor (\`.cursor/mcp.json\` or \`~/.cursor/mcp.json\`)
+### 4.2 Option B: Workspace MCP Configuration (\`.kiro/settings/mcp.json\`)
 \`\`\`json
 {
   "mcpServers": {
     "hauntview": {
-      "url": "https://hauntview.onrender.com/api/mcp"
-    }
-  }
-}
-\`\`\`
-
-### Windsurf (\`~/.codeium/windsurf/mcp_config.json\`)
-\`\`\`json
-{
-  "mcpServers": {
-    "hauntview": {
-      "serverUrl": "https://hauntview.onrender.com/api/mcp"
-    }
-  }
-}
-\`\`\`
-
-### VS Code (\`.vscode/mcp.json\`)
-\`\`\`json
-{
-  "servers": {
-    "hauntview": {
-      "url": "https://hauntview.onrender.com/api/mcp"
+      "command": "pnpm",
+      "args": ["mcp"],
+      "disabled": false
     }
   }
 }
@@ -170,20 +216,20 @@ claude mcp add --transport sse hauntview https://hauntview.onrender.com/api/mcp
 
 ---
 
-## 8. MCP Tools Reference
+## 5. Model Context Protocol Tools Reference
 
-| Tool Name | Arguments | Description |
-| :--- | :--- | :--- |
-| \`list-test-profiles\` | *(none)* | Returns all 25 supported failure-mode testing rites, viewports, and timeout settings. |
-| \`run-test-profile\` | \`url\` (string, req), \`profiles\` (array, opt), \`concurrency\` (bool, opt), \`concurrencyAmount\` (int, opt) | Drives headless browsers against target URL through selected rites. Returns run ID, duration, and structured findings. |
-| \`get-run-status\` | \`runId\` (string, req) | Returns real-time execution progress, status, and severity counters for an active or completed run. |
-| \`get-latest-report\` | *(none)* | Retrieves structured JSON report and findings from the most recent test run. |
-| \`compare-runs\` | \`runId1\` (string, req), \`runId2\` (string, req) | Performs differential regression analysis: detects new omens, persistent bugs, and resolved defects. |
-| \`export-report\` | \`runId\` (string, req), \`format\` ('html' \| 'markdown' \| 'json') | Exports report as interactive HTML Grimoire, clean Markdown, or raw JSON. |
+HauntView registers 6 tools on the MCP server:
+
+1. **\`list-test-profiles\`**: Returns all 29 testing profiles, viewports, and timeout matrices.
+2. **\`run-test-profile\`**: Executes testing profiles against a URL. Arguments: \`url\` (required), \`profileId\` (optional).
+3. **\`get-run-status\`**: Checks execution progress and severity counters for an active or completed run.
+4. **\`get-latest-report\`**: Retrieves the full structured JSON report from the most recent run.
+5. **\`compare-runs\`**: Computes visual and finding regressions between two runs (\`runId1\`, \`runId2\`).
+6. **\`export-report\`**: Generates HTML Grimoire, Markdown, or JSON export documents.
 
 ---
 
-## 9. Local Setup & Repository Development
+## 6. Local Development
 
 \`\`\`bash
 # 1. Clone repository
@@ -192,18 +238,18 @@ cd hauntview
 
 # 2. Install dependencies (Node 22 LTS + pnpm recommended)
 pnpm install
-pnpm run setup:hooks
 
-# 3. Start local development server (Parlour UI at http://localhost:3000)
+# 3. Start local development server (Victorian Parlour UI at http://localhost:3000)
 pnpm dev
 
-# 4. Run test suites (34 suites, 169 tests)
+# 4. Run test suites (39 Jest suites, 211 tests)
 pnpm test
 
-# 5. Build CLI executable
-pnpm run build:cli
+# 5. Build standalone CLI bundle
+node scripts/build-cli.mjs
 
-# 6. Run compliance presubmit checks
-pnpm run presubmit
+# 6. Typecheck and lint
+pnpm run typecheck
+pnpm run lint
 \`\`\`
 `;

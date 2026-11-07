@@ -7,7 +7,6 @@ import {
   SparklesIcon,
   CpuChipIcon,
   ServerStackIcon,
-  ClockIcon,
   ChevronRightIcon,
   CheckIcon,
   DocumentDuplicateIcon,
@@ -15,10 +14,15 @@ import {
   GlobeAltIcon,
   BoltIcon,
   CodeBracketIcon,
+  DevicePhoneMobileIcon,
+  WrenchScrewdriverIcon,
+  ShieldCheckIcon,
+  TagIcon,
 } from '@heroicons/react/24/outline';
 import { CodeBlock } from '../components/ui/CodeBlock';
 import { FloatingDraggableGhost } from '../components/features/FloatingDraggableGhost';
 import { HAUNTVIEW_DOCS_MARKDOWN } from './docs-markdown';
+import { VERSION } from '../../src/version';
 
 type ClientTab = 'kiro' | 'remote' | 'claude' | 'cursor' | 'windsurf' | 'vscode';
 
@@ -46,7 +50,16 @@ export default function ManualPage() {
         docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
       setScrollProgress(progress);
 
-      const sections = ['overview', 'clients', 'kiro-power', 'transports', 'tools', 'local-setup'];
+      const sections = [
+        'overview',
+        'cli',
+        'profiles',
+        'clients',
+        'kiro-power',
+        'transports',
+        'tools',
+        'local-setup',
+      ];
       const scrollPosition = window.scrollY + 160;
 
       for (const sectionId of sections) {
@@ -119,14 +132,28 @@ export default function ManualPage() {
                     <span>Overview</span>
                   </a>
                   <a
-                    href="#transports"
+                    href="#cli"
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
-                      activeSection === 'transports'
+                      activeSection === 'cli'
                         ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[var(--pumpkin-fire)]'
                         : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
-                    <span>Remote URL vs. Stdio</span>
+                    <CommandLineIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
+                    <span className="font-semibold text-[var(--bone-white)]">
+                      Official CLI (haunt)
+                    </span>
+                  </a>
+                  <a
+                    href="#profiles"
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      activeSection === 'profiles'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[var(--pumpkin-fire)]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
+                    }`}
+                  >
+                    <DevicePhoneMobileIcon className="w-3.5 h-3.5 text-[var(--ectoplasm-green)]" />
+                    <span>29 Testing Profiles</span>
                   </a>
                 </nav>
               </div>
@@ -219,7 +246,7 @@ export default function ManualPage() {
               {/* Navigation Group 3: Kiro Power & Reference */}
               <div>
                 <h4 className="text-[11px] font-mono uppercase tracking-wider text-[var(--ectoplasm-green)]/80 mb-2.5 font-semibold px-2">
-                  Kiro Power &amp; Reference
+                  Kiro Power &amp; Architecture
                 </h4>
                 <nav className="space-y-1">
                   <a
@@ -232,6 +259,16 @@ export default function ManualPage() {
                   >
                     <SparklesIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
                     <span className="text-[var(--bone-white)] font-semibold">Kiro Power Pack</span>
+                  </a>
+                  <a
+                    href="#transports"
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      activeSection === 'transports'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[var(--pumpkin-fire)]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
+                    }`}
+                  >
+                    <span>Remote URL vs. Stdio</span>
                   </a>
                   <a
                     href="#tools"
@@ -251,86 +288,78 @@ export default function ManualPage() {
                         : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
-                    <span>Local Self-Hosting</span>
+                    <span>Local Development Setup</span>
                   </a>
                 </nav>
               </div>
             </div>
 
-            {/* Quick Link Card in Sidebar */}
-            <div className="p-3.5 rounded-lg border border-[var(--tombstone-gray)]/40 bg-[#0d0714] text-xs space-y-2">
-              <div className="flex items-center justify-between text-[var(--grave-dust)]">
-                <span className="font-mono text-[11px] text-[var(--pumpkin-fire)]">
-                  Kiro Engine Live
-                </span>
-                <span className="inline-block w-2 h-2 rounded-full bg-[var(--ectoplasm-green)] animate-pulse" />
-              </div>
-              <p className="text-[11px] text-[#7a6a82] leading-relaxed">
-                Render deployment active with Sparticuz Chromium runtime.
-              </p>
+            {/* Quick Actions Panel in Sidebar */}
+            <div className="pt-4 border-t border-[var(--tombstone-gray)]/40 space-y-2">
+              <button
+                type="button"
+                onClick={handleCopyPageAsMd}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium bg-[#1e1329] text-[var(--bone-white)] border border-[rgba(255,121,31,0.25)] hover:border-[var(--pumpkin-fire)] hover:bg-[rgba(255,121,31,0.1)] transition-all shadow-sm"
+              >
+                {copiedMd ? (
+                  <>
+                    <CheckIcon className="w-4 h-4 text-[var(--ectoplasm-green)]" />
+                    <span className="text-[var(--ectoplasm-green)] font-semibold">
+                      Copied Markdown!
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <DocumentDuplicateIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
+                    <span>Copy docs as Markdown</span>
+                  </>
+                )}
+              </button>
+
               <Link
                 href="/"
-                className="inline-flex items-center gap-1 text-[11px] font-mono text-[var(--ectoplasm-green)] hover:underline"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs text-[#9c8ea3] hover:text-[var(--bone-white)] transition-colors"
               >
-                <span>Launch Parlour</span>
-                <ChevronRightIcon className="w-3 h-3" />
+                <span>Return to Parlour</span>
+                <ChevronRightIcon className="w-3.5 h-3.5" />
               </Link>
             </div>
           </aside>
 
           {/* ========================================================= */}
-          {/* MAIN DOCUMENTATION CONTENT                                */}
+          {/* MAIN ARTICLE CONTENT                                      */}
           {/* ========================================================= */}
-          <main className="flex-1 min-w-0 max-w-4xl space-y-16 pb-24">
-            {/* Top Breadcrumb & Actions Bar */}
-            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[var(--tombstone-gray)]/40">
-              <div className="flex items-center gap-2 text-xs text-[#7a6a82] font-mono">
-                <Link href="/" className="hover:text-[var(--pumpkin-fire)] transition-colors">
-                  HauntView
-                </Link>
-                <span>/</span>
-                <span className="text-[var(--grave-dust)]">Manual</span>
-                <span>/</span>
-                <span className="text-[var(--pumpkin-fire)]">Model Context Protocol</span>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* Reading time badge */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#120a1c] border border-[var(--tombstone-gray)]/50 text-xs text-[var(--grave-dust)] font-mono">
-                  <ClockIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
-                  <span>6 mins</span>
+          <main className="flex-1 min-w-0 space-y-12 pb-20">
+            {/* Header with Title and Metadata */}
+            <header className="space-y-4 pb-6 border-b border-[var(--tombstone-gray)]/40">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-2 text-xs text-[#7a6a82] font-mono">
+                  <span>Documentation</span>
+                  <span>/</span>
+                  <span className="text-[var(--pumpkin-fire)] font-medium">Developer Manual</span>
                 </div>
 
-                {/* "Copy page as Markdown" Button */}
-                <button
-                  type="button"
-                  onClick={handleCopyPageAsMd}
-                  aria-label="Copy entire manual as Markdown"
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-[var(--pumpkin-fire)]/40 bg-[var(--pumpkin-fire)]/10 hover:bg-[var(--pumpkin-fire)]/20 text-[var(--pumpkin-fire)] hover:text-[var(--bone-white)] text-xs font-mono transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(255,121,31,0.25)]"
-                >
-                  {copiedMd ? (
-                    <>
-                      <CheckIcon className="w-4 h-4 text-[var(--ectoplasm-green)]" />
-                      <span className="text-[var(--ectoplasm-green)] font-medium">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <DocumentDuplicateIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex items-center gap-2">
+                  <a
+                    href="https://www.npmjs.com/package/hauntview"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#cb3837]/15 border border-[#cb3837]/30 text-xs font-mono text-[#ff8b89] hover:bg-[#cb3837]/25 transition-colors"
+                  >
+                    <span>npm: hauntview@{VERSION}</span>
+                    <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
+                  </a>
 
-                {/* GitHub link */}
-                <a
-                  href="https://github.com/kingjethro999/hauntview"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-[var(--tombstone-gray)]/60 bg-[#120a1c] hover:bg-[#1a0f26] text-xs text-[var(--grave-dust)] hover:text-[var(--bone-white)] font-mono transition-all"
-                >
-                  <span>GitHub</span>
-                  <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
-                </a>
+                  <a
+                    href="https://github.com/kingjethro999/hauntview"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1e1329] border border-[var(--tombstone-gray)]/40 text-xs font-mono text-[var(--spirit-smoke)] hover:text-[var(--bone-white)] hover:border-[var(--pumpkin-fire)] transition-colors"
+                  >
+                    <span>GitHub</span>
+                    <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
+                  </a>
+                </div>
               </div>
             </header>
 
@@ -340,7 +369,7 @@ export default function ManualPage() {
             <section id="overview" className="space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(255,121,31,0.12)] text-[var(--pumpkin-fire)] border border-[rgba(255,121,31,0.3)]">
-                  Kiro Hackathon Edition · v0.0.3
+                  HauntView v{VERSION}
                 </span>
                 <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(154,255,154,0.12)] text-[var(--ectoplasm-green)] border border-[rgba(154,255,154,0.3)]">
                   Hosted Service Active
@@ -355,15 +384,577 @@ export default function ManualPage() {
               </h1>
 
               <p className="text-sm sm:text-base text-[var(--grave-dust)] leading-relaxed max-w-3xl">
-                The authoritative manual for orchestrating HauntView across autonomous coding
-                agents. Built for the <strong>Kiro Hackathon</strong> to equip your{' '}
-                <strong>Kiro agents</strong> with deterministic resilience testing, responsive
-                viewport audits, and accessibility defect detection.
+                The authoritative manual for orchestrating HauntView across autonomous coding agents
+                and terminal workflows. Built for the <strong>Kiro Hackathon</strong> to equip your{' '}
+                <strong>Kiro agents</strong> with deterministic failure-mode resilience testing,
+                responsive viewport audits, and accessibility defect detection across{' '}
+                <strong>29 automated testing profiles</strong>.
               </p>
             </section>
 
             {/* ========================================================= */}
-            {/* SECTION 2: CLIENT CONFIGURATION TABS (KIRO FIRST)         */}
+            {/* SECTION 2: OFFICIAL CLI (haunt)                           */}
+            {/* ========================================================= */}
+            <section id="cli" className="space-y-6 pt-6 border-t border-[var(--tombstone-gray)]/40">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded bg-[var(--pumpkin-fire)]/15 text-[var(--pumpkin-fire)]">
+                  <CommandLineIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-[var(--bone-white)]">
+                    1. Command-Line Interface (
+                    <code className="text-[var(--pumpkin-fire)]">haunt</code>)
+                  </h2>
+                  <p className="text-xs text-[#7a6a82]">
+                    Official zero-dependency CLI compiled for Node 22 LTS or newer. Install globally
+                    or run instantly with npx.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="victorian-panel p-4 space-y-2">
+                  <span className="text-xs font-mono uppercase tracking-wider text-[var(--pumpkin-fire)] font-bold">
+                    Global Installation via npm
+                  </span>
+                  <CodeBlock
+                    title="Install Globally"
+                    language="bash"
+                    code="npm install -g hauntview"
+                  />
+                  <p className="text-xs text-[#9c8ea3]">
+                    Installs the <code className="text-[var(--bone-white)]">haunt</code> and{' '}
+                    <code className="text-[var(--bone-white)]">hauntview</code> commands to your
+                    system path.
+                  </p>
+                </div>
+
+                <div className="victorian-panel p-4 space-y-2">
+                  <span className="text-xs font-mono uppercase tracking-wider text-[var(--ectoplasm-green)] font-bold">
+                    Zero-Install Execution via npx
+                  </span>
+                  <CodeBlock
+                    title="Instant Run"
+                    language="bash"
+                    code="npx hauntview http://localhost:3000"
+                  />
+                  <p className="text-xs text-[#9c8ea3]">
+                    Runs the latest release directly without permanent machine modifications.
+                  </p>
+                </div>
+              </div>
+
+              {/* Direct Profile Flags & Targeted Runs */}
+              <div className="space-y-3 pt-2">
+                <h3 className="text-base font-semibold text-[var(--bone-white)] flex items-center gap-2">
+                  <TagIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
+                  <span>Direct Profile Flags &amp; Targeted Runs</span>
+                </h3>
+                <p className="text-xs text-[var(--grave-dust)] leading-relaxed">
+                  Want to run just 1, 2, or 3 profiles? You don&apos;t have to remember profile IDs
+                  or configure a JSON file. Pass direct flags right in the command line:
+                </p>
+
+                <CodeBlock
+                  title="Direct Flag Examples"
+                  language="bash"
+                  code={`# Run specific profiles directly via flags
+haunt http://localhost:3000 --mobile --desktop --offline --broken-links
+
+# Run fault injection profiles
+haunt https://example.com --image-failure --font-failure --js-disabled
+
+# Run security header audits and performance checks
+haunt https://example.com --performance --security-hygiene`}
+                />
+              </div>
+
+              {/* Category Shortcut Flags */}
+              <div className="space-y-3 pt-2">
+                <h3 className="text-base font-semibold text-[var(--bone-white)] flex items-center gap-2">
+                  <BoltIcon className="w-4 h-4 text-[#a855f7]" />
+                  <span>Category Shortcut Flags</span>
+                </h3>
+                <p className="text-xs text-[var(--grave-dust)] leading-relaxed">
+                  Run entire testing categories with a single shorthand flag:
+                </p>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-[var(--tombstone-gray)] text-[#9c8ea3]">
+                        <th className="py-2.5 px-3 font-mono font-medium">Shortcut Flag</th>
+                        <th className="py-2.5 px-3 font-medium">Category Description</th>
+                        <th className="py-2.5 px-3 font-mono">Included Profiles</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--tombstone-gray)]/30 text-[var(--spirit-smoke)]">
+                      <tr>
+                        <td className="py-2.5 px-3 font-mono text-[var(--pumpkin-fire)] font-bold">
+                          --a11y, --accessibility
+                        </td>
+                        <td className="py-2.5 px-3">All 4 accessibility audits</td>
+                        <td className="py-2.5 px-3 font-mono text-xs">
+                          screenreader, keyboard, visual, cognitive
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 px-3 font-mono text-[var(--pumpkin-fire)] font-bold">
+                          --resilience
+                        </td>
+                        <td className="py-2.5 px-3">Network &amp; fault resilience</td>
+                        <td className="py-2.5 px-3 font-mono text-xs">
+                          offline, broken-links, network-resilience, form-resilience
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 px-3 font-mono text-[var(--pumpkin-fire)] font-bold">
+                          --devices
+                        </td>
+                        <td className="py-2.5 px-3">Responsive device viewports</td>
+                        <td className="py-2.5 px-3 font-mono text-xs">
+                          mobile, tablet, desktop, iphone15, android, ipad, 1080p, 4k
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 px-3 font-mono text-[var(--pumpkin-fire)] font-bold">
+                          --browsers
+                        </td>
+                        <td className="py-2.5 px-3">Browser engine compatibility</td>
+                        <td className="py-2.5 px-3 font-mono text-xs">
+                          webkit, firefox, edge, legacy
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 px-3 font-mono text-[var(--pumpkin-fire)] font-bold">
+                          --i18n
+                        </td>
+                        <td className="py-2.5 px-3">Internationalization &amp; scripts</td>
+                        <td className="py-2.5 px-3 font-mono text-xs">
+                          i18n-rtl, i18n-cjk, i18n-mixed
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 px-3 font-mono text-[var(--pumpkin-fire)] font-bold">
+                          --faults
+                        </td>
+                        <td className="py-2.5 px-3">Environmental chaos faults</td>
+                        <td className="py-2.5 px-3 font-mono text-xs">
+                          image-failure, font-failure, js-disabled, reduced-motion
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <CodeBlock
+                  title="Category Shortcut Commands"
+                  language="bash"
+                  code={`# Run all accessibility audits
+haunt http://localhost:3000 --a11y
+
+# Run resilience and recovery rites
+haunt http://localhost:3000 --resilience
+
+# Run by tag or combine multiple tags
+haunt http://localhost:3000 --tag mobile,resilience
+haunt http://localhost:3000 --tags devices,faults`}
+                />
+              </div>
+
+              {/* CI/CD & Automation Options */}
+              <div className="space-y-3 pt-2">
+                <h3 className="text-base font-semibold text-[var(--bone-white)] flex items-center gap-2">
+                  <ShieldCheckIcon className="w-4 h-4 text-[var(--ectoplasm-green)]" />
+                  <span>CI/CD Pipeline Automation &amp; Flags</span>
+                </h3>
+
+                <CodeBlock
+                  title="CI/CD Pipeline Run"
+                  language="bash"
+                  code={`# Complete CI run with custom outputs, export directory, and concurrency
+haunt https://example.com \\
+  --output zip,html \\
+  --out-dir ./reports \\
+  --concurrency \\
+  --concurrency-amount 2 \\
+  --yes`}
+                />
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-[var(--tombstone-gray)] text-[#9c8ea3]">
+                        <th className="py-2.5 px-3 font-mono font-medium">Flag</th>
+                        <th className="py-2.5 px-3 font-mono font-medium">Short</th>
+                        <th className="py-2.5 px-3 font-medium">Description</th>
+                        <th className="py-2.5 px-3 font-mono">Default</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--tombstone-gray)]/30 text-[var(--spirit-smoke)]">
+                      <tr>
+                        <td className="py-2 px-3 font-mono text-[var(--bone-white)]">
+                          --output &lt;formats&gt;
+                        </td>
+                        <td className="py-2 px-3 font-mono text-[var(--pumpkin-fire)]">-o</td>
+                        <td className="py-2 px-3">
+                          Comma-separated output formats (
+                          <code className="font-mono text-xs">zip, html, md, json</code>)
+                        </td>
+                        <td className="py-2 px-3 font-mono text-xs">
+                          Saved config (<code className="text-[var(--pumpkin-fire)]">zip,html</code>
+                          )
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 px-3 font-mono text-[var(--bone-white)]">
+                          --out-dir &lt;path&gt;
+                        </td>
+                        <td className="py-2 px-3 font-mono text-[var(--pumpkin-fire)]">-d</td>
+                        <td className="py-2 px-3">
+                          Destination directory (supports{' '}
+                          <code className="font-mono text-xs">.</code>,{' '}
+                          <code className="font-mono text-xs">~</code>, or absolute path)
+                        </td>
+                        <td className="py-2 px-3 font-mono text-xs">
+                          Saved config (<code className="text-[var(--pumpkin-fire)]">.</code>)
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 px-3 font-mono text-[var(--bone-white)]">
+                          --concurrency
+                        </td>
+                        <td className="py-2 px-3 font-mono text-[var(--pumpkin-fire)]">-c</td>
+                        <td className="py-2 px-3">
+                          Enable parallel profile execution across browser pool
+                        </td>
+                        <td className="py-2 px-3 font-mono text-xs">
+                          Active by default if &gt;= 4 cores
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 px-3 font-mono text-[var(--bone-white)]">
+                          --concurrency-amount &lt;n&gt;
+                        </td>
+                        <td className="py-2 px-3 font-mono text-[var(--pumpkin-fire)]">-a</td>
+                        <td className="py-2 px-3">
+                          Worker pool concurrency limit (subject to hardware cap)
+                        </td>
+                        <td className="py-2 px-3 font-mono text-xs">2 (dynamic up to 4)</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 px-3 font-mono text-[var(--bone-white)]">--yes</td>
+                        <td className="py-2 px-3 font-mono text-[var(--pumpkin-fire)]">-y</td>
+                        <td className="py-2 px-3">
+                          Non-interactive mode, skip interactive prompts and accept saved defaults
+                        </td>
+                        <td className="py-2 px-3 font-mono text-xs">false</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Subcommands: Setup, Doctor, Self-Update */}
+              <div className="space-y-3 pt-2">
+                <h3 className="text-base font-semibold text-[var(--bone-white)] flex items-center gap-2">
+                  <WrenchScrewdriverIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
+                  <span>Built-in Utility Commands</span>
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="victorian-panel p-4 space-y-1.5">
+                    <span className="font-mono text-xs text-[var(--pumpkin-fire)] font-bold">
+                      haunt setup
+                    </span>
+                    <p className="text-xs text-[#9c8ea3]">
+                      Interactive wizard to configure global defaults (export formats, destination
+                      folder, concurrency pool size).
+                    </p>
+                    <code className="text-[11px] font-mono text-[var(--grave-dust)] block pt-1">
+                      --show · --reset
+                    </code>
+                  </div>
+
+                  <div className="victorian-panel p-4 space-y-1.5">
+                    <span className="font-mono text-xs text-[var(--ectoplasm-green)] font-bold">
+                      haunt doctor
+                    </span>
+                    <p className="text-xs text-[#9c8ea3]">
+                      Verifies system health: Node.js version, Playwright browser installations, and
+                      hardware capability heuristics.
+                    </p>
+                    <code className="text-[11px] font-mono text-[var(--grave-dust)] block pt-1">
+                      Hardware &amp; browser probe
+                    </code>
+                  </div>
+
+                  <div className="victorian-panel p-4 space-y-1.5">
+                    <span className="font-mono text-xs text-[#a855f7] font-bold">
+                      haunt self-update
+                    </span>
+                    <p className="text-xs text-[#9c8ea3]">
+                      Checks the npm registry and updates the global installation to the latest
+                      published release.
+                    </p>
+                    <code className="text-[11px] font-mono text-[var(--grave-dust)] block pt-1">
+                      Aliases: update, upgrade
+                    </code>
+                  </div>
+                </div>
+              </div>
+
+              {/* Predictable Exit Codes */}
+              <div className="victorian-panel p-4 space-y-2 border-l-2 border-l-[var(--pumpkin-fire)]">
+                <span className="text-xs font-mono uppercase tracking-wider text-[var(--pumpkin-fire)] font-bold">
+                  Predictable Exit Codes for Test Gates
+                </span>
+                <ul className="text-xs space-y-1 text-[var(--spirit-smoke)]">
+                  <li>
+                    <code className="font-mono font-bold text-[var(--ectoplasm-green)]">0</code> —{' '}
+                    <strong>Success:</strong> All requested profiles executed and zero
+                    error-severity findings were discovered (warnings or info suggestions may
+                    exist).
+                  </li>
+                  <li>
+                    <code className="font-mono font-bold text-[#ff4538]">1</code> —{' '}
+                    <strong>Test Failure:</strong> One or more error-severity defects were proven
+                    (ideal for CI test gates).
+                  </li>
+                  <li>
+                    <code className="font-mono font-bold text-[#eab308]">2</code> —{' '}
+                    <strong>Runtime Error:</strong> URL safety violation (private network IP
+                    blocked), unhandled exception, or missing permissions.
+                  </li>
+                </ul>
+              </div>
+            </section>
+
+            {/* ========================================================= */}
+            {/* SECTION 3: 29 TESTING PROFILES                            */}
+            {/* ========================================================= */}
+            <section
+              id="profiles"
+              className="space-y-6 pt-6 border-t border-[var(--tombstone-gray)]/40"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded bg-[var(--ectoplasm-green)]/15 text-[var(--ectoplasm-green)]">
+                  <DevicePhoneMobileIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-[var(--bone-white)]">
+                    2. The 29 Testing Profiles Reference
+                  </h2>
+                  <p className="text-xs text-[#7a6a82]">
+                    Exhaustive matrix of device viewports, accessibility standards,
+                    internationalization, performance, and chaos rites.
+                  </p>
+                </div>
+              </div>
+
+              {/* Profiles Categorized Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Category 1: Devices */}
+                <div className="victorian-panel p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--pumpkin-fire)]">
+                      Device Viewports (8 Profiles)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--pumpkin-fire)]/10 text-[var(--pumpkin-fire)] border border-[var(--pumpkin-fire)]/20">
+                      --devices
+                    </span>
+                  </div>
+                  <ul className="text-xs space-y-2 text-[var(--spirit-smoke)]">
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">mobile</code>: Canonical
+                      390×844 mobile viewport with 48px touch target enforcement.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">desktop</code>: Canonical
+                      1280×800 desktop standard viewport.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">tablet</code>: Canonical
+                      820×1180 tablet viewport with 44px Apple touch target minimum.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">mobile-iphone15</code>:
+                      Apple iPhone 15 Pro (390×844 @3x DPR).
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">mobile-android</code>:
+                      Samsung Galaxy S23 (360×800 @2x DPR).
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">tablet-ipad</code>: Apple
+                      iPad Pro 12.9&quot; (1024×1366 @2x DPR).
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">desktop-1080p</code>:
+                      Standard Full HD 1920×1080 desktop.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">desktop-4k</code>: Ultra
+                      HD 4K 3840×2160 high-resolution desktop.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Category 2: Resilience */}
+                <div className="victorian-panel p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--ectoplasm-green)]">
+                      Resilience &amp; Degradation (4 Profiles)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--ectoplasm-green)]/10 text-[var(--ectoplasm-green)] border border-[var(--ectoplasm-green)]/20">
+                      --resilience
+                    </span>
+                  </div>
+                  <ul className="text-xs space-y-2 text-[var(--spirit-smoke)]">
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">offline</code>: Loads
+                      page, severs all network connectivity, and checks for service worker caches.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">broken-links</code>:
+                      Crawls same-origin anchor hrefs (cap 100) flagging 404/410/5xx errors.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">network-resilience</code>
+                      : Aborts all XHR and fetch requests to verify graceful degradation.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">form-resilience</code>:
+                      Submits empty and invalid forms, verifying that visual feedback is shown.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Category 3: Accessibility */}
+                <div className="victorian-panel p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#a855f7]">
+                      Accessibility Standards (4 Profiles)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#a855f7]/10 text-[#a855f7] border border-[#a855f7]/20">
+                      --a11y
+                    </span>
+                  </div>
+                  <ul className="text-xs space-y-2 text-[var(--spirit-smoke)]">
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">a11y-visual</code>: Color
+                      contrast (WCAG AA 4.5:1) with recursive alpha compositing and gradient
+                      detection.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">a11y-keyboard</code>: Tab
+                      stop sequence, visible focus rings, and focus trap detection.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">a11y-screenreader</code>:
+                      ARIA roles, skip-to-main-content link, and heading outline hierarchy.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">a11y-cognitive</code>:
+                      Reading complexity, paragraph density, and motion thresholds.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Category 4: Internationalization */}
+                <div className="victorian-panel p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#60a5fa]">
+                      Internationalization (3 Profiles)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#60a5fa]/10 text-[#60a5fa] border border-[#60a5fa]/20">
+                      --i18n
+                    </span>
+                  </div>
+                  <ul className="text-xs space-y-2 text-[var(--spirit-smoke)]">
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">i18n-rtl</code>:
+                      Right-to-Left Arabic (ar-SA) layout, mirrored navigation, and numeral formats.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">i18n-cjk</code>: Japanese
+                      (ja-JP) CJK font stack rendering and word-break boundary wrapping.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">i18n-mixed</code>:
+                      Multi-script rendering (Hindi Devanagari mixed with Latin numerals).
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Category 5: Browser Engines */}
+                <div className="victorian-panel p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#f59e0b]">
+                      Browser Engines (4 Profiles)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/20">
+                      --browsers
+                    </span>
+                  </div>
+                  <ul className="text-xs space-y-2 text-[var(--spirit-smoke)]">
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">browser-webkit</code>{' '}
+                      (alias <code className="text-[var(--pumpkin-fire)]">--webkit</code>): Apple
+                      Safari / WebKit engine compatibility.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">browser-firefox</code>{' '}
+                      (alias <code className="text-[var(--pumpkin-fire)]">--firefox</code>): Mozilla
+                      Firefox Gecko engine rendering.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">browser-edge</code>{' '}
+                      (alias <code className="text-[var(--pumpkin-fire)]">--edge</code>): Microsoft
+                      Edge Chromium channel compatibility.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">browser-legacy</code>:
+                      Legacy CSS custom properties and Modern Grid fallback verification.
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Category 6: Environmental Fault Injection */}
+                <div className="victorian-panel p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#ec4899]">
+                      Environmental Faults &amp; Chaos (4 Profiles)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#ec4899]/10 text-[#ec4899] border border-[#ec4899]/20">
+                      --faults
+                    </span>
+                  </div>
+                  <ul className="text-xs space-y-2 text-[var(--spirit-smoke)]">
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">image-failure</code>:
+                      Blocks 100% of images; validates alt attributes and layout stability.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">font-failure</code>:
+                      Blocks 100% of web fonts; audits fallback font layout shift (CLS).
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">js-disabled</code>:
+                      Disables JavaScript execution; audits readable content &amp; &lt;noscript&gt;
+                      fallbacks.
+                    </li>
+                    <li>
+                      <code className="font-mono text-[var(--bone-white)]">reduced-motion</code>:
+                      Sets prefers-reduced-motion: reduce; checks for running CSS/JS animations.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            {/* ========================================================= */}
+            {/* SECTION 4: CLIENT CONFIGURATION TABS (KIRO FIRST)         */}
             {/* ========================================================= */}
             <section
               id="clients"
@@ -375,349 +966,225 @@ export default function ManualPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-[var(--bone-white)]">
-                    1. Client Integration Guides (Kiro First)
+                    3. Client Integration Guides (Kiro First)
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
-                    Connect your AI coding assistant to HauntView via the Model Context Protocol.
+                    Connect your autonomous AI coding agents to HauntView via Model Context Protocol
+                    (MCP).
                   </p>
                 </div>
               </div>
 
-              {/* Tabs navigation - KIRO FIRST */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-lg bg-[#0e0717] border border-[var(--tombstone-gray)]/50">
-                {/* 1. KIRO IDE (FIRST) */}
+              {/* Tabs Navigation */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[var(--tombstone-gray)]/40">
                 <button
                   type="button"
                   onClick={() => setActiveTab('kiro')}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                     activeTab === 'kiro'
-                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[var(--pumpkin-fire)]/50 text-[var(--pumpkin-fire)]'
-                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
+                      ? 'bg-[var(--pumpkin-fire)] text-[var(--midnight-veil)] shadow-[0_0_12px_rgba(255,121,31,0.4)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                   }`}
                 >
-                  <SparklesIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
-                  <span>Kiro IDE</span>
-                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--pumpkin-fire)]/20 text-[var(--pumpkin-fire)] font-mono">
-                    Primary
-                  </span>
+                  <SparklesIcon className="w-4 h-4" />
+                  <span>Kiro IDE (Primary)</span>
                 </button>
 
-                {/* 2. REMOTE HTTP / SSE */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('remote')}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                     activeTab === 'remote'
-                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[var(--ectoplasm-green)]/40 text-[var(--ectoplasm-green)]'
-                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
+                      ? 'bg-[#a855f7] text-[var(--midnight-veil)] shadow-[0_0_12px_rgba(168,85,247,0.4)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                   }`}
                 >
-                  <GlobeAltIcon className="w-3.5 h-3.5 text-[var(--ectoplasm-green)]" />
+                  <GlobeAltIcon className="w-4 h-4" />
                   <span>Remote HTTP / SSE</span>
                 </button>
 
-                {/* 3. CLAUDE CODE */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('claude')}
-                  className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     activeTab === 'claude'
-                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[#a855f7]/40 text-[var(--bone-white)]'
-                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
+                      ? 'bg-[#a855f7] text-[var(--midnight-veil)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                   }`}
                 >
-                  Claude Code
+                  Claude Code CLI
                 </button>
 
-                {/* 4. CURSOR */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('cursor')}
-                  className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     activeTab === 'cursor'
-                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[#a855f7]/40 text-[var(--bone-white)]'
-                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
+                      ? 'bg-[#a855f7] text-[var(--midnight-veil)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                   }`}
                 >
-                  Cursor
+                  Cursor IDE
                 </button>
 
-                {/* 5. WINDSURF */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('windsurf')}
-                  className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     activeTab === 'windsurf'
-                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[#a855f7]/40 text-[var(--bone-white)]'
-                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
+                      ? 'bg-[#a855f7] text-[var(--midnight-veil)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                   }`}
                 >
                   Windsurf
                 </button>
 
-                {/* 6. VS CODE */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('vscode')}
-                  className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     activeTab === 'vscode'
-                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[#a855f7]/40 text-[var(--bone-white)]'
-                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
+                      ? 'bg-[#a855f7] text-[var(--midnight-veil)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                   }`}
                 >
                   VS Code
                 </button>
               </div>
 
-              {/* Tab Content Panes */}
-              <div className="victorian-panel p-6 space-y-4">
-                {/* 1. KIRO IDE TAB (FIRST) */}
-                {activeTab === 'kiro' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[var(--bone-white)] flex items-center gap-2">
-                        <SparklesIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
-                        Kiro IDE Configuration (Primary Hackathon Target)
-                      </h3>
-                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
-                        In your Kiro workspace, place this configuration directly inside{' '}
-                        <code className="text-[var(--pumpkin-fire)] font-mono">
-                          .kiro/settings/mcp.json
-                        </code>
-                        . Your Kiro agent will instantly gain access to all HauntView chaos testing
-                        tools.
-                      </p>
+              {/* Tab 1: Kiro IDE Content */}
+              {activeTab === 'kiro' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[var(--pumpkin-fire)]">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs uppercase tracking-wider text-[var(--pumpkin-fire)] font-bold">
+                        Native Kiro Configuration
+                      </span>
+                      <span className="text-[11px] font-mono text-[var(--pumpkin-fire)] px-2 py-0.5 rounded bg-[var(--pumpkin-fire)]/10 border border-[var(--pumpkin-fire)]/30">
+                        Target: .kiro/settings/mcp.json
+                      </span>
                     </div>
+                    <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
+                      Add HauntView to your project&apos;s workspace settings in{' '}
+                      <code className="text-[var(--bone-white)] font-mono">
+                        .kiro/settings/mcp.json
+                      </code>
+                      . Your Kiro agents will gain access to all 29 testing tools and skills.
+                    </p>
+                  </div>
 
-                    <div>
-                      <p className="text-xs text-[var(--ectoplasm-green)] font-mono mb-2">
-                        Option A: Remote Cloud (Zero local dependencies — Recommended)
-                      </p>
-                      <CodeBlock
-                        title=".kiro/settings/mcp.json (Remote Cloud)"
-                        language="json"
-                        code={`{
+                  <CodeBlock
+                    title=".kiro/settings/mcp.json"
+                    language="json"
+                    code={`{
   "mcpServers": {
     "hauntview": {
+      "command": "pnpm",
+      "args": ["mcp"],
+      "disabled": false
+    }
+  }
+}`}
+                  />
+                </div>
+              )}
+
+              {/* Tab 2: Remote HTTP / SSE */}
+              {activeTab === 'remote' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[#a855f7]">
+                    <span className="font-mono text-xs uppercase tracking-wider text-[#a855f7] font-bold">
+                      Hosted Render Cloud Endpoint
+                    </span>
+                    <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
+                      Connect any MCP client over Server-Sent Events (SSE) directly to the hosted
+                      engine.
+                    </p>
+                  </div>
+
+                  <CodeBlock
+                    title="mcp.json (Remote SSE)"
+                    language="json"
+                    code={`{
+  "mcpServers": {
+    "hauntview-remote": {
       "url": "https://hauntview.onrender.com/api/mcp"
     }
   }
 }`}
-                      />
-                    </div>
+                  />
+                </div>
+              )}
 
-                    <div className="pt-2">
-                      <p className="text-xs text-[var(--pumpkin-fire)] font-mono mb-2">
-                        Option B: Local Stdio Subprocess (With remote engine routing)
-                      </p>
-                      <CodeBlock
-                        title=".kiro/settings/mcp.json (Stdio Engine)"
-                        language="json"
-                        code={`{
+              {/* Tab 3: Claude Code CLI */}
+              {activeTab === 'claude' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <CodeBlock
+                    title="Terminal (Add MCP to Claude Code)"
+                    language="bash"
+                    code={`claude mcp add hauntview -- node /path/to/hauntview/dist/cli.js`}
+                  />
+                </div>
+              )}
+
+              {/* Tab 4: Cursor IDE */}
+              {activeTab === 'cursor' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <CodeBlock
+                    title=".cursor/mcp.json"
+                    language="json"
+                    code={`{
   "mcpServers": {
     "hauntview": {
       "command": "node",
-      "args": ["--import", "tsx/esm", "src/mcp/server.ts"],
-      "env": {
-        "HAUNT_API_URL": "https://hauntview.onrender.com",
-        "NODE_ENV": "development"
-      }
+      "args": ["/absolute/path/to/hauntview/dist/cli.js"]
     }
   }
 }`}
-                      />
-                    </div>
-                  </div>
-                )}
+                  />
+                </div>
+              )}
 
-                {/* 2. REMOTE TAB */}
-                {activeTab === 'remote' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[var(--bone-white)] flex items-center gap-2">
-                        <GlobeAltIcon className="w-4 h-4 text-[var(--ectoplasm-green)]" />
-                        Universal Remote HTTP / SSE Endpoint (Zero-Install)
-                      </h3>
-                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
-                        Add this configuration to any MCP-compatible agent to execute tests against
-                        HauntView&apos;s hosted engine. No local dependencies, Node.js installation,
-                        or browser binaries required.
-                      </p>
-                    </div>
-
-                    <CodeBlock
-                      title="mcp.json (Standard MCP HTTP format)"
-                      language="json"
-                      code={`{
+              {/* Tab 5: Windsurf */}
+              {activeTab === 'windsurf' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <CodeBlock
+                    title="~/.codeium/windsurf/mcp_config.json"
+                    language="json"
+                    code={`{
   "mcpServers": {
     "hauntview": {
-      "url": "https://hauntview.onrender.com/api/mcp"
+      "command": "pnpm",
+      "args": ["--prefix", "/absolute/path/to/hauntview", "mcp"]
     }
   }
 }`}
-                    />
-                  </div>
-                )}
+                  />
+                </div>
+              )}
 
-                {/* 3. CLAUDE CODE TAB */}
-                {activeTab === 'claude' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[var(--bone-white)]">
-                        Claude Code CLI Configuration
-                      </h3>
-                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
-                        Add HauntView directly to Claude Code using the CLI. The command
-                        automatically registers the tools in your global{' '}
-                        <code className="text-[var(--pumpkin-fire)] font-mono">~/.claude.json</code>
-                        :
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-[var(--ectoplasm-green)] font-mono mb-2">
-                        Option A: Remote Streamable HTTP (Recommended)
-                      </p>
-                      <CodeBlock
-                        title="Terminal"
-                        language="bash"
-                        code="claude mcp add --transport sse hauntview https://hauntview.onrender.com/api/mcp"
-                      />
-                    </div>
-
-                    <div className="pt-2">
-                      <p className="text-xs text-[var(--pumpkin-fire)] font-mono mb-2">
-                        Option B: Stdio Transport (Local Repository)
-                      </p>
-                      <CodeBlock
-                        title="Terminal"
-                        language="bash"
-                        code="claude mcp add hauntview -- node --import tsx/esm src/mcp/server.ts"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. CURSOR TAB */}
-                {activeTab === 'cursor' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[var(--bone-white)]">
-                        Cursor IDE Configuration
-                      </h3>
-                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
-                        In Cursor, open <strong>Settings &gt; Features &gt; MCP</strong>, or paste
-                        into{' '}
-                        <code className="text-[var(--pumpkin-fire)] font-mono">
-                          .cursor/mcp.json
-                        </code>{' '}
-                        (workspace) or{' '}
-                        <code className="text-[var(--pumpkin-fire)] font-mono">
-                          ~/.cursor/mcp.json
-                        </code>{' '}
-                        (global):
-                      </p>
-                    </div>
-
-                    <CodeBlock
-                      title=".cursor/mcp.json (Hosted Remote)"
-                      language="json"
-                      code={`{
-  "mcpServers": {
-    "hauntview": {
-      "url": "https://hauntview.onrender.com/api/mcp"
-    }
-  }
-}`}
-                    />
-
-                    <div className="pt-2">
-                      <p className="text-xs text-[#7a6a82] mb-2 font-mono">
-                        Alternative: Run via local stdio within the cloned repository:
-                      </p>
-                      <CodeBlock
-                        title=".cursor/mcp.json (Local Stdio)"
-                        language="json"
-                        code={`{
-  "mcpServers": {
-    "hauntview": {
-      "command": "node",
-      "args": ["--import", "tsx/esm", "src/mcp/server.ts"],
-      "env": {
-        "HAUNT_API_URL": "https://hauntview.onrender.com"
-      }
-    }
-  }
-}`}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* 5. WINDSURF TAB */}
-                {activeTab === 'windsurf' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[var(--bone-white)]">
-                        Windsurf Configuration
-                      </h3>
-                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
-                        Add to your Windsurf configuration at{' '}
-                        <code className="text-[var(--pumpkin-fire)] font-mono">
-                          ~/.codeium/windsurf/mcp_config.json
-                        </code>
-                        :
-                      </p>
-                    </div>
-
-                    <CodeBlock
-                      title="~/.codeium/windsurf/mcp_config.json"
-                      language="json"
-                      code={`{
-  "mcpServers": {
-    "hauntview": {
-      "serverUrl": "https://hauntview.onrender.com/api/mcp"
-    }
-  }
-}`}
-                    />
-                  </div>
-                )}
-
-                {/* 6. VS CODE TAB */}
-                {activeTab === 'vscode' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[var(--bone-white)]">
-                        VS Code Configuration
-                      </h3>
-                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
-                        Add to your workspace&apos;s{' '}
-                        <code className="text-[var(--pumpkin-fire)] font-mono">
-                          .vscode/mcp.json
-                        </code>{' '}
-                        file:
-                      </p>
-                    </div>
-
-                    <CodeBlock
-                      title=".vscode/mcp.json"
-                      language="json"
-                      code={`{
+              {/* Tab 6: VS Code */}
+              {activeTab === 'vscode' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <CodeBlock
+                    title=".vscode/mcp.json"
+                    language="json"
+                    code={`{
   "servers": {
     "hauntview": {
-      "url": "https://hauntview.onrender.com/api/mcp"
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["mcp"]
     }
   }
 }`}
-                    />
-                  </div>
-                )}
-              </div>
+                  />
+                </div>
+              )}
             </section>
 
             {/* ========================================================= */}
-            {/* SECTION 3: KIRO POWER EXTENSION                           */}
+            {/* SECTION 5: KIRO POWER PACK                                */}
             {/* ========================================================= */}
             <section
               id="kiro-power"
@@ -729,144 +1196,112 @@ export default function ManualPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-[var(--bone-white)]">
-                    2. Installing as a Kiro Power
+                    4. Installing as a Kiro Power
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
-                    Package HauntView skills into your Kiro agent to automatically audit and
-                    exorcise code defects.
+                    HauntView is fully packaged as an installable Kiro Power under{' '}
+                    <code className="font-mono text-xs">power/</code>.
                   </p>
                 </div>
               </div>
 
-              <div className="victorian-panel p-6 space-y-4">
-                <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
-                  HauntView ships a fully packaged Kiro Power in the{' '}
-                  <code className="font-mono text-[var(--pumpkin-fire)]">power/</code> directory.
-                  You can import it directly into Kiro IDE using GitHub:
-                </p>
-
-                <ol className="list-decimal list-inside space-y-2 text-xs text-[var(--spirit-smoke)]">
+              <div className="victorian-panel p-5 space-y-4">
+                <ol className="text-xs space-y-2 list-decimal list-inside text-[var(--spirit-smoke)] leading-relaxed">
                   <li>
-                    Open Kiro IDE and open the <strong>Powers</strong> panel.
+                    In <strong>Kiro IDE</strong>, open the <strong>Powers</strong> sidebar and click{' '}
+                    <strong>Add Custom Power</strong>.
                   </li>
                   <li>
-                    Click <strong>Import Power from GitHub</strong>.
+                    Select <strong>Import power from GitHub</strong>.
                   </li>
                   <li>
-                    Paste repository URL:
-                    <code className="ml-2 px-2 py-0.5 rounded bg-[var(--midnight-veil)] text-[var(--ectoplasm-green)] font-mono border border-[var(--tombstone-gray)]">
+                    Paste repository URL:{' '}
+                    <code className="text-[var(--pumpkin-fire)] font-mono">
                       https://github.com/kingjethro999/hauntview
                     </code>
                   </li>
-                  <li>
-                    Click <strong>Install</strong>. Kiro will register the MCP tools and three
-                    specialized skills:
-                  </li>
+                  <li>Confirm installation.</li>
                 </ol>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-                  <div className="p-3.5 rounded bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)]">
-                    <div className="text-xs font-mono font-semibold text-[var(--pumpkin-fire)] mb-1">
-                      haunt-a-website
-                    </div>
-                    <p className="text-[11px] text-[var(--grave-dust)]">
-                      Scans target website under failure rites and returns structured defect plates.
-                    </p>
-                  </div>
-                  <div className="p-3.5 rounded bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)]">
-                    <div className="text-xs font-mono font-semibold text-[var(--ectoplasm-green)] mb-1">
-                      exorcise-findings
-                    </div>
-                    <p className="text-[11px] text-[var(--grave-dust)]">
-                      Takes findings from a run, inspects codebase, and patches root causes.
-                    </p>
-                  </div>
-                  <div className="p-3.5 rounded bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)]">
-                    <div className="text-xs font-mono font-semibold text-[#60a5fa] mb-1">setup</div>
-                    <p className="text-[11px] text-[var(--grave-dust)]">
-                      One-shot environment verifier and configuration helper.
-                    </p>
-                  </div>
+              {/* Included Skills */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="victorian-panel p-4 space-y-1.5">
+                  <span className="font-mono text-xs text-[var(--pumpkin-fire)] font-bold">
+                    haunt-a-website
+                  </span>
+                  <p className="text-xs text-[#9c8ea3]">
+                    Runs automated failure-mode testing rites against any URL and returns structured
+                    finding plates.
+                  </p>
+                </div>
+
+                <div className="victorian-panel p-4 space-y-1.5">
+                  <span className="font-mono text-xs text-[var(--ectoplasm-green)] font-bold">
+                    exorcise-findings
+                  </span>
+                  <p className="text-xs text-[#9c8ea3]">
+                    Reads report findings, locates the root causes in your code, and patches them
+                    with verified evidence.
+                  </p>
+                </div>
+
+                <div className="victorian-panel p-4 space-y-1.5">
+                  <span className="font-mono text-xs text-[#a855f7] font-bold">setup</span>
+                  <p className="text-xs text-[#9c8ea3]">
+                    Verifies local dependencies, installs browser engines, and validates
+                    configuration.
+                  </p>
                 </div>
               </div>
             </section>
 
             {/* ========================================================= */}
-            {/* SECTION 4: TRANSPORTS ARCHITECTURE                        */}
+            {/* SECTION 6: TRANSPORTS (REMOTE VS STDIO)                   */}
             {/* ========================================================= */}
             <section
               id="transports"
               className="space-y-6 pt-6 border-t border-[var(--tombstone-gray)]/40"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-[var(--ectoplasm-green)]/15 text-[var(--ectoplasm-green)]">
+                <div className="p-2 rounded bg-[var(--pumpkin-fire)]/15 text-[var(--pumpkin-fire)]">
                   <ServerStackIcon className="w-5 h-5" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-[var(--bone-white)]">
-                    3. MCP Transports: Remote URL vs. Local Stdio
+                    5. Remote URL vs. Stdio Subprocess
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
-                    Why some MCP servers use remote URLs and others use local commands.
+                    Choose the transport mechanism that best fits your environment.
                   </p>
                 </div>
               </div>
 
-              {/* Explanatory cards side-by-side */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Remote HTTP / SSE Card */}
                 <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[var(--ectoplasm-green)]">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-[var(--ectoplasm-green)] font-semibold flex items-center gap-1.5">
-                      <GlobeAltIcon className="w-4 h-4" />
-                      Remote HTTP / SSE (&quot;url&quot;)
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded bg-[var(--ectoplasm-green)]/15 text-[var(--ectoplasm-green)] text-[10px] font-mono">
-                      Cloud Gateway
-                    </span>
-                  </div>
-                  <p className="text-xs text-[var(--grave-dust)] leading-relaxed">
-                    Connects directly over the web via Server-Sent Events (SSE) and HTTP POST.
-                    <strong> Zero local installation</strong>: your agent simply talks to the remote
-                    cloud URL. No Node.js, Playwright, or browser downloads on your machine.
+                  <span className="font-mono text-xs font-bold text-[var(--ectoplasm-green)] uppercase tracking-wider">
+                    Remote URL Transport (Cloud)
+                  </span>
+                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
+                    Zero local dependencies. Uses Server-Sent Events (SSE) to stream diagnostics
+                    from the hosted Render engine.
                   </p>
-                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[var(--tombstone-gray)]/40">
-                    Endpoint:{' '}
-                    <span className="text-[var(--ectoplasm-green)]">
-                      https://hauntview.onrender.com/api/mcp
-                    </span>
-                  </div>
                 </div>
 
-                {/* Local Stdio Subprocess Card */}
                 <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[var(--pumpkin-fire)]">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-[var(--pumpkin-fire)] font-semibold flex items-center gap-1.5">
-                      <CommandLineIcon className="w-4 h-4" />
-                      Local Stdio Subprocess (&quot;command&quot;)
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded bg-[var(--pumpkin-fire)]/15 text-[var(--pumpkin-fire)] text-[10px] font-mono">
-                      Subprocess
-                    </span>
-                  </div>
-                  <p className="text-xs text-[var(--grave-dust)] leading-relaxed">
-                    Spawns a local process on your computer communicating through standard
-                    input/output (<code className="text-[var(--pumpkin-fire)]">stdio</code>). Ideal
-                    for running 100% offline, inspecting local source files, or forwarding test
-                    executions to a private engine.
+                  <span className="font-mono text-xs font-bold text-[var(--pumpkin-fire)] uppercase tracking-wider">
+                    Stdio Subprocess (Local)
+                  </span>
+                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
+                    Spawns a local Node.js process directly within your IDE. Zero cloud round-trips
+                    and full parallel browser execution.
                   </p>
-                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[var(--tombstone-gray)]/40">
-                    Command:{' '}
-                    <span className="text-[var(--pumpkin-fire)]">
-                      node --import tsx/esm src/mcp/server.ts
-                    </span>
-                  </div>
                 </div>
               </div>
             </section>
 
             {/* ========================================================= */}
-            {/* SECTION 5: MCP TOOLS REFERENCE                            */}
+            {/* SECTION 7: MCP TOOLS REFERENCE                            */}
             {/* ========================================================= */}
             <section
               id="tools"
@@ -878,121 +1313,102 @@ export default function ManualPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-[var(--bone-white)]">
-                    4. Model Context Protocol Tools Reference
+                    6. Model Context Protocol Tools Reference
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
-                    Six tools registered on the server for automated chaos testing, auditing, and
-                    report generation.
+                    Six deterministic tools registered on the MCP server for chaos testing,
+                    auditing, and report generation.
                   </p>
                 </div>
               </div>
 
-              {/* Tools Table / Cards */}
-              <div className="space-y-4">
-                {/* Tool 1 */}
-                <div className="victorian-panel p-5 space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="space-y-3">
+                <div className="victorian-panel p-4 space-y-1.5">
+                  <div className="flex items-center justify-between">
                     <span className="font-mono text-sm font-bold text-[var(--ectoplasm-green)]">
                       list-test-profiles
                     </span>
-                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--tombstone-gray)]/40 self-start sm:self-auto">
-                      args: (none)
-                    </span>
+                    <span className="text-[11px] font-mono text-[#7a6a82]">args: none</span>
                   </div>
-                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
-                    Returns all 25 supported failure-mode testing rites, viewport matrices, and
-                    timeouts. Used by agents to discover which rites to run (e.g. mobile viewports,
-                    high-contrast, disabled JS).
+                  <p className="text-xs text-[var(--spirit-smoke)]">
+                    Returns all 29 testing profiles, viewports, and timeout matrices for agent
+                    discovery.
                   </p>
                 </div>
 
-                {/* Tool 2 */}
-                <div className="victorian-panel p-5 space-y-2 border-l-2 border-l-[var(--pumpkin-fire)]">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="victorian-panel p-4 space-y-1.5 border-l-2 border-l-[var(--pumpkin-fire)]">
+                  <div className="flex items-center justify-between">
                     <span className="font-mono text-sm font-bold text-[var(--pumpkin-fire)]">
                       run-test-profile
                     </span>
-                    <span className="text-[11px] font-mono text-[var(--pumpkin-fire)] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--pumpkin-fire)]/40 self-start sm:self-auto">
+                    <span className="text-[11px] font-mono text-[var(--pumpkin-fire)]">
                       url (req), profileId (opt)
                     </span>
                   </div>
-                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
-                    Drives headless Chromium through the requested profile (e.g.{' '}
-                    <code className="text-[var(--ectoplasm-green)] font-mono">mobile-iphone15</code>
-                    , <code className="text-[var(--ectoplasm-green)] font-mono">js-disabled</code>,{' '}
-                    <code className="text-[var(--ectoplasm-green)] font-mono">reduced-motion</code>
-                    ). Returns the unique run ID, total defect counts, and structured diagnostic
-                    findings.
+                  <p className="text-xs text-[var(--spirit-smoke)]">
+                    Drives headless browsers through specified testing profiles and returns
+                    structured defect findings.
                   </p>
                 </div>
 
-                {/* Tool 3 */}
-                <div className="victorian-panel p-5 space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="victorian-panel p-4 space-y-1.5">
+                  <div className="flex items-center justify-between">
                     <span className="font-mono text-sm font-bold text-[var(--ectoplasm-green)]">
                       get-run-status
                     </span>
-                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--tombstone-gray)]/40 self-start sm:self-auto">
-                      runId (req)
-                    </span>
+                    <span className="text-[11px] font-mono text-[#7a6a82]">runId (req)</span>
                   </div>
-                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
-                    Returns real-time execution progress, status, and severity counters (errors,
-                    warnings, info) for an active or completed run.
+                  <p className="text-xs text-[var(--spirit-smoke)]">
+                    Returns real-time execution progress, status, and severity counters.
                   </p>
                 </div>
 
-                {/* Tool 4 */}
-                <div className="victorian-panel p-5 space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="victorian-panel p-4 space-y-1.5">
+                  <div className="flex items-center justify-between">
                     <span className="font-mono text-sm font-bold text-[var(--ectoplasm-green)]">
                       get-latest-report
                     </span>
-                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--tombstone-gray)]/40 self-start sm:self-auto">
-                      args: (none)
-                    </span>
+                    <span className="text-[11px] font-mono text-[#7a6a82]">args: none</span>
                   </div>
-                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
-                    Retrieves the complete structured JSON report and findings from the most recent
-                    test run in the store.
+                  <p className="text-xs text-[var(--spirit-smoke)]">
+                    Retrieves the complete structured JSON report from the most recent run in the
+                    store.
                   </p>
                 </div>
 
-                {/* Tool 5 */}
-                <div className="victorian-panel p-5 space-y-2 border-l-2 border-l-[#a855f7]">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="victorian-panel p-4 space-y-1.5 border-l-2 border-l-[#a855f7]">
+                  <div className="flex items-center justify-between">
                     <span className="font-mono text-sm font-bold text-[#a855f7]">compare-runs</span>
-                    <span className="text-[11px] font-mono text-[#a855f7] px-2 py-0.5 rounded bg-[#0a0512] border border-[#a855f7]/40 self-start sm:self-auto">
+                    <span className="text-[11px] font-mono text-[#a855f7]">
                       runId1 (req), runId2 (req)
                     </span>
                   </div>
-                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
-                    Differential regression analysis between two runs: computes new defects
-                    introduced, persistent issues, and fixes laid to rest.
+                  <p className="text-xs text-[var(--spirit-smoke)]">
+                    Differential regression analysis between two runs: computes new defects,
+                    persistent issues, and fixed defects.
                   </p>
                 </div>
 
-                {/* Tool 6 */}
-                <div className="victorian-panel p-5 space-y-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="victorian-panel p-4 space-y-1.5">
+                  <div className="flex items-center justify-between">
                     <span className="font-mono text-sm font-bold text-[var(--ectoplasm-green)]">
                       export-report
                     </span>
-                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--tombstone-gray)]/40 self-start sm:self-auto">
+                    <span className="text-[11px] font-mono text-[#7a6a82]">
                       runId (req), format: &apos;html&apos; | &apos;markdown&apos; |
                       &apos;json&apos;
                     </span>
                   </div>
-                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
-                    Generates an interactive stand-alone HTML Grimoire report, clean Markdown
-                    document, or JSON export.
+                  <p className="text-xs text-[var(--spirit-smoke)]">
+                    Generates standalone HTML Grimoire report, clean Markdown document, or JSON
+                    export.
                   </p>
                 </div>
               </div>
             </section>
 
             {/* ========================================================= */}
-            {/* SECTION 6: LOCAL REPOSITORY SETUP                         */}
+            {/* SECTION 8: LOCAL REPOSITORY SETUP                         */}
             {/* ========================================================= */}
             <section
               id="local-setup"
@@ -1004,10 +1420,10 @@ export default function ManualPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-[var(--bone-white)]">
-                    5. Local Setup &amp; Repository Development
+                    7. Local Setup &amp; Repository Development
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
-                    Quickstart instructions for running HauntView on your local workstation.
+                    Instructions for cloning and developing HauntView locally.
                   </p>
                 </div>
               </div>
@@ -1025,14 +1441,15 @@ pnpm install
 # 3. Start local development server (Parlour UI at http://localhost:3000)
 pnpm dev
 
-# 4. Run test suites (34 suites, 169 tests)
+# 4. Run test suites (39 Jest suites, 211 tests)
 pnpm test
 
 # 5. Build CLI bundle
-pnpm run build:cli
+node scripts/build-cli.mjs
 
-# 6. Run compliance presubmit checks
-pnpm run presubmit`}
+# 6. Typecheck and lint
+pnpm run typecheck
+pnpm run lint`}
               />
             </section>
           </main>

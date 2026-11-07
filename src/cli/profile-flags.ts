@@ -8,8 +8,6 @@
  *   haunt http://localhost:3000 --tags mobile,resilience
  */
 
-import type { Command } from 'commander';
-
 /**
  * Category tag groups that expand to multiple canonical profiles.
  */
@@ -73,10 +71,14 @@ export const PROFILE_FLAGS: Record<string, string> = {
   desktop4k: 'desktop-4k',
 };
 
+export interface OptionRegistrar {
+  option(flags: string, description?: string): this;
+}
+
 /**
  * Register all profile and tag flags onto a Commander command.
  */
-export function registerProfileOptions(command: Command): Command {
+export function registerProfileOptions<T extends OptionRegistrar>(command: T): T {
   return (
     command
       .option(

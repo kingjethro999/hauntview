@@ -72,12 +72,12 @@ describe('CLI Profile Flags & Tags', () => {
   it('registers options onto command object chaining', () => {
     const registered: string[] = [];
     interface MockCommand {
-      option: (flags: string, desc?: string) => MockCommand;
+      option(flags: string, desc?: string): this;
     }
     const mockCmd: MockCommand = {
-      option: (flags: string) => {
+      option(flags: string) {
         registered.push(flags);
-        return mockCmd;
+        return this;
       },
     };
 
