@@ -69,7 +69,7 @@ export class HauntViewEngine {
   constructor() {
     this.profileManager = new ProfileManager();
     this.browserPool = new BrowserPool({
-      maxBrowsers: 3,
+      maxBrowsers: 6,
       maxPagesPerBrowser: 10,
       idleTimeout: 30000,
     });

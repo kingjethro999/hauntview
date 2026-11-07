@@ -24,13 +24,15 @@ interface PooledPage {
 export class BrowserPool {
   private browsers: Map<string, PooledBrowser> = new Map();
   private pagePool: PooledPage[] = [];
-  private config: BrowserPoolConfig;
+  private config: Required<Omit<BrowserPoolConfig, 'launchOptions'>> & {
+    launchOptions?: Record<string, unknown>;
+  };
   private cleanupInterval: NodeJS.Timeout | null = null;
 
-  constructor(config: BrowserPoolConfig) {
+  constructor(config: Partial<BrowserPoolConfig> = {}) {
     this.config = {
-      maxBrowsers: config.maxBrowsers ?? 3,
-      maxPagesPerBrowser: config.maxPagesPerBrowser ?? 5,
+      maxBrowsers: config.maxBrowsers ?? 6,
+      maxPagesPerBrowser: config.maxPagesPerBrowser ?? 10,
       idleTimeout: config.idleTimeout ?? 30000,
       launchOptions: config.launchOptions,
     };
@@ -137,6 +139,13 @@ export class BrowserPool {
    * Register a browser instance
    */
   registerBrowser(key: string, browser: Browser): void {
+    // 1. Clean up any browsers that are no longer connected
+    for (const [existingKey, entry] of this.browsers.entries()) {
+      if (!entry.browser.isConnected()) {
+        this.browsers.delete(existingKey);
+      }
+    }
+
     if (this.browsers.has(key)) {
       const existing = this.browsers.get(key)!;
       existing.browser = browser;
@@ -144,8 +153,34 @@ export class BrowserPool {
       return;
     }
 
+    // 2. If at capacity, gracefully evict the least recently used browser with no active pages
     if (this.browsers.size >= this.config.maxBrowsers) {
-      throw new Error(`Browser pool full: max ${this.config.maxBrowsers} browsers reached`);
+      let oldestKey: string | null = null;
+      let oldestTime = Infinity;
+
+      for (const [k, b] of this.browsers.entries()) {
+        const activeCount = Array.from(b.activePages).filter((p) => !p.isClosed()).length;
+        if (activeCount === 0 && b.lastUsed < oldestTime) {
+          oldestTime = b.lastUsed;
+          oldestKey = k;
+        }
+      }
+
+      if (oldestKey) {
+        const toEvict = this.browsers.get(oldestKey);
+        try {
+          toEvict?.browser.close().catch(() => {});
+        } catch {
+          // Ignore close error during eviction
+        }
+        this.browsers.delete(oldestKey);
+      }
+    }
+
+    // 3. Dynamic headroom: if all existing browsers have active pages,
+    // gracefully expand pool capacity instead of aborting the test suite
+    if (this.browsers.size >= this.config.maxBrowsers) {
+      this.config.maxBrowsers = this.browsers.size + 2;
     }
 
     this.browsers.set(key, {

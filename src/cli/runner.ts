@@ -265,6 +265,13 @@ export async function runHaunt(targetUrl: string, options: CliRunOptions): Promi
 
   tracker.finish();
 
+  // Clean up browser processes to free memory immediately
+  try {
+    await engine.cleanup();
+  } catch {
+    // Non-fatal if cleanup encounters already-closed browsers
+  }
+
   // 7. Persist to SQLite store for local history
   try {
     saveTestReportToDb(report);

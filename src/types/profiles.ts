@@ -139,9 +139,9 @@ export interface ProfileConfig {
  * Browser pool configuration
  */
 export interface BrowserPoolConfig {
-  maxBrowsers: number;
-  maxPagesPerBrowser: number;
-  idleTimeout: number;
+  maxBrowsers?: number;
+  maxPagesPerBrowser?: number;
+  idleTimeout?: number;
   launchOptions?: Record<string, unknown>;
 }
 

@@ -4,7 +4,7 @@
 import { Command } from "commander";
 
 // src/version.ts
-var VERSION = "0.1.5";
+var VERSION = "0.1.6";
 
 // src/cli/runner.ts
 import * as fs8 from "fs";
@@ -491,13 +491,13 @@ var ProfileManager = class {
 
 // src/core/browser-pool.ts
 var BrowserPool = class {
-  constructor(config) {
+  constructor(config = {}) {
     this.browsers = /* @__PURE__ */ new Map();
     this.pagePool = [];
     this.cleanupInterval = null;
     this.config = {
-      maxBrowsers: config.maxBrowsers ?? 3,
-      maxPagesPerBrowser: config.maxPagesPerBrowser ?? 5,
+      maxBrowsers: config.maxBrowsers ?? 6,
+      maxPagesPerBrowser: config.maxPagesPerBrowser ?? 10,
       idleTimeout: config.idleTimeout ?? 3e4,
       launchOptions: config.launchOptions
     };
@@ -585,6 +585,11 @@ var BrowserPool = class {
    * Register a browser instance
    */
   registerBrowser(key, browser) {
+    for (const [existingKey, entry] of this.browsers.entries()) {
+      if (!entry.browser.isConnected()) {
+        this.browsers.delete(existingKey);
+      }
+    }
     if (this.browsers.has(key)) {
       const existing = this.browsers.get(key);
       existing.browser = browser;
@@ -592,7 +597,27 @@ var BrowserPool = class {
       return;
     }
     if (this.browsers.size >= this.config.maxBrowsers) {
-      throw new Error(`Browser pool full: max ${this.config.maxBrowsers} browsers reached`);
+      let oldestKey = null;
+      let oldestTime = Infinity;
+      for (const [k, b] of this.browsers.entries()) {
+        const activeCount = Array.from(b.activePages).filter((p) => !p.isClosed()).length;
+        if (activeCount === 0 && b.lastUsed < oldestTime) {
+          oldestTime = b.lastUsed;
+          oldestKey = k;
+        }
+      }
+      if (oldestKey) {
+        const toEvict = this.browsers.get(oldestKey);
+        try {
+          toEvict?.browser.close().catch(() => {
+          });
+        } catch {
+        }
+        this.browsers.delete(oldestKey);
+      }
+    }
+    if (this.browsers.size >= this.config.maxBrowsers) {
+      this.config.maxBrowsers = this.browsers.size + 2;
     }
     this.browsers.set(key, {
       browser,
@@ -8579,7 +8604,7 @@ var HauntViewEngine = class {
     this.browserLaunchPromises = /* @__PURE__ */ new Map();
     this.profileManager = new ProfileManager();
     this.browserPool = new BrowserPool({
-      maxBrowsers: 3,
+      maxBrowsers: 6,
       maxPagesPerBrowser: 10,
       idleTimeout: 3e4
     });
@@ -9969,6 +9994,10 @@ async function runHaunt(targetUrl, options) {
     }
   });
   tracker.finish();
+  try {
+    await engine.cleanup();
+  } catch {
+  }
   try {
     saveTestReportToDb(report);
   } catch {
