@@ -5,7 +5,7 @@
 
 import { Page } from 'playwright';
 import { sanitizeUntrusted } from '../types/contracts';
-import { buildFinding } from '../types/finding-utils';
+import { buildFinding, executionErrorEvidence } from '../types/finding-utils';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -98,6 +98,7 @@ export class ImageFailureProfile {
           severity: 'warning',
           category: 'accessibility',
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: {
             canonicalFinding: canonical,
             count: evalResult.missingAlt.length,
@@ -137,6 +138,7 @@ export class ImageFailureProfile {
           severity: 'info',
           category: 'performance',
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: {
             canonicalFinding: canonical,
             count: evalResult.missingDimensions.length,
@@ -152,6 +154,7 @@ export class ImageFailureProfile {
         severity: 'error',
         category: 'execution',
         message: `Image failure profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false,
       });

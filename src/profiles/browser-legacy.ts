@@ -4,6 +4,7 @@
  */
 
 import { Page } from 'playwright';
+import { sanitizeUntrusted } from '../types/contracts';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -39,6 +40,13 @@ export class BrowserLegacyProfile {
           category: 'browser-compatibility',
           message:
             'Missing <meta http-equiv="X-UA-Compatible" content="IE=edge"> tag to prevent IE compatibility view mode',
+          evidence: [
+            {
+              kind: 'dom',
+              selector: 'body',
+              snippet: sanitizeUntrusted('missing x ua compatible'),
+            },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -85,6 +93,9 @@ export class BrowserLegacyProfile {
           category: 'browser-compatibility',
           message: `CSS Custom Properties (var(--*)) detected in ${cssAudit.cssVarCount} rules; unsupported in IE11 and legacy browsers without build-time post-processing`,
           details: { count: cssAudit.cssVarCount },
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('css variables') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -98,6 +109,7 @@ export class BrowserLegacyProfile {
           category: 'browser-compatibility',
           message: `Modern CSS Grid detected in ${cssAudit.cssGridCount} rules; IE11 requires -ms-grid prefixes or flexbox/float fallbacks`,
           details: { count: cssAudit.cssGridCount },
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('css grid') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -111,6 +123,9 @@ export class BrowserLegacyProfile {
           category: 'browser-compatibility',
           message: `CSS clamp(), min(), or max() functions used in ${cssAudit.cssClampCount} rules; ignored in IE11 and legacy browsers`,
           details: { count: cssAudit.cssClampCount },
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('css clamp min max') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -149,6 +164,9 @@ export class BrowserLegacyProfile {
           severity: 'error',
           category: 'browser-compatibility',
           message: `Untranspiled modern JavaScript syntax ("${feature}") detected in inline script; causes fatal syntax errors in legacy browsers / IE11`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('untranspiled ') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -175,6 +193,13 @@ export class BrowserLegacyProfile {
           category: 'browser-compatibility',
           message:
             'No unsupported browser warning banner or <noscript> tag detected to gracefully notify legacy browser users',
+          evidence: [
+            {
+              kind: 'dom',
+              selector: 'body',
+              snippet: sanitizeUntrusted('no unsupported browser warning'),
+            },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -186,6 +211,9 @@ export class BrowserLegacyProfile {
         severity: 'error',
         category: 'execution',
         message: `Legacy browser profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('execution error') },
+        ],
         timestamp: Date.now(),
         isClassified: false,
       });

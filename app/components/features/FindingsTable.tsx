@@ -109,10 +109,10 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
       {/* Search and Filters Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="font-display font-bold text-lg text-[#fff1dc]">
+          <h3 className="font-display font-bold text-lg text-[var(--bone-white)]">
             Detected Issues & Findings ({filteredFindings.length})
           </h3>
-          <p className="text-xs text-[#646478]">
+          <p className="text-xs text-[var(--slate-epitaph)]">
             Filter findings by severity or search by keyword and category
           </p>
         </div>
@@ -128,8 +128,8 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                 px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer flex items-center gap-1.5
                 ${
                   selectedSeverity === sev
-                    ? 'bg-[#4a2b8a] text-[#fff1dc] shadow-[0_2px_8px_rgba(74,43,138,0.4)]'
-                    : 'bg-[#2d1a4a]/50 text-[#646478] hover:text-[#fff1dc] hover:bg-[#2d1a4a]'
+                    ? 'bg-[var(--witchcraft-violet)] text-[var(--bone-white)] shadow-[0_2px_8px_rgba(74,43,138,0.4)]'
+                    : 'bg-[var(--haunted-purple)]/50 text-[var(--slate-epitaph)] hover:text-[var(--bone-white)] hover:bg-[var(--haunted-purple)]'
                 }
               `}
             >
@@ -154,7 +154,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
       {/* Findings List */}
       {filteredFindings.length === 0 ? (
         <EmptyState
-          icon={<ExclamationCircleIcon className="w-8 h-8 text-[#646478]" />}
+          icon={<ExclamationCircleIcon className="w-8 h-8 text-[var(--slate-epitaph)]" />}
           title="No Findings Found"
           description={
             searchTerm
@@ -170,15 +170,15 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
             return (
               <div
                 key={`${finding.id}-${idx}`}
-                className="rounded-lg border border-[#6C3CAA]/20 bg-[#0a0711]/50 overflow-hidden transition-colors hover:border-[#6C3CAA]/40"
+                className="rounded-lg border border-[var(--witchcraft-violet)]/20 bg-[var(--midnight-veil)]/50 overflow-hidden transition-colors hover:border-[var(--witchcraft-violet)]/40"
               >
                 <div
                   onClick={() => toggleExpand(finding.id)}
                   className="flex items-start gap-3 p-3.5 cursor-pointer select-none"
                 >
-                  <div className="mt-0.5 text-[#646478]">
+                  <div className="mt-0.5 text-[var(--slate-epitaph)]">
                     {isExpanded ? (
-                      <ChevronDownIcon className="w-4 h-4 text-[#ff791f]" />
+                      <ChevronDownIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
                     ) : (
                       <ChevronRightIcon className="w-4 h-4" />
                     )}
@@ -188,13 +188,15 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                     <div className="flex-shrink-0 mt-0.5">{getSeverityBadge(finding.severity)}</div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#fff1dc] leading-snug">
+                      <p className="text-sm font-medium text-[var(--bone-white)] leading-snug">
                         {finding.message}
                       </p>
-                      <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-[#646478]">
-                        <span className="font-mono text-[#ff791f]">{finding.profileId}</span>
+                      <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-[var(--slate-epitaph)]">
+                        <span className="font-mono text-[var(--pumpkin-fire)]">
+                          {finding.profileId}
+                        </span>
                         <span>•</span>
-                        <span className="bg-[#2d1a4a]/60 px-2 py-0.5 rounded text-[#fff1dc]">
+                        <span className="bg-[var(--haunted-purple)]/60 px-2 py-0.5 rounded text-[var(--bone-white)]">
                           {finding.category}
                         </span>
                         {finding.location?.selector && (
@@ -212,14 +214,14 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
 
                 {/* Expanded Details Drawer */}
                 {isExpanded && (
-                  <div className="px-6 sm:px-10 pb-5 pt-3 border-t border-[#6C3CAA]/20 bg-[#0a0711]/70 text-xs space-y-4">
+                  <div className="px-6 sm:px-10 pb-5 pt-3 border-t border-[var(--witchcraft-violet)]/20 bg-[var(--midnight-veil)]/70 text-xs space-y-4">
                     {/* Remediation Guidance */}
-                    <div className="p-3 rounded-lg bg-[#4a2b8a]/20 border border-[#6C3CAA]/30">
-                      <div className="flex items-center gap-1.5 font-semibold text-[#ff791f] mb-1">
+                    <div className="p-3 rounded-lg bg-[var(--witchcraft-violet)]/20 border border-[var(--witchcraft-violet)]/30">
+                      <div className="flex items-center gap-1.5 font-semibold text-[var(--pumpkin-fire)] mb-1">
                         <LightBulbIcon className="w-4 h-4" />
                         <span>Recommended Remediation</span>
                       </div>
-                      <p className="text-[#fff1dc] text-xs leading-relaxed">
+                      <p className="text-[var(--bone-white)] text-xs leading-relaxed">
                         {getRemediation(finding.category, finding.message)}
                       </p>
                     </div>
@@ -227,10 +229,10 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                     {/* Location Info (Only if selector or file/line exists) */}
                     {finding.location?.selector && (
                       <div>
-                        <span className="text-[#646478] font-semibold block mb-1">
+                        <span className="text-[var(--slate-epitaph)] font-semibold block mb-1">
                           Target DOM Selector:
                         </span>
-                        <code className="inline-block p-2 rounded bg-[#0a0711] border border-[#6C3CAA]/30 font-mono text-xs text-[#a855f7]">
+                        <code className="inline-block p-2 rounded bg-[var(--midnight-veil)] border border-[var(--witchcraft-violet)]/30 font-mono text-xs text-[#a855f7]">
                           {finding.location.selector}
                         </code>
                       </div>
@@ -238,10 +240,10 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
 
                     {finding.location?.file && (
                       <div>
-                        <span className="text-[#646478] font-semibold block mb-1">
+                        <span className="text-[var(--slate-epitaph)] font-semibold block mb-1">
                           Source Location:
                         </span>
-                        <code className="inline-block p-2 rounded bg-[#0a0711] border border-[#6C3CAA]/30 font-mono text-xs text-[#86efac]">
+                        <code className="inline-block p-2 rounded bg-[var(--midnight-veil)] border border-[var(--witchcraft-violet)]/30 font-mono text-xs text-[var(--success)]">
                           {finding.location.file}
                           {finding.location.line ? `:${finding.location.line}` : ''}
                         </code>
@@ -251,16 +253,16 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                     {/* Structured Details if available */}
                     {finding.details && Object.keys(finding.details).length > 0 && (
                       <div>
-                        <span className="text-[#646478] font-semibold block mb-1.5">
+                        <span className="text-[var(--slate-epitaph)] font-semibold block mb-1.5">
                           Observation Breakdown:
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                           {Object.entries(finding.details).map(([key, val]) => (
                             <div
                               key={key}
-                              className="p-2.5 rounded bg-[#2d1a4a]/40 border border-[#6C3CAA]/20 flex flex-col justify-between"
+                              className="p-2.5 rounded bg-[var(--haunted-purple)]/40 border border-[var(--witchcraft-violet)]/20 flex flex-col justify-between"
                             >
-                              <span className="text-[10px] text-[#646478] uppercase tracking-wider font-semibold">
+                              <span className="text-[10px] text-[var(--slate-epitaph)] uppercase tracking-wider font-semibold">
                                 {key.replace(/([A-Z])/g, ' $1')}
                               </span>
                               <span className="font-mono text-xs text-[#7dd3fc] mt-1 break-all">
@@ -273,15 +275,16 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                     )}
 
                     {/* Technical Metadata Footer */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#d9d3e0] pt-2 border-t border-[#46334b]/30">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--spirit-smoke)] pt-2 border-t border-[var(--tombstone-gray)]/30">
                       <div className="flex flex-wrap items-center gap-2">
                         <span>
                           Rite Engine:{' '}
-                          <strong className="text-[#fff1dc]">{finding.profileId}</strong>
+                          <strong className="text-[var(--bone-white)]">{finding.profileId}</strong>
                         </span>
                         <span>•</span>
                         <span>
-                          Unique ID: <code className="font-mono text-[#fff1dc]">{finding.id}</code>
+                          Unique ID:{' '}
+                          <code className="font-mono text-[var(--bone-white)]">{finding.id}</code>
                         </span>
                       </div>
 
@@ -292,7 +295,7 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
                             e.stopPropagation();
                             onExorcise(finding);
                           }}
-                          className="px-2.5 py-1 rounded-[4px] bg-[#ff791f]/15 border border-[#ff791f]/50 text-[#ff791f] hover:bg-[#ff791f] hover:text-[#0a0711] font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                          className="px-2.5 py-1 rounded-[4px] bg-[var(--pumpkin-fire)]/15 border border-[var(--pumpkin-fire)]/50 text-[var(--pumpkin-fire)] hover:bg-[var(--pumpkin-fire)] hover:text-[var(--midnight-veil)] font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
                         >
                           <SparklesIcon className="w-3.5 h-3.5" />
                           <span>Fix with Kiro</span>

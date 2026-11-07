@@ -5,6 +5,7 @@
 
 import * as crypto from 'crypto';
 import { Finding, ClassificationResult, CacheEntry } from '../types';
+import { assertFindingHasEvidence } from '../types/finding-utils';
 
 interface ClassificationRule {
   pattern: RegExp;
@@ -27,6 +28,9 @@ export class FindingClassifier {
    * Classify a finding
    */
   async classify(finding: Finding): Promise<ClassificationResult> {
+    // Evidence invariant (steering: type_and_schema_guardrails.md)
+    assertFindingHasEvidence(finding);
+
     // Check cache first
     const cacheKey = this.generateFindingHash(finding);
     const cached = this.cache.get(cacheKey);

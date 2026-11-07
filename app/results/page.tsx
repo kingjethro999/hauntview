@@ -64,7 +64,7 @@ export default function ResultsIndexPage() {
     <div className="py-10 md:py-14 space-y-8">
       <Container size="lg">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#6C3CAA]/25">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[var(--witchcraft-violet)]/25">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Link href="/">
@@ -72,11 +72,11 @@ export default function ResultsIndexPage() {
                   Back
                 </Button>
               </Link>
-              <h1 className="font-display font-bold text-2xl md:text-3xl text-[#fff1dc]">
+              <h1 className="font-display font-bold text-2xl md:text-3xl text-[var(--bone-white)]">
                 Test Reports & Execution History
               </h1>
             </div>
-            <p className="text-xs text-[#646478] pl-10">
+            <p className="text-xs text-[var(--slate-epitaph)] pl-10">
               Browse, inspect, and download past test sessions recorded by the HauntView engine
             </p>
           </div>
@@ -100,12 +100,12 @@ export default function ResultsIndexPage() {
 
         {/* Content */}
         {isLoading ? (
-          <div className="p-16 text-center text-sm text-[#646478] bg-[#2d1a4a]/20 rounded-xl border border-[#6C3CAA]/20">
+          <div className="p-16 text-center text-sm text-[var(--slate-epitaph)] bg-[var(--haunted-purple)]/20 rounded-xl border border-[var(--witchcraft-violet)]/20">
             Loading test reports history...
           </div>
         ) : reports.length === 0 ? (
           <EmptyState
-            icon={<DocumentChartBarIcon className="w-10 h-10 text-[#646478]" />}
+            icon={<DocumentChartBarIcon className="w-10 h-10 text-[var(--slate-epitaph)]" />}
             title="No Test Sessions Recorded"
             description="You haven't run any tests yet. Launch your first test suite against a website to generate a report."
             action={
@@ -116,13 +116,13 @@ export default function ResultsIndexPage() {
           />
         ) : (
           <div className="space-y-3">
-            <div className="text-xs text-[#646478] font-medium px-2">
+            <div className="text-xs text-[var(--slate-epitaph)] font-medium px-2">
               Showing {reports.length} {reports.length === 1 ? 'report' : 'reports'}
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-[#6C3CAA]/30 bg-[#2d1a4a]/30">
-              <table className="w-full text-left text-sm text-[#fff1dc]">
-                <thead className="bg-[#4a2b8a]/15 border-b border-[#6C3CAA]/30 text-xs font-semibold text-[#fff1dc] uppercase tracking-wider">
+            <div className="overflow-x-auto rounded-xl border border-[var(--witchcraft-violet)]/30 bg-[var(--haunted-purple)]/30">
+              <table className="w-full text-left text-sm text-[var(--bone-white)]">
+                <thead className="bg-[var(--witchcraft-violet)]/15 border-b border-[var(--witchcraft-violet)]/30 text-xs font-semibold text-[var(--bone-white)] uppercase tracking-wider">
                   <tr>
                     <th className="py-3 px-4">Status</th>
                     <th className="py-3 px-4">Target URL</th>
@@ -132,12 +132,15 @@ export default function ResultsIndexPage() {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#6C3CAA]/15">
+                <tbody className="divide-y divide-[var(--witchcraft-violet)]/15">
                   {reports.map((report) => {
                     const isPass = report.errorCount === 0;
 
                     return (
-                      <tr key={report.id} className="hover:bg-[#4a2b8a]/10 transition-colors">
+                      <tr
+                        key={report.id}
+                        className="hover:bg-[var(--witchcraft-violet)]/10 transition-colors"
+                      >
                         <td className="py-3.5 px-4">
                           <Badge variant={isPass ? 'success' : 'error'} size="sm">
                             {isPass ? 'PASS' : `${report.errorCount} ERRORS`}
@@ -150,14 +153,14 @@ export default function ResultsIndexPage() {
                         >
                           <Link
                             href={`/results/${report.id}`}
-                            className="hover:text-[#ff791f] transition-colors"
+                            className="hover:text-[var(--pumpkin-fire)] transition-colors"
                           >
                             {report.url}
                           </Link>
                         </td>
 
-                        <td className="py-3.5 px-4 text-xs text-[#646478]">
-                          <span className="text-[#fff1dc] font-semibold">
+                        <td className="py-3.5 px-4 text-xs text-[var(--slate-epitaph)]">
+                          <span className="text-[var(--bone-white)] font-semibold">
                             {report.successfulProfiles}
                           </span>
                           /{report.totalProfiles} passed
@@ -165,18 +168,18 @@ export default function ResultsIndexPage() {
 
                         <td className="py-3.5 px-4 text-xs">
                           {report.totalFindings > 0 ? (
-                            <span className="text-[#ff791f] font-semibold">
+                            <span className="text-[var(--pumpkin-fire)] font-semibold">
                               {report.totalFindings} issues
                             </span>
                           ) : (
-                            <span className="text-[#86efac]">Clean</span>
+                            <span className="text-[var(--success)]">Clean</span>
                           )}
                         </td>
 
-                        <td className="py-3.5 px-4 text-xs text-[#646478] whitespace-nowrap">
+                        <td className="py-3.5 px-4 text-xs text-[var(--slate-epitaph)] whitespace-nowrap">
                           <div>{new Date(report.startTime).toLocaleDateString()}</div>
-                          <div className="text-[10px] text-[#646478]/80 flex items-center gap-1">
-                            <ClockIcon className="w-3 h-3 text-[#ff791f]" />
+                          <div className="text-[10px] text-[var(--slate-epitaph)]/80 flex items-center gap-1">
+                            <ClockIcon className="w-3 h-3 text-[var(--pumpkin-fire)]" />
                             <span>{(report.duration / 1000).toFixed(1)}s</span>
                           </div>
                         </td>
@@ -187,7 +190,7 @@ export default function ResultsIndexPage() {
                               href={`/api/results/${report.id}?format=markdown`}
                               download
                               title="Download Markdown Report"
-                              className="p-1.5 rounded text-[#646478] hover:text-[#ff791f] hover:bg-[#2d1a4a]/60 transition-colors"
+                              className="p-1.5 rounded text-[var(--slate-epitaph)] hover:text-[var(--pumpkin-fire)] hover:bg-[var(--haunted-purple)]/60 transition-colors"
                             >
                               <DocumentTextIcon className="w-4 h-4" />
                             </a>
@@ -195,7 +198,7 @@ export default function ResultsIndexPage() {
                               href={`/api/results/${report.id}?format=html`}
                               download
                               title="Download HTML Report"
-                              className="p-1.5 rounded text-[#646478] hover:text-[#ff791f] hover:bg-[#2d1a4a]/60 transition-colors"
+                              className="p-1.5 rounded text-[var(--slate-epitaph)] hover:text-[var(--pumpkin-fire)] hover:bg-[var(--haunted-purple)]/60 transition-colors"
                             >
                               <ArrowDownTrayIcon className="w-4 h-4" />
                             </a>

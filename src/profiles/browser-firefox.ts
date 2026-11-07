@@ -4,6 +4,7 @@
  */
 
 import { Page } from 'playwright';
+import { sanitizeUntrusted } from '../types/contracts';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -93,6 +94,9 @@ export class BrowserFirefoxProfile {
           category: 'browser-compatibility',
           message:
             'Page uses ::-webkit-scrollbar without standard scrollbar-width / scrollbar-color, ignored in Firefox',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('webkit scrollbar') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -106,6 +110,9 @@ export class BrowserFirefoxProfile {
           category: 'browser-compatibility',
           message:
             'Page uses -webkit-backdrop-filter without standard backdrop-filter, will not render blur in Firefox',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('webkit backdrop') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -119,6 +126,9 @@ export class BrowserFirefoxProfile {
           category: 'browser-compatibility',
           message:
             'Page uses -webkit-background-clip: text; verify text fill color fallback is defined for Firefox',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('background clip text') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -163,6 +173,7 @@ export class BrowserFirefoxProfile {
           severity: 'error',
           category: 'browser-compatibility',
           message: `Script relies on WebKit-specific API "${issue}" without standard fallback, breaks in Firefox`,
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('check') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -200,6 +211,9 @@ export class BrowserFirefoxProfile {
           severity: 'info',
           category: 'browser-compatibility',
           message: `${formAppearanceIssues} controls use -webkit-appearance without standard appearance or -moz-appearance`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('appearance property') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -214,6 +228,9 @@ export class BrowserFirefoxProfile {
           category: 'console-errors',
           message: `${consoleErrors.length} JavaScript console errors encountered in Firefox engine`,
           details: { errors: consoleErrors.slice(0, 5) },
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('console errors') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -225,6 +242,9 @@ export class BrowserFirefoxProfile {
         severity: 'error',
         category: 'execution',
         message: `Firefox profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('execution error') },
+        ],
         timestamp: Date.now(),
         isClassified: false,
       });

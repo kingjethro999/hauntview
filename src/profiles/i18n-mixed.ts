@@ -4,6 +4,7 @@
  */
 
 import { Page } from 'playwright';
+import { sanitizeUntrusted } from '../types/contracts';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -36,6 +37,7 @@ export class I18nMixedProfile {
           severity: 'warning',
           category: 'i18n',
           message: 'Page lang attribute not set to Hindi',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no hi lang') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -59,6 +61,9 @@ export class I18nMixedProfile {
           severity: 'warning',
           category: 'i18n',
           message: `Font stack "${fontFamily}" may not support Devanagari script`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no devanagari font') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -79,6 +84,9 @@ export class I18nMixedProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Page contains no Devanagari diacritics/vowel signs',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no diacritics') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -96,6 +104,7 @@ export class I18nMixedProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Ligatures disabled (font-variant-ligatures: none), needed for complex scripts',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no ligatures') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -113,6 +122,7 @@ export class I18nMixedProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Consider explicit line-height > 1.2 for complex script readability',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('line height') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -130,6 +140,9 @@ export class I18nMixedProfile {
           severity: 'info',
           category: 'i18n',
           message: `text-rendering: "${textRendering}", consider optimizeLegibility for complex scripts`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('text rendering') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -147,6 +160,7 @@ export class I18nMixedProfile {
           severity: 'info',
           category: 'i18n',
           message: `word-spacing: "${wordSpacing}" may distort complex script rendering`,
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('word spacing') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -169,6 +183,9 @@ export class I18nMixedProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Page mixes Latin and Devanagari scripts, verify rendering',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('script mixing') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -190,6 +207,7 @@ export class I18nMixedProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Page has numbers but no rupee symbol (₹), verify currency formatting',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('currency') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -218,6 +236,7 @@ export class I18nMixedProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Verify vowel sign placement in complex script rendering',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('vowel order') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -229,6 +248,9 @@ export class I18nMixedProfile {
         severity: 'error',
         category: 'execution',
         message: `Mixed scripts profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('execution error') },
+        ],
         timestamp: Date.now(),
         isClassified: false,
       });

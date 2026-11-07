@@ -26,16 +26,18 @@ export function CodeBlock({ code, title, language = 'bash', className = '' }: Co
 
   return (
     <div
-      className={`relative group rounded-lg border border-[#46334b]/60 bg-[#07040d] overflow-hidden ${className}`}
+      className={`relative group rounded-lg border border-[var(--tombstone-gray)]/60 bg-[#07040d] overflow-hidden ${className}`}
     >
       {/* Top Header Bar */}
-      <div className="flex items-center justify-between px-3.5 py-2 border-b border-[#46334b]/40 bg-[#120a1c]/80 text-xs">
+      <div className="flex items-center justify-between px-3.5 py-2 border-b border-[var(--tombstone-gray)]/40 bg-[#120a1c]/80 text-xs">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#ff791f]/40 border border-[#ff791f]/60 inline-block" />
-          <span className="w-2.5 h-2.5 rounded-full bg-[#9aff9a]/40 border border-[#9aff9a]/60 inline-block" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[var(--pumpkin-fire)]/40 border border-[var(--pumpkin-fire)]/60 inline-block" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[var(--ectoplasm-green)]/40 border border-[var(--ectoplasm-green)]/60 inline-block" />
           <span className="w-2.5 h-2.5 rounded-full bg-[#a855f7]/40 border border-[#a855f7]/60 inline-block" />
           {title ? (
-            <span className="ml-2 font-mono text-[11px] text-[#b9acbf] tracking-wide">{title}</span>
+            <span className="ml-2 font-mono text-[11px] text-[var(--grave-dust)] tracking-wide">
+              {title}
+            </span>
           ) : (
             <span className="ml-2 font-mono text-[10px] uppercase text-[#7a6a82] tracking-wider">
               {language}
@@ -48,24 +50,24 @@ export function CodeBlock({ code, title, language = 'bash', className = '' }: Co
           type="button"
           onClick={handleCopy}
           aria-label={copied ? 'Copied to clipboard' : 'Copy code to clipboard'}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono transition-all duration-150 border border-[#46334b]/50 hover:border-[#ff791f]/50 bg-[#191024] hover:bg-[#231733] text-[#d9d3e0] hover:text-[#fff1dc] cursor-pointer"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono transition-all duration-150 border border-[var(--tombstone-gray)]/50 hover:border-[var(--pumpkin-fire)]/50 bg-[#191024] hover:bg-[#231733] text-[var(--spirit-smoke)] hover:text-[var(--bone-white)] cursor-pointer"
         >
           {copied ? (
             <>
-              <CheckIcon className="w-3.5 h-3.5 text-[#9aff9a]" />
-              <span className="text-[11px] text-[#9aff9a] font-medium">Copied!</span>
+              <CheckIcon className="w-3.5 h-3.5 text-[var(--ectoplasm-green)]" />
+              <span className="text-[11px] text-[var(--ectoplasm-green)] font-medium">Copied!</span>
             </>
           ) : (
             <>
-              <ClipboardDocumentIcon className="w-3.5 h-3.5 text-[#b9acbf] group-hover:text-[#ff791f]" />
-              <span className="text-[11px] text-[#b9acbf]">Copy</span>
+              <ClipboardDocumentIcon className="w-3.5 h-3.5 text-[var(--grave-dust)] group-hover:text-[var(--pumpkin-fire)]" />
+              <span className="text-[11px] text-[var(--grave-dust)]">Copy</span>
             </>
           )}
         </button>
       </div>
 
       {/* Code Area */}
-      <pre className="p-4 text-xs font-mono leading-relaxed text-[#e6e0ed] overflow-x-auto selection:bg-[#ff791f]/30">
+      <pre className="p-4 text-xs font-mono leading-relaxed text-[#e6e0ed] overflow-x-auto selection:bg-[var(--pumpkin-fire)]/30">
         <code>{code.trim()}</code>
       </pre>
     </div>

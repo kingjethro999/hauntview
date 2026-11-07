@@ -5,6 +5,8 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult, ProfileContext } from '../types';
+import { sanitizeUntrusted } from '../types/contracts';
+import { buildFinding, buildProfileFinding, executionErrorEvidence } from '../types/finding-utils';
 import { navigateResilient } from './navigation';
 
 interface PerformanceEntryWithHadRecentInput extends PerformanceEntry {
@@ -55,15 +57,38 @@ export class DesktopProfile {
 
       // CLS should be less than 0.1 for good experience
       if (clsValue > 0.1) {
-        findings.push({
-          id: `${this.profileId}-cls-poor`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: 'desktop.cumulative-layout-shift',
+          rite: 'desktop',
           severity: 'warning',
-          category: 'performance',
-          message: `Cumulative Layout Shift (${clsValue.toFixed(3)}) exceeds WCAG threshold of 0.1`,
-          timestamp: Date.now(),
-          isClassified: false,
+          confidence: 'measured',
+          title: `Cumulative Layout Shift ${clsValue.toFixed(3)} exceeds 0.1 threshold`,
+          summary: `The page accumulated a CLS of ${clsValue.toFixed(3)} during load, above the 0.1 "good" threshold. Layout shifts degrade readability and can cause mis-clicks.`,
+          where: { url },
+          evidence: [
+            {
+              kind: 'metric',
+              name: 'cumulativeLayoutShift',
+              value: Number(clsValue.toFixed(4)),
+              unit: 'score',
+              threshold: 0.1,
+            },
+          ],
+          investigate: [
+            'Reserve space for images/embeds with width/height attributes and avoid injecting content above existing content.',
+          ],
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-cls-poor`,
+            profileId: this.profileId,
+            severity: 'warning',
+            category: 'performance',
+            message: canonical.title,
+            details: { canonicalFinding: canonical, cls: clsValue },
+            evidence: [...canonical.evidence],
+          })
+        );
       }
 
       // Check for unused CSS (simple heuristic)
@@ -90,15 +115,38 @@ export class DesktopProfile {
         });
 
         if (unusedStyles > 10) {
-          findings.push({
-            id: `${this.profileId}-unused-css`,
-            profileId: this.profileId,
+          const canonical = buildFinding({
+            ruleId: 'desktop.unused-css-rules',
+            rite: 'desktop',
             severity: 'info',
-            category: 'performance',
-            message: `Found approximately ${unusedStyles} unused CSS rules`,
-            timestamp: Date.now(),
-            isClassified: false,
+            confidence: 'heuristic',
+            title: `Approximately ${unusedStyles} CSS rules match no elements`,
+            summary: `A heuristic scan found ~${unusedStyles} CSS rules whose selectors match nothing in the DOM. Unused CSS increases parse and render cost.`,
+            where: { url },
+            evidence: [
+              {
+                kind: 'metric',
+                name: 'unusedCssRuleCount',
+                value: unusedStyles,
+                unit: 'rules',
+                threshold: 10,
+              },
+            ],
+            investigate: [
+              'Audit stylesheets with DevTools coverage or a PurgeCSS-style build step.',
+            ],
           });
+          findings.push(
+            buildProfileFinding({
+              id: `${this.profileId}-unused-css`,
+              profileId: this.profileId,
+              severity: 'info',
+              category: 'performance',
+              message: canonical.title,
+              details: { canonicalFinding: canonical, unusedStyles },
+              evidence: [...canonical.evidence],
+            })
+          );
         }
       }
 
@@ -111,15 +159,38 @@ export class DesktopProfile {
 
       const viewportWidth = context.viewport.width;
       if (maxWidth > viewportWidth * 0.9) {
-        findings.push({
-          id: `${this.profileId}-wide-content`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: 'desktop.content-fills-viewport',
+          rite: 'desktop',
           severity: 'info',
-          category: 'responsive-design',
-          message: `Content width (${maxWidth}px) is near or exceeds viewport width (${viewportWidth}px)`,
-          timestamp: Date.now(),
-          isClassified: false,
+          confidence: 'measured',
+          title: `Content width ${maxWidth}px fills ${Math.round((maxWidth / viewportWidth) * 100)}% of viewport`,
+          summary: `The document's scroll width (${maxWidth}px) is at or beyond 90% of the ${viewportWidth}px viewport width, suggesting content stretches edge-to-edge with little breathing room.`,
+          where: { selector: 'body', url },
+          evidence: [
+            {
+              kind: 'metric',
+              name: 'contentWidthPx',
+              value: maxWidth,
+              unit: 'px',
+              threshold: Math.round(viewportWidth * 0.9),
+            },
+          ],
+          investigate: [
+            'Consider constraining main content with a max-width container for readability.',
+          ],
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-wide-content`,
+            profileId: this.profileId,
+            severity: 'info',
+            category: 'responsive-design',
+            message: canonical.title,
+            details: { canonicalFinding: canonical, maxWidth, viewportWidth },
+            evidence: [...canonical.evidence],
+          })
+        );
       }
 
       // Check for images without width/height attributes (CLS trigger)
@@ -134,40 +205,85 @@ export class DesktopProfile {
       });
 
       if (imagesWithoutDimensions > 0) {
-        findings.push({
-          id: `${this.profileId}-images-no-dimensions`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: 'desktop.images-missing-dimensions',
+          rite: 'desktop',
           severity: 'warning',
-          category: 'performance',
-          message: `${imagesWithoutDimensions} images lack width/height attributes, may cause layout shift`,
-          timestamp: Date.now(),
-          isClassified: false,
+          confidence: 'measured',
+          title: `${imagesWithoutDimensions} images lack width/height attributes`,
+          summary: `${imagesWithoutDimensions} <img> elements have no width/height attributes or computed width, so the browser cannot reserve space before load — a common cause of layout shift.`,
+          where: { selector: 'img', url },
+          evidence: [
+            {
+              kind: 'metric',
+              name: 'imagesMissingDimensions',
+              value: imagesWithoutDimensions,
+              unit: 'elements',
+            },
+          ],
+          investigate: [
+            'Add explicit width and height attributes (or aspect-ratio CSS) to every <img>.',
+          ],
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-images-no-dimensions`,
+            profileId: this.profileId,
+            severity: 'warning',
+            category: 'performance',
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: imagesWithoutDimensions },
+            evidence: [...canonical.evidence],
+          })
+        );
       }
 
       // Check viewport meta tag strictness
       const viewportContent = await page.locator('meta[name="viewport"]').getAttribute('content');
       if (viewportContent && viewportContent.includes('user-scalable=no')) {
-        findings.push({
-          id: `${this.profileId}-no-user-zoom`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: 'desktop.user-zoom-disabled',
+          rite: 'desktop',
           severity: 'warning',
-          category: 'accessibility',
-          message: 'Viewport disables user zoom, violates accessibility guidelines',
-          timestamp: Date.now(),
-          isClassified: false,
+          confidence: 'observed',
+          title: 'Viewport meta disables user zoom',
+          summary:
+            'The viewport meta tag contains user-scalable=no, preventing pinch-zoom. This violates WCAG 1.4.4 (Resize Text) and harms low-vision users.',
+          where: { selector: 'meta[name="viewport"]', url },
+          evidence: [
+            {
+              kind: 'dom',
+              selector: 'meta[name="viewport"]',
+              snippet: sanitizeUntrusted(viewportContent),
+            },
+          ],
+          investigate: [
+            'Remove user-scalable=no and maximum-scale restrictions from the viewport meta tag.',
+          ],
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-no-user-zoom`,
+            profileId: this.profileId,
+            severity: 'warning',
+            category: 'accessibility',
+            message: canonical.title,
+            details: { canonicalFinding: canonical, viewportContent },
+            evidence: [...canonical.evidence],
+          })
+        );
       }
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: 'error',
-        category: 'execution',
-        message: `Desktop profile execution error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false,
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: 'error',
+          category: 'execution',
+          message: `Desktop profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
+        })
+      );
     }
 
     const endTime = Date.now();

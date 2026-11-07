@@ -4,7 +4,7 @@
 import { Command } from "commander";
 
 // src/version.ts
-var VERSION = "0.1.3";
+var VERSION = "0.1.4";
 
 // src/cli/runner.ts
 import * as fs8 from "fs";
@@ -682,6 +682,127 @@ var BrowserPool = class {
 
 // src/core/finding-classifier.ts
 import * as crypto from "crypto";
+
+// src/types/finding-utils.ts
+import { createHash } from "crypto";
+
+// src/types/contracts.ts
+import { z } from "zod";
+var RiteIdSchema = z.enum([
+  "full",
+  "mobile",
+  "tablet",
+  "desktop",
+  "image-failure",
+  "font-failure",
+  "js-disabled",
+  "reduced-motion",
+  "console-errors",
+  "offline",
+  "accessibility",
+  "broken-links",
+  "network-resilience",
+  "performance",
+  "security-hygiene",
+  "form-resilience"
+]);
+var SeveritySchema = z.enum(["info", "warning", "serious"]);
+var ConfidenceSchema = z.enum(["observed", "measured", "heuristic"]);
+function sanitizeUntrusted(raw) {
+  const stripped = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+  return { untrusted: true, text: stripped.slice(0, 300) };
+}
+var ConcurrencyOptionsSchema = z.object({
+  concurrency: z.boolean().default(false),
+  concurrencyAmount: z.number().int().min(1).default(2)
+});
+
+// src/types/finding-utils.ts
+function assertValidSeverityConfidence(severity, confidence) {
+  if (confidence === "heuristic" && severity === "serious") {
+    throw new Error(
+      `Invalid combination: confidence 'heuristic' cannot be paired with severity 'serious'. Heuristic findings must be 'info' or 'warning'.`
+    );
+  }
+}
+function makeFindingId(ruleId, rite, normalizedLocator) {
+  return createHash("sha256").update(ruleId + rite + normalizedLocator).digest("hex").slice(0, 16);
+}
+function buildFinding(params) {
+  const {
+    normalizedLocator,
+    ruleId,
+    rite,
+    severity,
+    confidence,
+    title,
+    summary,
+    where,
+    evidence,
+    investigate
+  } = params;
+  if (!evidence || evidence.length === 0) {
+    throw new Error(
+      `Finding '${ruleId}' on rite '${rite}' has no evidence. Every finding must carry at least one piece of evidence.`
+    );
+  }
+  assertValidSeverityConfidence(severity, confidence);
+  if (title.length > 90) {
+    throw new Error(
+      `Finding title exceeds 90 characters (${title.length}): "${title.slice(0, 50)}\u2026"`
+    );
+  }
+  const locator = normalizedLocator ?? where?.selector ?? where?.url ?? "";
+  const id = makeFindingId(ruleId, rite, locator);
+  return {
+    id,
+    ruleId,
+    rite,
+    severity,
+    confidence,
+    title,
+    summary,
+    ...where !== void 0 ? { where } : {},
+    evidence,
+    investigate: investigate ?? []
+  };
+}
+var FINDING_MESSAGE_MAX_LENGTH = 500;
+function sanitizeMessage(raw) {
+  const stripped = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+  return stripped.slice(0, FINDING_MESSAGE_MAX_LENGTH);
+}
+function assertFindingHasEvidence(finding) {
+  if (!finding.evidence || finding.evidence.length === 0) {
+    throw new Error(
+      `Finding ${finding.id} (profile '${finding.profileId}') has no evidence \u2014 refused`
+    );
+  }
+}
+function executionErrorEvidence(message) {
+  return [{ kind: "console", level: "error", text: sanitizeUntrusted(message) }];
+}
+function buildProfileFinding(params) {
+  if (!params.evidence || params.evidence.length === 0) {
+    throw new Error(
+      `Profile finding '${params.id}' has no evidence. Every finding must carry at least one piece of evidence.`
+    );
+  }
+  return {
+    id: params.id,
+    profileId: params.profileId,
+    severity: params.severity,
+    category: params.category,
+    message: sanitizeMessage(params.message),
+    ...params.location !== void 0 ? { location: params.location } : {},
+    ...params.details !== void 0 ? { details: params.details } : {},
+    timestamp: params.timestamp ?? Date.now(),
+    isClassified: false,
+    evidence: params.evidence
+  };
+}
+
+// src/core/finding-classifier.ts
 var FindingClassifier = class {
   // 1 hour
   constructor() {
@@ -696,6 +817,7 @@ var FindingClassifier = class {
    * Classify a finding
    */
   async classify(finding) {
+    assertFindingHasEvidence(finding);
     const cacheKey = this.generateFindingHash(finding);
     const cached = this.cache.get(cacheKey);
     if (cached && !this.isCacheExpired(cached)) {
@@ -2701,16 +2823,43 @@ var MobileProfile = class {
       await navigateResilient(page, url);
       const viewportMeta = await page.locator('meta[name="viewport"]').count();
       if (viewportMeta === 0) {
-        findings.push({
-          id: `${this.profileId}-viewport-missing`,
-          profileId: this.profileId,
-          severity: "error",
-          category: "responsive-design",
-          message: "Missing viewport meta tag for responsive design",
-          location: { file: url, line: 1 },
-          timestamp: Date.now(),
-          isClassified: false
+        const canonical = buildFinding({
+          ruleId: "mobile.viewport-meta-missing",
+          rite: "mobile",
+          severity: "serious",
+          confidence: "observed",
+          title: "Missing viewport meta tag",
+          summary: 'The page has no <meta name="viewport"> tag, so mobile browsers render it at desktop width and users must zoom and pan to read content.',
+          where: { selector: 'meta[name="viewport"]', url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "viewportMetaCount",
+              value: viewportMeta,
+              unit: "elements"
+            },
+            {
+              kind: "dom",
+              selector: "head",
+              snippet: sanitizeUntrusted('no meta[name="viewport"] element present')
+            }
+          ],
+          investigate: [
+            'Add <meta name="viewport" content="width=device-width, initial-scale=1"> to the document head.'
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-viewport-missing`,
+            profileId: this.profileId,
+            severity: "error",
+            category: "responsive-design",
+            message: canonical.title,
+            location: { file: url, line: 1 },
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const interactiveElements = await page.locator("button, a, input, select, textarea").all();
       for (const element of interactiveElements) {
@@ -2723,23 +2872,51 @@ var MobileProfile = class {
             const classAttr = await element.getAttribute("class");
             const textContent = await element.evaluate((el) => (el.textContent || "").trim().slice(0, 30)).catch(() => "");
             const selector = elementId ? `#${elementId}` : classAttr ? `${tagName}.${classAttr.split(/\s+/).filter(Boolean).slice(0, 2).join(".")}` : `${tagName}${textContent ? `[text="${textContent}"]` : ""}`;
-            findings.push({
-              id: `${this.profileId}-small-touch-target-${findings.length + 1}`,
-              profileId: this.profileId,
+            const canonical = buildFinding({
+              ruleId: "mobile.touch-target-too-small",
+              rite: "mobile",
               severity: "warning",
-              category: "touch-targets",
-              message: `Touch target ${Math.round(box.width)}x${Math.round(box.height)}px is smaller than WCAG recommended ${this.minTouchTargetSize}px`,
-              location: {
-                selector
-              },
-              details: {
-                actualSize: `${Math.round(box.width)}x${Math.round(box.height)}px`,
-                recommendedSize: `${this.minTouchTargetSize}x${this.minTouchTargetSize}px`,
-                element: `<${tagName}>${textContent ? ` "${textContent}"` : ""}`
-              },
-              timestamp: Date.now(),
-              isClassified: false
+              confidence: "measured",
+              title: `Touch target ${Math.round(box.width)}\xD7${Math.round(box.height)}px below ${this.minTouchTargetSize}px minimum`,
+              summary: `An interactive element renders at ${Math.round(box.width)}\xD7${Math.round(box.height)}px, below the WCAG-recommended ${this.minTouchTargetSize}px minimum touch target size. Users may mis-tap on touch devices.`,
+              where: { selector, url },
+              evidence: [
+                {
+                  kind: "metric",
+                  name: "touchTargetMinDimension",
+                  value: Math.round(size),
+                  unit: "px",
+                  threshold: this.minTouchTargetSize
+                },
+                {
+                  kind: "dom",
+                  selector,
+                  snippet: sanitizeUntrusted(
+                    `<${tagName}>${textContent ? ` "${textContent}"` : ""}`
+                  )
+                }
+              ],
+              investigate: [
+                "Increase the element's padding or min-width/min-height so its smallest dimension is at least 48px."
+              ]
             });
+            findings.push(
+              buildProfileFinding({
+                id: `${this.profileId}-small-touch-target-${findings.length + 1}`,
+                profileId: this.profileId,
+                severity: "warning",
+                category: "touch-targets",
+                message: canonical.title,
+                location: { selector },
+                details: {
+                  canonicalFinding: canonical,
+                  actualSize: `${Math.round(box.width)}x${Math.round(box.height)}px`,
+                  recommendedSize: `${this.minTouchTargetSize}x${this.minTouchTargetSize}px`,
+                  element: `<${tagName}>${textContent ? ` "${textContent}"` : ""}`
+                },
+                evidence: [...canonical.evidence]
+              })
+            );
           }
         }
       }
@@ -2747,30 +2924,79 @@ var MobileProfile = class {
         return document.documentElement.scrollWidth - window.innerWidth;
       });
       if (scrollWidth > 5) {
-        findings.push({
-          id: `${this.profileId}-horizontal-scroll`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "mobile.horizontal-overflow",
+          rite: "mobile",
           severity: "warning",
-          category: "responsive-design",
-          message: `Page causes horizontal scrolling on mobile (${scrollWidth}px overflow)`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `Horizontal overflow of ${scrollWidth}px on mobile viewport`,
+          summary: `The document scroll width exceeds the viewport by ${scrollWidth}px, forcing horizontal scrolling on mobile devices.`,
+          where: { selector: "html", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "horizontalOverflowPx",
+              value: scrollWidth,
+              unit: "px",
+              threshold: 5
+            }
+          ],
+          investigate: [
+            "Find the widest element (e.g. via document.elementFromPoint or devtools) and constrain it with max-width or overflow rules."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-horizontal-scroll`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "responsive-design",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, overflowPx: scrollWidth },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const images = await page.locator("img").all();
       for (const img of images) {
         const naturalWidth = await img.evaluate((el) => el.naturalWidth);
         const displayWidth = await img.evaluate((el) => el.offsetWidth);
         if (naturalWidth > 0 && displayWidth > 0 && naturalWidth > displayWidth * 1.5) {
-          findings.push({
-            id: `${this.profileId}-oversized-image`,
-            profileId: this.profileId,
+          const oversizePercent = Math.round(naturalWidth / displayWidth * 100);
+          const canonical = buildFinding({
+            ruleId: "mobile.oversized-image",
+            rite: "mobile",
             severity: "info",
-            category: "performance",
-            message: `Image is ${Math.round(naturalWidth / displayWidth * 100)}% larger than displayed size`,
-            timestamp: Date.now(),
-            isClassified: false
+            confidence: "measured",
+            title: `Image rendered at ${oversizePercent}% of its natural size`,
+            summary: `An <img> is displayed at ${Math.round(displayWidth)}px but its natural width is ${naturalWidth}px \u2014 downloading roughly ${oversizePercent}% more pixels than needed on mobile.`,
+            where: { url },
+            evidence: [
+              {
+                kind: "metric",
+                name: "imageOversizePercent",
+                value: oversizePercent,
+                unit: "percent",
+                threshold: 150
+              }
+            ],
+            investigate: ["Serve a responsively sized image (srcset/sizes) or compress the asset."]
           });
+          findings.push(
+            buildProfileFinding({
+              id: `${this.profileId}-oversized-image`,
+              profileId: this.profileId,
+              severity: "info",
+              category: "performance",
+              message: canonical.title,
+              details: {
+                canonicalFinding: canonical,
+                naturalWidth,
+                displayWidth
+              },
+              evidence: [...canonical.evidence]
+            })
+          );
         }
       }
       const bodyFontSize = await page.evaluate(() => {
@@ -2778,26 +3004,48 @@ var MobileProfile = class {
       });
       const fontSizeValue = parseInt(bodyFontSize);
       if (fontSizeValue < 16) {
-        findings.push({
-          id: `${this.profileId}-small-font`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "mobile.base-font-too-small",
+          rite: "mobile",
           severity: "warning",
-          category: "accessibility",
-          message: `Base font size ${bodyFontSize} is smaller than WCAG recommended 16px`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `Base font size ${bodyFontSize} below 16px readability minimum`,
+          summary: `The computed body font size is ${bodyFontSize}, below the 16px minimum recommended for readable text on mobile devices.`,
+          where: { selector: "body", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "baseFontSizePx",
+              value: fontSizeValue,
+              unit: "px",
+              threshold: 16
+            }
+          ],
+          investigate: ["Increase the base font size to at least 16px (1rem) for body text."]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-small-font`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, computedFontSize: bodyFontSize },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: "error",
-        category: "execution",
-        message: `Mobile profile execution error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: "error",
+          category: "execution",
+          message: `Mobile profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error))
+        })
+      );
     }
     const endTime = Date.now();
     const metadata = await page.context().browser()?.version();
@@ -2851,15 +3099,38 @@ var DesktopProfile = class {
         });
       });
       if (clsValue > 0.1) {
-        findings.push({
-          id: `${this.profileId}-cls-poor`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop.cumulative-layout-shift",
+          rite: "desktop",
           severity: "warning",
-          category: "performance",
-          message: `Cumulative Layout Shift (${clsValue.toFixed(3)}) exceeds WCAG threshold of 0.1`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `Cumulative Layout Shift ${clsValue.toFixed(3)} exceeds 0.1 threshold`,
+          summary: `The page accumulated a CLS of ${clsValue.toFixed(3)} during load, above the 0.1 "good" threshold. Layout shifts degrade readability and can cause mis-clicks.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "cumulativeLayoutShift",
+              value: Number(clsValue.toFixed(4)),
+              unit: "score",
+              threshold: 0.1
+            }
+          ],
+          investigate: [
+            "Reserve space for images/embeds with width/height attributes and avoid injecting content above existing content."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-cls-poor`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, cls: clsValue },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const stylesheets = await page.locator('link[rel="stylesheet"]').count();
       if (stylesheets > 0) {
@@ -2882,15 +3153,38 @@ var DesktopProfile = class {
           return count;
         });
         if (unusedStyles > 10) {
-          findings.push({
-            id: `${this.profileId}-unused-css`,
-            profileId: this.profileId,
+          const canonical = buildFinding({
+            ruleId: "desktop.unused-css-rules",
+            rite: "desktop",
             severity: "info",
-            category: "performance",
-            message: `Found approximately ${unusedStyles} unused CSS rules`,
-            timestamp: Date.now(),
-            isClassified: false
+            confidence: "heuristic",
+            title: `Approximately ${unusedStyles} CSS rules match no elements`,
+            summary: `A heuristic scan found ~${unusedStyles} CSS rules whose selectors match nothing in the DOM. Unused CSS increases parse and render cost.`,
+            where: { url },
+            evidence: [
+              {
+                kind: "metric",
+                name: "unusedCssRuleCount",
+                value: unusedStyles,
+                unit: "rules",
+                threshold: 10
+              }
+            ],
+            investigate: [
+              "Audit stylesheets with DevTools coverage or a PurgeCSS-style build step."
+            ]
           });
+          findings.push(
+            buildProfileFinding({
+              id: `${this.profileId}-unused-css`,
+              profileId: this.profileId,
+              severity: "info",
+              category: "performance",
+              message: canonical.title,
+              details: { canonicalFinding: canonical, unusedStyles },
+              evidence: [...canonical.evidence]
+            })
+          );
         }
       }
       const maxWidth = await page.evaluate(() => {
@@ -2900,15 +3194,38 @@ var DesktopProfile = class {
       });
       const viewportWidth = context.viewport.width;
       if (maxWidth > viewportWidth * 0.9) {
-        findings.push({
-          id: `${this.profileId}-wide-content`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop.content-fills-viewport",
+          rite: "desktop",
           severity: "info",
-          category: "responsive-design",
-          message: `Content width (${maxWidth}px) is near or exceeds viewport width (${viewportWidth}px)`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `Content width ${maxWidth}px fills ${Math.round(maxWidth / viewportWidth * 100)}% of viewport`,
+          summary: `The document's scroll width (${maxWidth}px) is at or beyond 90% of the ${viewportWidth}px viewport width, suggesting content stretches edge-to-edge with little breathing room.`,
+          where: { selector: "body", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "contentWidthPx",
+              value: maxWidth,
+              unit: "px",
+              threshold: Math.round(viewportWidth * 0.9)
+            }
+          ],
+          investigate: [
+            "Consider constraining main content with a max-width container for readability."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-wide-content`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "responsive-design",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, maxWidth, viewportWidth },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const imagesWithoutDimensions = await page.evaluate(() => {
         const images = Array.from(document.querySelectorAll("img"));
@@ -2917,38 +3234,82 @@ var DesktopProfile = class {
         ).length;
       });
       if (imagesWithoutDimensions > 0) {
-        findings.push({
-          id: `${this.profileId}-images-no-dimensions`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop.images-missing-dimensions",
+          rite: "desktop",
           severity: "warning",
-          category: "performance",
-          message: `${imagesWithoutDimensions} images lack width/height attributes, may cause layout shift`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${imagesWithoutDimensions} images lack width/height attributes`,
+          summary: `${imagesWithoutDimensions} <img> elements have no width/height attributes or computed width, so the browser cannot reserve space before load \u2014 a common cause of layout shift.`,
+          where: { selector: "img", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "imagesMissingDimensions",
+              value: imagesWithoutDimensions,
+              unit: "elements"
+            }
+          ],
+          investigate: [
+            "Add explicit width and height attributes (or aspect-ratio CSS) to every <img>."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-images-no-dimensions`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: imagesWithoutDimensions },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const viewportContent = await page.locator('meta[name="viewport"]').getAttribute("content");
       if (viewportContent && viewportContent.includes("user-scalable=no")) {
-        findings.push({
-          id: `${this.profileId}-no-user-zoom`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop.user-zoom-disabled",
+          rite: "desktop",
           severity: "warning",
-          category: "accessibility",
-          message: "Viewport disables user zoom, violates accessibility guidelines",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "Viewport meta disables user zoom",
+          summary: "The viewport meta tag contains user-scalable=no, preventing pinch-zoom. This violates WCAG 1.4.4 (Resize Text) and harms low-vision users.",
+          where: { selector: 'meta[name="viewport"]', url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: 'meta[name="viewport"]',
+              snippet: sanitizeUntrusted(viewportContent)
+            }
+          ],
+          investigate: [
+            "Remove user-scalable=no and maximum-scale restrictions from the viewport meta tag."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-no-user-zoom`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, viewportContent },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: "error",
-        category: "execution",
-        message: `Desktop profile execution error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: "error",
+          category: "execution",
+          message: `Desktop profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error))
+        })
+      );
     }
     const endTime = Date.now();
     const metadata = await page.context().browser()?.version();
@@ -3003,28 +3364,73 @@ var Desktop4KProfile = class {
         return { upscaledImages, missingSrcset };
       });
       if (imageQualityIssues.upscaledImages > 0) {
-        findings.push({
-          id: `${this.profileId}-upscaled-images`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop-4k.upscaled-images",
+          rite: "desktop",
           severity: "warning",
-          category: "responsive-design",
-          message: `${imageQualityIssues.upscaledImages} images are upscaled beyond their natural resolution on 4K, resulting in blurriness`,
-          details: { count: imageQualityIssues.upscaledImages },
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${imageQualityIssues.upscaledImages} images upscaled beyond natural resolution`,
+          summary: `${imageQualityIssues.upscaledImages} visible <img> elements render wider than 1.5\xD7 their natural pixel width on the 4K viewport, producing blurry upscaling.`,
+          where: { selector: "img", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "upscaledImageCount",
+              value: imageQualityIssues.upscaledImages,
+              unit: "elements"
+            }
+          ],
+          investigate: [
+            "Provide higher-resolution sources via srcset or replace the assets with 2x/3x artwork."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-upscaled-images`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "responsive-design",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: imageQualityIssues.upscaledImages },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (imageQualityIssues.missingSrcset > 0) {
-        findings.push({
-          id: `${this.profileId}-missing-highdpi-images`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop-4k.missing-srcset",
+          rite: "desktop",
           severity: "info",
-          category: "responsive-design",
-          message: `${imageQualityIssues.missingSrcset} large images lack srcset or <picture> sources for 4K/high-DPI screens`,
-          details: { count: imageQualityIssues.missingSrcset },
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${imageQualityIssues.missingSrcset} large images lack srcset/<picture>`,
+          summary: `${imageQualityIssues.missingSrcset} images wider than 500px have no srcset or <picture> wrapper, so 4K/high-DPI displays cannot fetch appropriately sized assets.`,
+          where: { selector: "img", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "imagesMissingSrcset",
+              value: imageQualityIssues.missingSrcset,
+              unit: "elements"
+            }
+          ],
+          investigate: [
+            "Add srcset with 2x/3x candidates or wrap images in <picture> with media/density sources."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-missing-highdpi-images`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "responsive-design",
+            message: canonical.title,
+            details: {
+              canonicalFinding: canonical,
+              count: imageQualityIssues.missingSrcset
+            },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const typographyChecks = await page.evaluate(() => {
         const textElements = Array.from(
@@ -3048,28 +3454,75 @@ var Desktop4KProfile = class {
         return { tinyTextCount, excessiveLineLengthCount };
       });
       if (typographyChecks.tinyTextCount > 0) {
-        findings.push({
-          id: `${this.profileId}-tiny-text`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop-4k.tiny-text",
+          rite: "desktop",
           severity: "warning",
-          category: "accessibility",
-          message: `${typographyChecks.tinyTextCount} text elements have font sizes below 12px, hindering legibility on 4K displays`,
-          details: { count: typographyChecks.tinyTextCount },
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${typographyChecks.tinyTextCount} text elements below 12px font size`,
+          summary: `${typographyChecks.tinyTextCount} visible text elements compute a font size under 12px, which is hard to read even on a large 4K display.`,
+          where: { selector: "p, span, li, a, h1, h2, h3, h4, h5, h6", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "sub12pxTextElements",
+              value: typographyChecks.tinyTextCount,
+              unit: "elements",
+              threshold: 12
+            }
+          ],
+          investigate: [
+            "Raise font sizes below 12px; consider rem-based sizing so text scales with user settings."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-tiny-text`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: typographyChecks.tinyTextCount },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (typographyChecks.excessiveLineLengthCount > 0) {
-        findings.push({
-          id: `${this.profileId}-excessive-line-length`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop-4k.excessive-line-length",
+          rite: "desktop",
           severity: "info",
-          category: "responsive-design",
-          message: `${typographyChecks.excessiveLineLengthCount} paragraphs exceed optimal reading line length at 4K width (>1600px width)`,
-          details: { count: typographyChecks.excessiveLineLengthCount },
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${typographyChecks.excessiveLineLengthCount} paragraphs exceed readable line length`,
+          summary: `${typographyChecks.excessiveLineLengthCount} <p> elements render wider than 1600px at 4K, producing line lengths far beyond the ~75-character ergonomic reading measure.`,
+          where: { selector: "p", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "overlongParagraphs",
+              value: typographyChecks.excessiveLineLengthCount,
+              unit: "elements",
+              threshold: 1600
+            }
+          ],
+          investigate: [
+            "Constrain text columns with max-width (~65\u201375ch) so lines stay within a comfortable measure."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-excessive-line-length`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "responsive-design",
+            message: canonical.title,
+            details: {
+              canonicalFinding: canonical,
+              count: typographyChecks.excessiveLineLengthCount
+            },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const layoutChecks = await page.evaluate((vpWidth) => {
         const body = document.body;
@@ -3092,39 +3545,108 @@ var Desktop4KProfile = class {
         return { scrollWidth, hasHorizontalOverflow, unconstrainedContent, fixedBackgrounds };
       }, viewportWidth);
       if (layoutChecks.hasHorizontalOverflow) {
-        findings.push({
-          id: `${this.profileId}-horizontal-overflow`,
-          profileId: this.profileId,
-          severity: "error",
-          category: "responsive-design",
-          message: `Horizontal overflow detected at 4K: page width (${layoutChecks.scrollWidth}px) exceeds viewport width (${viewportWidth}px)`,
-          details: { scrollWidth: layoutChecks.scrollWidth, viewportWidth },
-          timestamp: Date.now(),
-          isClassified: false
+        const canonical = buildFinding({
+          ruleId: "desktop-4k.horizontal-overflow",
+          rite: "desktop",
+          severity: "serious",
+          confidence: "measured",
+          title: `Horizontal overflow at 4K: ${layoutChecks.scrollWidth}px > ${viewportWidth}px viewport`,
+          summary: `The document scroll width (${layoutChecks.scrollWidth}px) exceeds the ${viewportWidth}px 4K viewport width, forcing horizontal scrolling.`,
+          where: { selector: "html", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "horizontalOverflowPx",
+              value: layoutChecks.scrollWidth - viewportWidth,
+              unit: "px",
+              threshold: 5
+            }
+          ],
+          investigate: [
+            "Identify the widest element and constrain it; check for fixed-width grids or non-wrapping content."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-horizontal-overflow`,
+            profileId: this.profileId,
+            severity: "error",
+            category: "responsive-design",
+            message: canonical.title,
+            details: {
+              canonicalFinding: canonical,
+              scrollWidth: layoutChecks.scrollWidth,
+              viewportWidth
+            },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (layoutChecks.unconstrainedContent) {
-        findings.push({
-          id: `${this.profileId}-unconstrained-layout`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop-4k.unconstrained-layout",
+          rite: "desktop",
           severity: "info",
-          category: "responsive-design",
-          message: "Main content lacks max-width containment, stretching across the entire 4K viewport",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "heuristic",
+          title: "Main content lacks max-width constraint at 4K",
+          summary: "The primary content container has no max-width and spans ~the full 3840px viewport, producing excessively long lines and stretched layouts.",
+          where: { selector: "main, #root, #__next, .container, body", url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: "main, #root, #__next, .container, body",
+              snippet: sanitizeUntrusted("max-width: none computed on main container")
+            }
+          ],
+          investigate: ["Add a max-width container (e.g. 1200\u20131400px) around primary content."]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-unconstrained-layout`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "responsive-design",
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (layoutChecks.fixedBackgrounds > 0) {
-        findings.push({
-          id: `${this.profileId}-fixed-background-performance`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop-4k.fixed-backgrounds",
+          rite: "desktop",
           severity: "info",
-          category: "performance",
-          message: `${layoutChecks.fixedBackgrounds} elements use background-attachment: fixed, which can degrade scrolling performance on 4K displays`,
-          details: { count: layoutChecks.fixedBackgrounds },
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${layoutChecks.fixedBackgrounds} elements use background-attachment: fixed`,
+          summary: `${layoutChecks.fixedBackgrounds} elements paint a fixed background image, which forces re-compositing on scroll and can degrade frame rates on large 4K canvases.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "fixedBackgroundCount",
+              value: layoutChecks.fixedBackgrounds,
+              unit: "elements"
+            }
+          ],
+          investigate: [
+            "Prefer background-attachment: scroll or a dedicated fixed layer; test scroll performance on 4K."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-fixed-background-performance`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "performance",
+            message: canonical.title,
+            details: {
+              canonicalFinding: canonical,
+              count: layoutChecks.fixedBackgrounds
+            },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const clsValue = await page.evaluate(() => {
         return new Promise((resolve3) => {
@@ -3148,27 +3670,50 @@ var Desktop4KProfile = class {
         });
       });
       if (clsValue > 0.1) {
-        findings.push({
-          id: `${this.profileId}-cls-poor`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "desktop-4k.cumulative-layout-shift",
+          rite: "desktop",
           severity: "warning",
-          category: "performance",
-          message: `Cumulative Layout Shift (${clsValue.toFixed(3)}) on 4K exceeds threshold of 0.1`,
-          details: { cls: clsValue },
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `Cumulative Layout Shift ${clsValue.toFixed(3)} on 4K exceeds 0.1`,
+          summary: `The page accumulated a CLS of ${clsValue.toFixed(3)} at the 4K viewport, above the 0.1 "good" threshold.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "cumulativeLayoutShift",
+              value: Number(clsValue.toFixed(4)),
+              unit: "score",
+              threshold: 0.1
+            }
+          ],
+          investigate: [
+            "Reserve space for images/embeds and avoid injecting content above existing content."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-cls-poor`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, cls: clsValue },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: "error",
-        category: "execution",
-        message: `Desktop 4K profile execution error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: "error",
+          category: "execution",
+          message: `Desktop 4K profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error))
+        })
+      );
     }
     const endTime = Date.now();
     const metadata = await page.context().browser()?.version();
@@ -3255,51 +3800,110 @@ var ConsoleErrorsProfile = class {
         if (this.isIgnoredMessage(msg.text)) {
           continue;
         }
-        findings.push({
-          id: `${this.profileId}-${msg.type}-${findings.length}`,
-          profileId: this.profileId,
-          severity,
-          category: "console",
-          message: `${msg.type.toUpperCase()}: ${msg.text}`,
-          location: msg.location ? { file: msg.location } : void 0,
-          timestamp: Date.now(),
-          isClassified: false
+        const canonicalSeverity = msg.type === "error" ? "serious" : msg.type === "warn" ? "warning" : "info";
+        const canonical = buildFinding({
+          ruleId: `console-errors.${msg.type}-message`,
+          rite: "console-errors",
+          severity: canonicalSeverity,
+          confidence: "observed",
+          title: `Console ${msg.type} emitted during page load`,
+          summary: `The page logged a console.${msg.type} message during the test run. Console errors often indicate broken functionality; review the message text in evidence.`,
+          ...msg.location ? { where: { url: sanitizeUntrusted(msg.location).text } } : {},
+          evidence: [{ kind: "console", level: msg.type, text: sanitizeUntrusted(msg.text) }],
+          investigate: [
+            "Open the browser DevTools console, reproduce the load, and trace the message to its source."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-${msg.type}-${findings.length}`,
+            profileId: this.profileId,
+            severity,
+            category: "console",
+            message: `${msg.type.toUpperCase()}: ${msg.text}`,
+            location: msg.location ? { file: msg.location } : void 0,
+            details: { canonicalFinding: canonical, consoleType: msg.type },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       for (const swError of swErrors) {
-        findings.push({
-          id: `${this.profileId}-sw-error-${findings.length}`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "console-errors.service-worker-error",
+          rite: "console-errors",
           severity: "warning",
-          category: "console",
-          message: `Service Worker: ${swError}`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "Service worker reported an error during registration",
+          summary: `A service worker issue was detected: ${swError}. Service worker failures can break offline support and caching.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "console",
+              level: "error",
+              text: sanitizeUntrusted(`Service Worker: ${swError}`)
+            }
+          ],
+          investigate: [
+            "Check the service worker registration code and browser console for the underlying failure."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-sw-error-${findings.length}`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "console",
+            message: `Service Worker: ${swError}`,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       page.on("pageerror", (error) => {
         if (error.message.includes("Unhandled promise rejection")) {
-          findings.push({
-            id: `${this.profileId}-unhandled-rejection-${findings.length}`,
-            profileId: this.profileId,
-            severity: "error",
-            category: "console",
-            message: `Unhandled Promise Rejection: ${error.message}`,
-            timestamp: Date.now(),
-            isClassified: false
+          const canonical = buildFinding({
+            ruleId: "console-errors.unhandled-rejection",
+            rite: "console-errors",
+            severity: "warning",
+            confidence: "observed",
+            title: "Unhandled promise rejection during page load",
+            summary: "A promise rejected without a catch handler. Unhandled rejections can leave UI in a broken state and are a common source of silent failures.",
+            where: { url },
+            evidence: [
+              {
+                kind: "console",
+                level: "error",
+                text: sanitizeUntrusted(error.message)
+              }
+            ],
+            investigate: [
+              "Add .catch() handlers or try/catch around the async code that rejected."
+            ]
           });
+          findings.push(
+            buildProfileFinding({
+              id: `${this.profileId}-unhandled-rejection-${findings.length}`,
+              profileId: this.profileId,
+              severity: "error",
+              category: "console",
+              message: `Unhandled Promise Rejection: ${error.message}`,
+              details: { canonicalFinding: canonical },
+              evidence: [...canonical.evidence]
+            })
+          );
         }
       });
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: "error",
-        category: "execution",
-        message: `Console errors profile execution error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: "error",
+          category: "execution",
+          message: `Console errors profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error))
+        })
+      );
     } finally {
       page.removeAllListeners();
     }
@@ -3350,44 +3954,113 @@ var TabletProfile = class {
       await navigateResilient(page, url);
       const viewportContent = await page.locator('meta[name="viewport"]').getAttribute("content");
       if (!viewportContent?.includes("viewport-fit")) {
-        findings.push({
-          id: `${this.profileId}-viewport-fit`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "tablet.viewport-fit-missing",
+          rite: "tablet",
           severity: "info",
-          category: "responsive-design",
-          message: "Missing viewport-fit for safe area handling on tablets",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "Missing viewport-fit=cover for tablet safe areas",
+          summary: "The viewport meta tag lacks viewport-fit=cover, so content may render under the notch/home indicator safe areas on modern tablets.",
+          where: { selector: 'meta[name="viewport"]', url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: 'meta[name="viewport"]',
+              snippet: sanitizeUntrusted(viewportContent ?? "(no viewport meta tag)")
+            }
+          ],
+          investigate: [
+            "Add viewport-fit=cover to the viewport meta content and use env(safe-area-inset-*) in CSS."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-viewport-fit`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "responsive-design",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, viewportContent },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const orientationMeta = await page.locator("meta").evaluateAll(
         (metas) => metas.some((m) => m.getAttribute("name") === "orientation")
       );
       if (!orientationMeta) {
-        findings.push({
-          id: `${this.profileId}-orientation-meta`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "tablet.orientation-meta-missing",
+          rite: "tablet",
           severity: "info",
-          category: "responsive-design",
-          message: "No orientation meta tag for tablet landscape/portrait handling",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "No orientation meta tag for tablet rotation handling",
+          summary: 'The document has no <meta name="orientation"> tag, so the page does not declare how it should behave when the tablet rotates between portrait and landscape.',
+          where: { selector: 'meta[name="orientation"]', url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: "head",
+              snippet: sanitizeUntrusted('no meta[name="orientation"] element present')
+            }
+          ],
+          investigate: [
+            'Consider adding <meta name="orientation"> or ensure layout adapts via CSS media queries.'
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-orientation-meta`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "responsive-design",
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const touchActionStyle = await page.evaluate(() => {
         const root = document.documentElement;
         return window.getComputedStyle(root).touchAction;
       });
       if (touchActionStyle === "pan-x pan-y") {
-        findings.push({
-          id: `${this.profileId}-touch-action`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "tablet.touch-action-pan-only",
+          rite: "tablet",
           severity: "info",
-          category: "touch-optimization",
-          message: "touch-action: pan-x pan-y enables double-tap zoom, consider optimization",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: "touch-action allows double-tap zoom delay on tablets",
+          summary: "The root element computes touch-action: pan-x pan-y, which permits double-tap zoom and adds a ~300ms tap delay on tablets. Setting touch-action: manipulation removes the delay.",
+          where: { selector: "html", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "touchAction",
+              value: 0,
+              unit: "computed-style"
+            },
+            {
+              kind: "dom",
+              selector: "html",
+              snippet: sanitizeUntrusted(`touch-action: ${touchActionStyle}`)
+            }
+          ],
+          investigate: [
+            "Set touch-action: manipulation on interactive elements or the root to eliminate the double-tap delay."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-touch-action`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "touch-optimization",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, touchAction: touchActionStyle },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const buttons = await page.locator('button, a, input[type="button"]').all();
       let smallTouchTargets = 0;
@@ -3401,15 +4074,38 @@ var TabletProfile = class {
         }
       }
       if (smallTouchTargets > 0) {
-        findings.push({
-          id: `${this.profileId}-small-touch-targets`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "tablet.touch-targets-below-44px",
+          rite: "tablet",
           severity: "warning",
-          category: "touch-targets",
-          message: `${smallTouchTargets} interactive elements smaller than 44px Apple minimum for tablets`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${smallTouchTargets} touch targets below 44px minimum`,
+          summary: `${smallTouchTargets} interactive elements have a smallest dimension under 44px, below Apple's recommended minimum touch target size for tablets.`,
+          where: { selector: 'button, a, input[type="button"]', url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "undersizedTouchTargets",
+              value: smallTouchTargets,
+              unit: "elements",
+              threshold: 44
+            }
+          ],
+          investigate: [
+            "Increase padding or min dimensions so every interactive element is at least 44\xD744px."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-small-touch-targets`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "touch-targets",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: smallTouchTargets },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const landWidth = await page.evaluate(() => {
         if (window.matchMedia("(orientation: landscape)").matches) {
@@ -3418,15 +4114,38 @@ var TabletProfile = class {
         return 0;
       });
       if (landWidth > context.viewport.width * 1.1) {
-        findings.push({
-          id: `${this.profileId}-landscape-overflow`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "tablet.landscape-horizontal-overflow",
+          rite: "tablet",
           severity: "warning",
-          category: "responsive-design",
-          message: "Page may have horizontal scroll in landscape mode on tablets",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: "Page overflows horizontally in tablet landscape",
+          summary: `In landscape orientation the document scroll width (${landWidth}px) exceeds 110% of the ${context.viewport.width}px viewport width, causing horizontal scrolling.`,
+          where: { selector: "html", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "landscapeScrollWidthPx",
+              value: landWidth,
+              unit: "px",
+              threshold: Math.round(context.viewport.width * 1.1)
+            }
+          ],
+          investigate: [
+            "Constrain wide elements with max-width: 100% and audit grid/flex children for fixed widths."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-landscape-overflow`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "responsive-design",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, landscapeWidth: landWidth },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const modals = await page.locator('[role="dialog"], .modal, .popup').all();
       if (modals.length > 0) {
@@ -3434,30 +4153,57 @@ var TabletProfile = class {
           const box = await modal.boundingBox();
           if (box && await modal.isVisible()) {
             if (box.width > context.viewport.width * 0.9) {
-              findings.push({
-                id: `${this.profileId}-modal-width`,
-                profileId: this.profileId,
+              const canonical = buildFinding({
+                ruleId: "tablet.modal-near-full-width",
+                rite: "tablet",
                 severity: "info",
-                category: "responsive-design",
-                message: "Modal/dialog width approaches screen edge on tablet",
-                timestamp: Date.now(),
-                isClassified: false
+                confidence: "measured",
+                title: "Modal/dialog width approaches tablet screen edge",
+                summary: `A dialog renders ${Math.round(box.width)}px wide, over 90% of the ${context.viewport.width}px tablet viewport, leaving little margin around it.`,
+                where: { selector: '[role="dialog"], .modal, .popup', url },
+                evidence: [
+                  {
+                    kind: "metric",
+                    name: "modalWidthRatio",
+                    value: Math.round(box.width / context.viewport.width * 100),
+                    unit: "percent",
+                    threshold: 90
+                  }
+                ],
+                investigate: [
+                  "Cap modal width (e.g. max-width: 90vw) and center it with adequate margins."
+                ]
               });
+              findings.push(
+                buildProfileFinding({
+                  id: `${this.profileId}-modal-width`,
+                  profileId: this.profileId,
+                  severity: "info",
+                  category: "responsive-design",
+                  message: canonical.title,
+                  details: {
+                    canonicalFinding: canonical,
+                    modalWidth: Math.round(box.width)
+                  },
+                  evidence: [...canonical.evidence]
+                })
+              );
               break;
             }
           }
         }
       }
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: "error",
-        category: "execution",
-        message: `Tablet profile execution error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: "error",
+          category: "execution",
+          message: `Tablet profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error))
+        })
+      );
     }
     const endTime = Date.now();
     const metadata = await page.context().browser()?.version();
@@ -3539,60 +4285,175 @@ var PerformanceProfile = class {
         });
       });
       if (vitals.fcp && vitals.fcp > 1800) {
-        findings.push({
-          id: `${this.profileId}-fcp-slow`,
-          profileId: this.profileId,
-          severity: vitals.fcp > 3e3 ? "error" : "warning",
-          category: "performance",
-          message: `First Contentful Paint ${vitals.fcp.toFixed(0)}ms exceeds good threshold (1.8s)`,
-          timestamp: Date.now(),
-          isClassified: false
+        const canonical = buildFinding({
+          ruleId: "performance.fcp-slow",
+          rite: "performance",
+          severity: vitals.fcp > 3e3 ? "serious" : "warning",
+          confidence: "measured",
+          title: `First Contentful Paint ${Math.round(vitals.fcp)}ms exceeds 1.8s`,
+          summary: `FCP was ${Math.round(vitals.fcp)}ms, above the 1800ms "good" threshold${vitals.fcp > 3e3 ? ' and into the "poor" range' : ""}. Users see a blank page until first paint.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "firstContentfulPaint",
+              value: Math.round(vitals.fcp),
+              unit: "ms",
+              threshold: 1800
+            }
+          ],
+          investigate: [
+            "Reduce render-blocking resources, optimize critical CSS, and defer non-essential JS."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-fcp-slow`,
+            profileId: this.profileId,
+            severity: vitals.fcp > 3e3 ? "error" : "warning",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, fcp: vitals.fcp },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (vitals.lcp && vitals.lcp > 2500) {
-        findings.push({
-          id: `${this.profileId}-lcp-slow`,
-          profileId: this.profileId,
-          severity: vitals.lcp > 4e3 ? "error" : "warning",
-          category: "performance",
-          message: `Largest Contentful Paint ${vitals.lcp.toFixed(0)}ms exceeds good threshold (2.5s)`,
-          timestamp: Date.now(),
-          isClassified: false
+        const canonical = buildFinding({
+          ruleId: "performance.lcp-slow",
+          rite: "performance",
+          severity: vitals.lcp > 4e3 ? "serious" : "warning",
+          confidence: "measured",
+          title: `Largest Contentful Paint ${Math.round(vitals.lcp)}ms exceeds 2.5s`,
+          summary: `LCP was ${Math.round(vitals.lcp)}ms, above the 2500ms "good" threshold${vitals.lcp > 4e3 ? ' and into the "poor" range' : ""}. The main content took too long to render.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "largestContentfulPaint",
+              value: Math.round(vitals.lcp),
+              unit: "ms",
+              threshold: 2500
+            }
+          ],
+          investigate: [
+            "Optimize the LCP element (usually a hero image or heading): preload it, compress it, and remove render-blocking chains."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-lcp-slow`,
+            profileId: this.profileId,
+            severity: vitals.lcp > 4e3 ? "error" : "warning",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, lcp: vitals.lcp },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (vitals.cls > 0.1) {
-        findings.push({
-          id: `${this.profileId}-cls-high`,
-          profileId: this.profileId,
-          severity: vitals.cls > 0.25 ? "error" : "warning",
-          category: "performance",
-          message: `Cumulative Layout Shift ${vitals.cls.toFixed(3)} exceeds good threshold (0.1)`,
-          timestamp: Date.now(),
-          isClassified: false
+        const canonical = buildFinding({
+          ruleId: "performance.cls-high",
+          rite: "performance",
+          severity: vitals.cls > 0.25 ? "serious" : "warning",
+          confidence: "measured",
+          title: `Cumulative Layout Shift ${vitals.cls.toFixed(3)} exceeds 0.1`,
+          summary: `CLS was ${vitals.cls.toFixed(3)}, above the 0.1 "good" threshold${vitals.cls > 0.25 ? ' and into the "poor" range' : ""}. Visible content shifts during load.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "cumulativeLayoutShift",
+              value: Number(vitals.cls.toFixed(4)),
+              unit: "score",
+              threshold: 0.1
+            }
+          ],
+          investigate: [
+            "Set width/height on images and embeds; avoid inserting content above existing content after load."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-cls-high`,
+            profileId: this.profileId,
+            severity: vitals.cls > 0.25 ? "error" : "warning",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, cls: vitals.cls },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (vitals.resourceCount > 100) {
-        findings.push({
-          id: `${this.profileId}-resource-count`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "performance.resource-count-high",
+          rite: "performance",
           severity: "warning",
-          category: "performance",
-          message: `Page loads ${vitals.resourceCount} resources, consider consolidation`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `Page loads ${vitals.resourceCount} resources`,
+          summary: `The page requested ${vitals.resourceCount} subresources, above the recommended ~100. Excessive requests increase load time and failure surface.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "resourceCount",
+              value: vitals.resourceCount,
+              unit: "requests",
+              threshold: 100
+            }
+          ],
+          investigate: [
+            "Bundle and consolidate assets; audit third-party scripts and unused resources."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-resource-count`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, resourceCount: vitals.resourceCount },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const sizeMb = vitals.totalResourceSize / (1024 * 1024);
       if (sizeMb > 5) {
-        findings.push({
-          id: `${this.profileId}-resource-size`,
-          profileId: this.profileId,
-          severity: sizeMb > 10 ? "error" : "warning",
-          category: "performance",
-          message: `Total resource size ${sizeMb.toFixed(1)}MB exceeds recommended ~3MB`,
-          timestamp: Date.now(),
-          isClassified: false
+        const canonical = buildFinding({
+          ruleId: "performance.resource-size-high",
+          rite: "performance",
+          severity: sizeMb > 10 ? "serious" : "warning",
+          confidence: "measured",
+          title: `Total resource size ${sizeMb.toFixed(1)}MB exceeds 5MB`,
+          summary: `The page transferred ${sizeMb.toFixed(1)}MB of resources, above the ~3MB recommendation${sizeMb > 10 ? " and into double digits" : ""}. Large payloads slow load, especially on mobile networks.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "totalResourceSize",
+              value: Number(sizeMb.toFixed(2)),
+              unit: "MB",
+              threshold: 5
+            }
+          ],
+          investigate: [
+            "Compress images, enable Brotli/gzip, code-split JS, and lazy-load below-fold assets."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-resource-size`,
+            profileId: this.profileId,
+            severity: sizeMb > 10 ? "error" : "warning",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, sizeMb },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const unminified = await page.evaluate(() => {
         const scripts = Array.from(document.querySelectorAll("script[src]"));
@@ -3602,15 +4463,37 @@ var PerformanceProfile = class {
         }).length;
       });
       if (unminified > 0) {
-        findings.push({
-          id: `${this.profileId}-unminified-js`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "performance.unminified-js",
+          rite: "performance",
           severity: "info",
-          category: "performance",
-          message: `Found ${unminified} potentially unminified JavaScript files`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "heuristic",
+          title: `${unminified} script(s) appear unminified`,
+          summary: `${unminified} <script src> URLs look unminified (no .min. or /src/ path heuristics). Unminified JS ships extra bytes to every user.`,
+          where: { selector: "script[src]", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "unminifiedScriptCount",
+              value: unminified,
+              unit: "scripts"
+            }
+          ],
+          investigate: [
+            "Serve minified production bundles; verify build output includes minification."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-unminified-js`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: unminified },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const renderBlocking = await page.evaluate(() => {
         return performance.getEntriesByType("resource").filter((r) => {
@@ -3619,26 +4502,50 @@ var PerformanceProfile = class {
         }).length;
       });
       if (renderBlocking > 0) {
-        findings.push({
-          id: `${this.profileId}-render-blocking`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "performance.render-blocking-resources",
+          rite: "performance",
           severity: "warning",
-          category: "performance",
-          message: `${renderBlocking} render-blocking resources taking > 500ms`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${renderBlocking} render-blocking resources over 500ms`,
+          summary: `${renderBlocking} CSS/JS resources each took over 500ms and block first render. Render-blocking chains directly delay FCP and LCP.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "slowRenderBlockingResources",
+              value: renderBlocking,
+              unit: "resources",
+              threshold: 500
+            }
+          ],
+          investigate: [
+            "Inline critical CSS, defer non-critical JS with async/defer, and reduce chain depth."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-render-blocking`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "performance",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: renderBlocking },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: "error",
-        category: "execution",
-        message: `Performance profile execution error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: "error",
+          category: "execution",
+          message: `Performance profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error))
+        })
+      );
     }
     const endTime = Date.now();
     const metadata = await page.context().browser()?.version();
@@ -3673,64 +4580,169 @@ var AccessibilityScreenReaderProfile = class {
       await navigateResilient(page, url);
       const langAttr = await page.locator("html").getAttribute("lang");
       if (!langAttr) {
-        findings.push({
-          id: `${this.profileId}-no-lang`,
-          profileId: this.profileId,
-          severity: "error",
-          category: "accessibility",
-          message: "Missing lang attribute on html element",
-          timestamp: Date.now(),
-          isClassified: false
+        const canonical = buildFinding({
+          ruleId: "accessibility.html-lang-missing",
+          rite: "accessibility",
+          severity: "serious",
+          confidence: "observed",
+          title: "Missing lang attribute on <html>",
+          summary: "The document element has no lang attribute, so screen readers cannot select the correct pronunciation rules for the page content.",
+          where: { selector: "html", url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: "html",
+              snippet: sanitizeUntrusted("<html> without lang attribute")
+            }
+          ],
+          investigate: ['Add lang="\u2026" to the <html> element matching the page language.']
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-no-lang`,
+            profileId: this.profileId,
+            severity: "error",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const hasMain = await page.locator('main, [role="main"]').count();
       if (hasMain === 0) {
-        findings.push({
-          id: `${this.profileId}-no-main`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.main-landmark-missing",
+          rite: "accessibility",
           severity: "warning",
-          category: "accessibility",
-          message: 'Page missing <main> or role="main" landmark',
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "Page has no main landmark",
+          summary: 'No <main> element or role="main" landmark exists, so screen reader users cannot jump directly to the primary content.',
+          where: { selector: 'main, [role="main"]', url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "mainLandmarkCount",
+              value: hasMain,
+              unit: "elements"
+            }
+          ],
+          investigate: ['Wrap primary content in <main> or add role="main" to the main container.']
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-no-main`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const headings = await page.evaluate(() => {
         const h = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"));
         return h.map((el) => parseInt(el.tagName[1]));
       });
       if (headings.length === 0) {
-        findings.push({
-          id: `${this.profileId}-no-headings`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.no-headings",
+          rite: "accessibility",
           severity: "warning",
-          category: "accessibility",
-          message: "Page contains no heading elements",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "Page contains no heading elements",
+          summary: "No h1\u2013h6 elements were found. Headings provide the primary navigation structure for screen reader users.",
+          where: { selector: "h1, h2, h3, h4, h5, h6", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "headingCount",
+              value: headings.length,
+              unit: "elements"
+            }
+          ],
+          investigate: ["Add a logical heading hierarchy starting with a single <h1>."]
         });
-      } else if (headings[0] !== 1) {
-        findings.push({
-          id: `${this.profileId}-h1-missing`,
-          profileId: this.profileId,
-          severity: "warning",
-          category: "accessibility",
-          message: "Page should start with <h1> element",
-          timestamp: Date.now(),
-          isClassified: false
-        });
-      }
-      for (let i = 1; i < headings.length; i++) {
-        if (headings[i] > headings[i - 1] + 1) {
-          findings.push({
-            id: `${this.profileId}-heading-order`,
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-no-headings`,
             profileId: this.profileId,
             severity: "warning",
             category: "accessibility",
-            message: `Heading order skips level (h${headings[i - 1]} to h${headings[i]})`,
-            timestamp: Date.now(),
-            isClassified: false
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
+      } else if (headings[0] !== 1) {
+        const canonical = buildFinding({
+          ruleId: "accessibility.h1-not-first",
+          rite: "accessibility",
+          severity: "warning",
+          confidence: "observed",
+          title: "First heading is not <h1>",
+          summary: `The document's first heading is h${headings[0] ?? 0}, not h1. Pages should begin their outline with a single top-level heading.`,
+          where: { selector: "h1, h2, h3, h4, h5, h6", url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: "h1, h2, h3, h4, h5, h6",
+              snippet: sanitizeUntrusted(
+                `first heading level: h${headings[0] ?? "none"} of ${headings.length} total`
+              )
+            }
+          ],
+          investigate: ["Start the heading outline with one <h1> describing the page."]
+        });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-h1-missing`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, firstHeading: headings[0] },
+            evidence: [...canonical.evidence]
+          })
+        );
+      }
+      for (let i = 1; i < headings.length; i++) {
+        if (headings[i] > headings[i - 1] + 1) {
+          const canonical = buildFinding({
+            ruleId: "accessibility.heading-level-skip",
+            rite: "accessibility",
+            severity: "warning",
+            confidence: "observed",
+            title: `Heading order skips from h${headings[i - 1]} to h${headings[i]}`,
+            summary: `The heading outline jumps a level (h${headings[i - 1]} \u2192 h${headings[i]}), which disorients screen reader navigation.`,
+            where: { selector: "h1, h2, h3, h4, h5, h6", url },
+            evidence: [
+              {
+                kind: "dom",
+                selector: "h1, h2, h3, h4, h5, h6",
+                snippet: sanitizeUntrusted(
+                  `heading sequence contains h${headings[i - 1]} followed by h${headings[i]}`
+                )
+              }
+            ],
+            investigate: ["Do not skip heading levels; use one level at a time down the outline."]
           });
+          findings.push(
+            buildProfileFinding({
+              id: `${this.profileId}-heading-order`,
+              profileId: this.profileId,
+              severity: "warning",
+              category: "accessibility",
+              message: canonical.title,
+              details: {
+                canonicalFinding: canonical,
+                fromLevel: headings[i - 1],
+                toLevel: headings[i]
+              },
+              evidence: [...canonical.evidence]
+            })
+          );
           break;
         }
       }
@@ -3740,15 +4752,35 @@ var AccessibilityScreenReaderProfile = class {
         ).length;
       });
       if (imgsNoAlt > 0) {
-        findings.push({
-          id: `${this.profileId}-img-alt`,
-          profileId: this.profileId,
-          severity: "error",
-          category: "accessibility",
-          message: `${imgsNoAlt} images missing alt text`,
-          timestamp: Date.now(),
-          isClassified: false
+        const canonical = buildFinding({
+          ruleId: "accessibility.images-missing-alt",
+          rite: "accessibility",
+          severity: "serious",
+          confidence: "measured",
+          title: `${imgsNoAlt} images missing alt text`,
+          summary: `${imgsNoAlt} <img> elements have no alt attribute or an empty one. Screen readers announce them as unlabelled graphics.`,
+          where: { selector: "img", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "imagesMissingAlt",
+              value: imgsNoAlt,
+              unit: "elements"
+            }
+          ],
+          investigate: ['Add descriptive alt text, or alt="" for purely decorative images.']
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-img-alt`,
+            profileId: this.profileId,
+            severity: "error",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: imgsNoAlt },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const inputs = await page.locator("input, textarea, select").all();
       let missingLabels = 0;
@@ -3764,27 +4796,71 @@ var AccessibilityScreenReaderProfile = class {
         }
       }
       if (missingLabels > 0) {
-        findings.push({
-          id: `${this.profileId}-form-labels`,
-          profileId: this.profileId,
-          severity: "error",
-          category: "accessibility",
-          message: `${missingLabels} form inputs missing associated labels`,
-          timestamp: Date.now(),
-          isClassified: false
+        const canonical = buildFinding({
+          ruleId: "accessibility.inputs-missing-labels",
+          rite: "accessibility",
+          severity: "serious",
+          confidence: "measured",
+          title: `${missingLabels} form inputs missing accessible names`,
+          summary: `${missingLabels} input/select/textarea elements have no associated <label>, aria-label, or aria-labelledby. Screen readers cannot announce their purpose.`,
+          where: { selector: "input, textarea, select", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "unlabeledInputs",
+              value: missingLabels,
+              unit: "elements"
+            }
+          ],
+          investigate: [
+            "Associate a <label for>, or add aria-label / aria-labelledby to each input."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-form-labels`,
+            profileId: this.profileId,
+            severity: "error",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: missingLabels },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const skipLink = await page.locator('a[href="#main"], a[href="#content"]').count();
       if (skipLink === 0) {
-        findings.push({
-          id: `${this.profileId}-skip-link`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.skip-link-missing",
+          rite: "accessibility",
           severity: "warning",
-          category: "accessibility",
-          message: "Missing skip-to-main-content link",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "Missing skip-to-main-content link",
+          summary: "No skip link targeting #main or #content was found. Keyboard and screen reader users must tab through the entire header/navigation on every page.",
+          where: { selector: 'a[href="#main"], a[href="#content"]', url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "skipLinkCount",
+              value: skipLink,
+              unit: "elements"
+            }
+          ],
+          investigate: [
+            'Add a visually-hidden "Skip to main content" link as the first focusable element.'
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-skip-link`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const ariaErrors = await page.evaluate(() => {
         const errors = [];
@@ -3801,38 +4877,82 @@ var AccessibilityScreenReaderProfile = class {
         return errors;
       });
       if (ariaErrors.length > 0) {
-        findings.push({
-          id: `${this.profileId}-aria-conflicts`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.aria-semantic-conflicts",
+          rite: "accessibility",
           severity: "warning",
-          category: "accessibility",
-          message: `Found ${ariaErrors.length} potential ARIA/semantic conflicts`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "heuristic",
+          title: `${ariaErrors.length} potential ARIA/semantic role conflicts`,
+          summary: `${ariaErrors.length} elements combine a semantic HTML tag with a conflicting ARIA role, which can confuse assistive technology. First conflict: ${sanitizeUntrusted(ariaErrors[0] ?? "").text}`,
+          where: { selector: "[role]", url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: "[role]",
+              snippet: sanitizeUntrusted(ariaErrors.slice(0, 3).join(" | "))
+            }
+          ],
+          investigate: [
+            "Prefer native semantic elements over redundant ARIA roles; audit flagged elements."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-aria-conflicts`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: ariaErrors.length },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const focusableCount = await page.locator("a, button, input, select, textarea, [tabindex]").count();
       if (focusableCount === 0) {
-        findings.push({
-          id: `${this.profileId}-no-focusable`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.no-focusable-elements",
+          rite: "accessibility",
           severity: "info",
-          category: "accessibility",
-          message: "Page has no focusable elements",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "Page has no keyboard-focusable elements",
+          summary: "No links, buttons, inputs, or [tabindex] elements exist, so keyboard users have nothing to interact with.",
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "focusableElementCount",
+              value: focusableCount,
+              unit: "elements"
+            }
+          ],
+          investigate: [
+            "If the page is purely informational this may be acceptable; otherwise add interactive controls."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-no-focusable`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: "error",
-        category: "execution",
-        message: `Screen reader profile error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: "error",
+          category: "execution",
+          message: `Screen reader profile error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error))
+        })
+      );
     }
     const endTime = Date.now();
     const metadata = await page.context().browser()?.version();
@@ -3872,15 +4992,37 @@ var AccessibilityKeyboardProfile = class {
         ).length;
       });
       if (positiveTabindex > 0) {
-        findings.push({
-          id: `${this.profileId}-positive-tabindex`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.positive-tabindex",
+          rite: "accessibility",
           severity: "warning",
-          category: "accessibility",
-          message: `${positiveTabindex} elements use positive tabindex, breaks tab order`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${positiveTabindex} elements use positive tabindex`,
+          summary: `${positiveTabindex} elements have tabindex > 0, which overrides the natural tab order and disorients keyboard users.`,
+          where: { selector: "[tabindex]", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "positiveTabindexCount",
+              value: positiveTabindex,
+              unit: "elements"
+            }
+          ],
+          investigate: [
+            'Remove positive tabindex values; use tabindex="0" or fix DOM order instead.'
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-positive-tabindex`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: positiveTabindex },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const buttons = await page.locator("button, a, input").all();
       let nonKeyboardAccessible = 0;
@@ -3901,15 +5043,37 @@ var AccessibilityKeyboardProfile = class {
         }
       }
       if (nonKeyboardAccessible > 0) {
-        findings.push({
-          id: `${this.profileId}-non-keyboard-buttons`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.non-keyboard-interactive",
+          rite: "accessibility",
           severity: "warning",
-          category: "accessibility",
-          message: `${nonKeyboardAccessible} elements may not be keyboard accessible`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "heuristic",
+          title: `${nonKeyboardAccessible} clickable elements lack keyboard handlers`,
+          summary: `${nonKeyboardAccessible} elements have click handlers but no keyboard equivalent, making them unreachable without a mouse.`,
+          where: { selector: "[onclick]", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "nonKeyboardAccessibleCount",
+              value: nonKeyboardAccessible,
+              unit: "elements"
+            }
+          ],
+          investigate: [
+            "Use native <button>/<a> elements or add keydown handlers for Enter/Space."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-non-keyboard-buttons`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: nonKeyboardAccessible },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const focusStyles = await page.evaluate(() => {
         const styles = getComputedStyle(document.body);
@@ -3918,29 +5082,63 @@ var AccessibilityKeyboardProfile = class {
         };
       });
       if (!focusStyles.hasFocus) {
-        findings.push({
-          id: `${this.profileId}-no-focus-styles`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.focus-indicator-missing",
+          rite: "accessibility",
           severity: "warning",
-          category: "accessibility",
-          message: "Focus indicator not visible with outline styling",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "heuristic",
+          title: "Focus indicator may not be visible",
+          summary: "The body computed style reports outline: none, suggesting focus outlines may be suppressed without a visible replacement (WCAG 2.4.7).",
+          where: { selector: "body", url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: "body",
+              snippet: sanitizeUntrusted("computed outline-style on body is none")
+            }
+          ],
+          investigate: ["Ensure :focus-visible styles provide a clear, high-contrast indicator."]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-no-focus-styles`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const hasAccessKey = await page.evaluate(() => {
         return document.querySelectorAll("[accesskey]").length > 0;
       });
       if (hasAccessKey) {
-        findings.push({
-          id: `${this.profileId}-accesskey`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.accesskey-undocumented",
+          rite: "accessibility",
           severity: "info",
-          category: "accessibility",
-          message: "Page uses accesskey attribute, should document shortcuts",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "Page uses accesskey attributes",
+          summary: "One or more elements define accesskey shortcuts. These should be documented for users and checked for conflicts with browser/AT shortcuts.",
+          where: { selector: "[accesskey]", url },
+          evidence: [{ kind: "metric", name: "accesskeyElementCount", value: 1, unit: "present" }],
+          investigate: [
+            "Document keyboard shortcuts in help text; prefer single-key alternatives."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-accesskey`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const modals = await page.locator('[role="dialog"], .modal').all();
       if (modals.length > 0) {
@@ -3953,15 +5151,28 @@ var AccessibilityKeyboardProfile = class {
           return focusableElements.length > 0;
         });
         if (!focusTrapped) {
-          findings.push({
-            id: `${this.profileId}-modal-focus`,
-            profileId: this.profileId,
+          const canonical = buildFinding({
+            ruleId: "accessibility.modal-no-focusable",
+            rite: "accessibility",
             severity: "warning",
-            category: "accessibility",
-            message: "Modal dialog has no focusable elements",
-            timestamp: Date.now(),
-            isClassified: false
+            confidence: "observed",
+            title: "Modal dialog has no focusable elements",
+            summary: 'An element matching [role="dialog"] or .modal contains no focusable descendants, trapping keyboard users with no way to interact or dismiss it.',
+            where: { selector: '[role="dialog"], .modal', url },
+            evidence: [{ kind: "metric", name: "modalFocusableCount", value: 0, unit: "elements" }],
+            investigate: ["Ensure dialogs contain at least one focusable control and trap focus."]
           });
+          findings.push(
+            buildProfileFinding({
+              id: `${this.profileId}-modal-focus`,
+              profileId: this.profileId,
+              severity: "warning",
+              category: "accessibility",
+              message: canonical.title,
+              details: { canonicalFinding: canonical },
+              evidence: [...canonical.evidence]
+            })
+          );
         }
       }
       const formInputs = await page.locator('input[type="text"], textarea').all();
@@ -3973,15 +5184,32 @@ var AccessibilityKeyboardProfile = class {
         }
       }
       if (tabHandled > 0) {
-        findings.push({
-          id: `${this.profileId}-tab-handling`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility.custom-tab-handling",
+          rite: "accessibility",
           severity: "info",
-          category: "accessibility",
-          message: `${tabHandled} form inputs handle Tab key, ensure escape to native tab works`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "heuristic",
+          title: `${tabHandled} inputs intercept the Tab key`,
+          summary: `${tabHandled} text inputs have custom Tab keydown handlers. Custom tab handling can break expected focus order if not carefully implemented.`,
+          where: { selector: 'input[type="text"], textarea', url },
+          evidence: [
+            { kind: "metric", name: "tabInterceptingInputs", value: tabHandled, unit: "elements" }
+          ],
+          investigate: [
+            "Verify custom Tab handlers preserve logical focus order and Escape behavior."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-tab-handling`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "accessibility",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: tabHandled },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const overlays = await page.locator('[role="dialog"], .modal, .popover').all();
       if (overlays.length > 0) {
@@ -3991,27 +5219,47 @@ var AccessibilityKeyboardProfile = class {
           return listeners?.keydown?.some((l) => l.listener.toString().includes("Escape")) ?? false;
         });
         if (!hasEscapeHandler) {
-          findings.push({
-            id: `${this.profileId}-escape-close`,
-            profileId: this.profileId,
+          const canonical = buildFinding({
+            ruleId: "accessibility.overlay-no-escape",
+            rite: "accessibility",
             severity: "info",
-            category: "accessibility",
-            message: "Overlay/modal should close on Escape key",
-            timestamp: Date.now(),
-            isClassified: false
+            confidence: "heuristic",
+            title: "Overlay/modal lacks detected Escape handler",
+            summary: "An overlay element exists but no Escape keydown listener was detected. Users expect Escape to dismiss modals and popovers.",
+            where: { selector: '[role="dialog"], .modal, .popover', url },
+            evidence: [
+              {
+                kind: "dom",
+                selector: '[role="dialog"], .modal, .popover',
+                snippet: sanitizeUntrusted("no Escape keydown listener detected")
+              }
+            ],
+            investigate: ["Add an Escape key handler that closes the overlay and returns focus."]
           });
+          findings.push(
+            buildProfileFinding({
+              id: `${this.profileId}-escape-close`,
+              profileId: this.profileId,
+              severity: "info",
+              category: "accessibility",
+              message: canonical.title,
+              details: { canonicalFinding: canonical },
+              evidence: [...canonical.evidence]
+            })
+          );
         }
       }
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: "error",
-        category: "execution",
-        message: `Keyboard profile error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: "error",
+          category: "execution",
+          message: `Keyboard profile error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error))
+        })
+      );
     }
     const endTime = Date.now();
     const metadata = await page.context().browser()?.version();
@@ -4105,6 +5353,9 @@ var AccessibilityVisualProfile = class {
           severity: failCount > 0 ? "error" : "warning",
           category: "accessibility",
           message: `${contrastIssues.length} text elements have insufficient color contrast (< 4.5:1)`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("contrast ratio") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4129,6 +5380,7 @@ var AccessibilityVisualProfile = class {
           severity: "warning",
           category: "accessibility",
           message: `Found ${colorOnlyInfo.length} elements that may use color alone to convey meaning`,
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("color only") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4143,6 +5395,9 @@ var AccessibilityVisualProfile = class {
           severity: "info",
           category: "accessibility",
           message: "Consider adding high-contrast mode support with prefers-contrast media query",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("high contrast") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4157,6 +5412,9 @@ var AccessibilityVisualProfile = class {
           severity: "info",
           category: "accessibility",
           message: "Consider testing with forced colors mode (Windows High Contrast)",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("forced colors") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4180,6 +5438,9 @@ var AccessibilityVisualProfile = class {
           severity: "warning",
           category: "accessibility",
           message: `${bgImageText} elements have text over background images, verify contrast`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("bg image text") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4196,6 +5457,7 @@ var AccessibilityVisualProfile = class {
           severity: "warning",
           category: "accessibility",
           message: "Page disables user zoom, violates visual accessibility guidelines",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("no zoom") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4207,6 +5469,9 @@ var AccessibilityVisualProfile = class {
         severity: "error",
         category: "execution",
         message: `Visual profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: "dom", selector: "body", snippet: sanitizeUntrusted("execution error") }
+        ],
         timestamp: Date.now(),
         isClassified: false
       });
@@ -4264,63 +5529,168 @@ var AccessibilityCognitiveProfile = class {
         };
       });
       if (complexity.elements > 500) {
-        findings.push({
-          id: `${this.profileId}-too-many-elements`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility-cognitive.dom-too-large",
+          rite: "accessibility",
           severity: "warning",
-          category: "cognitive",
-          message: `Page has ${complexity.elements} DOM elements, consider simplification`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `Page has ${complexity.elements} DOM elements`,
+          summary: `The DOM contains ${complexity.elements} elements, above the ~500 threshold where cognitive load and assistive-technology navigation degrade.`,
+          where: { selector: "body", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "domElementCount",
+              value: complexity.elements,
+              unit: "elements",
+              threshold: 500
+            }
+          ],
+          investigate: [
+            "Reduce DOM size: paginate, lazy-render sections, and remove unused markup."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-too-many-elements`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "cognitive",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, elementCount: complexity.elements },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (complexity.nested > 15) {
-        findings.push({
-          id: `${this.profileId}-deep-nesting`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility-cognitive.deep-nesting",
+          rite: "accessibility",
           severity: "info",
-          category: "cognitive",
-          message: `Maximum nesting depth is ${complexity.nested} levels, consider flattening`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `Maximum DOM nesting depth is ${complexity.nested} levels`,
+          summary: `The deepest element sits ${complexity.nested} levels below <html>, making the structure hard to parse for assistive technology and maintainers.`,
+          where: { selector: "body", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "maxDomDepth",
+              value: complexity.nested,
+              unit: "levels",
+              threshold: 15
+            }
+          ],
+          investigate: ["Flatten deeply nested wrappers; prefer semantic landmarks over div-soup."]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-deep-nesting`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "cognitive",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, maxDepth: complexity.nested },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (complexity.animations > 10) {
-        findings.push({
-          id: `${this.profileId}-excessive-animation`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility-cognitive.excessive-animation",
+          rite: "accessibility",
           severity: "info",
-          category: "cognitive",
-          message: `${complexity.animations} animated elements, may overwhelm users`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${complexity.animations} animated elements on page`,
+          summary: `${complexity.animations} elements use CSS animation/transition inline styles, which can overwhelm users with cognitive or vestibular sensitivities.`,
+          where: { url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "animatedElementCount",
+              value: complexity.animations,
+              unit: "elements",
+              threshold: 10
+            }
+          ],
+          investigate: [
+            "Reduce simultaneous animations and ensure prefers-reduced-motion is honored."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-excessive-animation`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "cognitive",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, animationCount: complexity.animations },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const autoplay = await page.locator("audio[autoplay], video[autoplay]").count();
       if (autoplay > 0) {
-        findings.push({
-          id: `${this.profileId}-autoplay`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility-cognitive.autoplay-media",
+          rite: "accessibility",
           severity: "warning",
-          category: "cognitive",
-          message: `${autoplay} media elements auto-play, breaks cognitive accessibility`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: `${autoplay} media element(s) auto-play`,
+          summary: `${autoplay} <audio>/<video> element(s) have the autoplay attribute, which can distract or distress users and violates WCAG 1.4.2 (audio control).`,
+          where: { selector: "audio[autoplay], video[autoplay]", url },
+          evidence: [
+            { kind: "metric", name: "autoplayMediaCount", value: autoplay, unit: "elements" }
+          ],
+          investigate: ["Remove autoplay or require explicit user initiation before playback."]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-autoplay`,
+            profileId: this.profileId,
+            severity: "warning",
+            category: "cognitive",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: autoplay },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const reducedMotion = await page.evaluate(() => {
         return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       });
       if (!reducedMotion) {
-        findings.push({
-          id: `${this.profileId}-no-reduced-motion`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility-cognitive.no-reduced-motion",
+          rite: "accessibility",
           severity: "info",
-          category: "cognitive",
-          message: "Add prefers-reduced-motion media query support for animations",
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "observed",
+          title: "No prefers-reduced-motion handling detected",
+          summary: "The user agent reports no reduced-motion preference was set during testing, and the page should still honor the media query for users who do set it.",
+          where: { url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: "html",
+              snippet: sanitizeUntrusted(
+                'matchMedia("(prefers-reduced-motion: reduce)").matches === false'
+              )
+            }
+          ],
+          investigate: [
+            "Wrap animations/transitions in @media (prefers-reduced-motion: no-preference) or provide a reduce variant."
+          ]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-no-reduced-motion`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "cognitive",
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       if (complexity.forms > 0) {
         const formComplexity = await page.evaluate(() => {
@@ -4339,44 +5709,113 @@ var AccessibilityCognitiveProfile = class {
           return issues;
         });
         if (formComplexity.length > 0) {
-          findings.push({
-            id: `${this.profileId}-form-complexity`,
+          const canonical = buildFinding({
+            ruleId: "accessibility-cognitive.form-complexity",
+            rite: "accessibility",
+            severity: "info",
+            confidence: "observed",
+            title: `Form complexity issue: ${formComplexity[0]}`,
+            summary: `A form on the page triggered complexity heuristics: ${formComplexity[0]}. Long or unlabelled forms increase cognitive load.`,
+            where: { selector: "form", url },
+            evidence: [
+              {
+                kind: "dom",
+                selector: "form",
+                snippet: sanitizeUntrusted(formComplexity[0] ?? "")
+              },
+              { kind: "metric", name: "formCount", value: complexity.forms, unit: "forms" }
+            ],
+            investigate: [
+              "Split long forms into steps and ensure every field has a visible label."
+            ]
+          });
+          findings.push(
+            buildProfileFinding({
+              id: `${this.profileId}-form-complexity`,
+              profileId: this.profileId,
+              severity: "info",
+              category: "cognitive",
+              message: canonical.title,
+              details: { canonicalFinding: canonical, issues: formComplexity },
+              evidence: [...canonical.evidence]
+            })
+          );
+        }
+      }
+      const instructionsCheck = await page.evaluate(() => {
+        const text = document.body.textContent?.toLowerCase() || "";
+        const hasInstructions2 = text.includes("step") || text.includes("instructions") || text.includes("how to") || text.includes("guide");
+        return { hasInstructions: hasInstructions2, snippet: (document.body.textContent ?? "").slice(0, 200) };
+      });
+      const hasInstructions = typeof instructionsCheck === "boolean" ? instructionsCheck : instructionsCheck.hasInstructions;
+      const instructionsSnippet = typeof instructionsCheck === "object" ? instructionsCheck.snippet ?? "" : "";
+      if (!hasInstructions) {
+        const canonical = buildFinding({
+          ruleId: "accessibility-cognitive.no-instructions",
+          rite: "accessibility",
+          severity: "info",
+          confidence: "heuristic",
+          title: "Page lacks clear instructions or guidance",
+          summary: "Body text contains no instructional keywords (step/instructions/how to/guide). Users with cognitive disabilities benefit from explicit guidance.",
+          where: { selector: "body", url },
+          evidence: [
+            {
+              kind: "dom",
+              selector: "body",
+              snippet: sanitizeUntrusted(instructionsSnippet)
+            }
+          ],
+          investigate: ['Add a short "how to" section or step-by-step guidance for key tasks.']
+        });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-no-instructions`,
             profileId: this.profileId,
             severity: "info",
             category: "cognitive",
-            message: `Form complexity issue: ${formComplexity[0]}`,
-            timestamp: Date.now(),
-            isClassified: false
-          });
-        }
-      }
-      const hasInstructions = await page.evaluate(() => {
-        const text = document.body.textContent?.toLowerCase() || "";
-        return text.includes("step") || text.includes("instructions") || text.includes("how to") || text.includes("guide");
-      });
-      if (!hasInstructions) {
-        findings.push({
-          id: `${this.profileId}-no-instructions`,
-          profileId: this.profileId,
-          severity: "info",
-          category: "cognitive",
-          message: "Page lacks clear instructions or guidance for users",
-          timestamp: Date.now(),
-          isClassified: false
-        });
+            message: canonical.title,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const abbreviations = await page.locator("abbr").count();
       const abbreviationsWithTitle = await page.locator("abbr[title]").count();
       if (abbreviations > 0 && abbreviationsWithTitle < abbreviations) {
-        findings.push({
-          id: `${this.profileId}-unexplained-abbr`,
-          profileId: this.profileId,
+        const unexplained = abbreviations - abbreviationsWithTitle;
+        const canonical = buildFinding({
+          ruleId: "accessibility-cognitive.unexplained-abbreviations",
+          rite: "accessibility",
           severity: "info",
-          category: "cognitive",
-          message: `${abbreviations - abbreviationsWithTitle} abbreviations lack title/explanation`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${unexplained} abbreviations lack title/explanation`,
+          summary: `${unexplained} of ${abbreviations} <abbr> elements have no title attribute, so their expansions are unavailable to users.`,
+          where: { selector: "abbr", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "unexplainedAbbreviations",
+              value: unexplained,
+              unit: "elements"
+            }
+          ],
+          investigate: ["Add a title attribute or <dfn> markup to every abbreviation."]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-unexplained-abbr`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "cognitive",
+            message: canonical.title,
+            details: {
+              canonicalFinding: canonical,
+              total: abbreviations,
+              withTitle: abbreviationsWithTitle
+            },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const avgWordLength = await page.evaluate(() => {
         const text = document.body.innerText || "";
@@ -4386,15 +5825,36 @@ var AccessibilityCognitiveProfile = class {
         return totalChars / words.length;
       });
       if (avgWordLength > 7) {
-        findings.push({
-          id: `${this.profileId}-complex-language`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility-cognitive.complex-language",
+          rite: "accessibility",
           severity: "info",
-          category: "cognitive",
-          message: `Average word length ${avgWordLength.toFixed(1)} characters, consider simpler language`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `Average word length ${avgWordLength.toFixed(1)} characters`,
+          summary: `Body text averages ${avgWordLength.toFixed(1)} characters per word, above the ~7 char guideline for easy readability.`,
+          where: { selector: "body", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "averageWordLengthChars",
+              value: Number(avgWordLength.toFixed(2)),
+              unit: "chars",
+              threshold: 7
+            }
+          ],
+          investigate: ["Prefer shorter words and sentences; split long compound words."]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-complex-language`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "cognitive",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, avgWordLength },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
       const paragraphs = await page.evaluate(() => {
         return Array.from(document.querySelectorAll("p")).filter((p) => {
@@ -4403,26 +5863,48 @@ var AccessibilityCognitiveProfile = class {
         }).length;
       });
       if (paragraphs > 0) {
-        findings.push({
-          id: `${this.profileId}-long-paragraphs`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: "accessibility-cognitive.long-paragraphs",
+          rite: "accessibility",
           severity: "info",
-          category: "cognitive",
-          message: `${paragraphs} paragraphs with > 100 words, consider breaking up`,
-          timestamp: Date.now(),
-          isClassified: false
+          confidence: "measured",
+          title: `${paragraphs} paragraphs exceed 100 words`,
+          summary: `${paragraphs} <p> element(s) contain over 100 words each, forming walls of text that are hard to scan.`,
+          where: { selector: "p", url },
+          evidence: [
+            {
+              kind: "metric",
+              name: "overlongParagraphCount",
+              value: paragraphs,
+              unit: "elements",
+              threshold: 100
+            }
+          ],
+          investigate: ["Break long paragraphs into shorter chunks with subheadings or lists."]
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-long-paragraphs`,
+            profileId: this.profileId,
+            severity: "info",
+            category: "cognitive",
+            message: canonical.title,
+            details: { canonicalFinding: canonical, count: paragraphs },
+            evidence: [...canonical.evidence]
+          })
+        );
       }
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: "error",
-        category: "execution",
-        message: `Cognitive profile error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: "error",
+          category: "execution",
+          message: `Cognitive profile error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error))
+        })
+      );
     }
     const endTime = Date.now();
     const metadata = await page.context().browser()?.version();
@@ -4466,6 +5948,7 @@ var I18nRTLProfile = class {
           severity: "error",
           category: "i18n",
           message: 'Missing or incorrect dir="rtl" attribute on html element',
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("no rtl dir") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4481,6 +5964,9 @@ var I18nRTLProfile = class {
           severity: "warning",
           category: "i18n",
           message: `Text align hardcoded to "${textAlign}", should use logical properties or start/end`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("hardcoded text align") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4503,6 +5989,9 @@ var I18nRTLProfile = class {
           severity: "warning",
           category: "i18n",
           message: `${stylesUseLR} elements use physical properties (left/right) instead of logical`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("physical properties") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4523,6 +6012,9 @@ var I18nRTLProfile = class {
           severity: "info",
           category: "i18n",
           message: `${arrowImages} directional images may need RTL-specific versions`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("directional images") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4538,6 +6030,9 @@ var I18nRTLProfile = class {
           severity: "info",
           category: "i18n",
           message: "Page uses border-radius, verify appearance in RTL context",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("rounded checks") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4561,6 +6056,9 @@ var I18nRTLProfile = class {
           severity: "info",
           category: "i18n",
           message: "Flexbox direction hardcoded, consider auto-direction in RTL",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("flexbox direction") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4581,6 +6079,9 @@ var I18nRTLProfile = class {
           severity: "info",
           category: "i18n",
           message: "Page uses Latin numerals, consider Arabic numerals for RTL",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("no arabic numerals") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4595,6 +6096,9 @@ var I18nRTLProfile = class {
             severity: "info",
             category: "i18n",
             message: "Form elements should inherit or explicitly set dir attribute",
+            evidence: [
+              { kind: "dom", selector: "body", snippet: sanitizeUntrusted("form no dir") }
+            ],
             timestamp: Date.now(),
             isClassified: false
           });
@@ -4607,6 +6111,9 @@ var I18nRTLProfile = class {
         severity: "error",
         category: "execution",
         message: `RTL profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: "dom", selector: "body", snippet: sanitizeUntrusted("execution error") }
+        ],
         timestamp: Date.now(),
         isClassified: false
       });
@@ -4653,6 +6160,7 @@ var I18nCJKProfile = class {
           severity: "warning",
           category: "i18n",
           message: "Page lang attribute not set to Japanese",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("no ja lang") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4668,6 +6176,7 @@ var I18nCJKProfile = class {
           severity: "info",
           category: "i18n",
           message: `Font stack "${fontFamily}" may not include CJK support`,
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("no cjk font") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4682,6 +6191,9 @@ var I18nCJKProfile = class {
           severity: "info",
           category: "i18n",
           message: "Consider word-break properties for CJK text",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("line breaking") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4694,6 +6206,7 @@ var I18nCJKProfile = class {
           severity: "info",
           category: "i18n",
           message: "No ruby annotations (furigana) found, consider adding for kanji",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("no ruby") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4710,6 +6223,7 @@ var I18nCJKProfile = class {
           severity: "info",
           category: "i18n",
           message: "Page contains no CJK-specific punctuation, may use ASCII substitutes",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("no cjk punct") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4725,6 +6239,9 @@ var I18nCJKProfile = class {
           severity: "info",
           category: "i18n",
           message: "Page lacks vertical text support, common in Japanese",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("vertical text") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4739,6 +6256,9 @@ var I18nCJKProfile = class {
           severity: "info",
           category: "i18n",
           message: `Letter-spacing "${letterSpacing}" may distort CJK text`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("letter spacing") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4754,6 +6274,9 @@ var I18nCJKProfile = class {
           severity: "info",
           category: "i18n",
           message: "Page contains numbers, verify proper locale-specific formatting",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("number format") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4770,6 +6293,7 @@ var I18nCJKProfile = class {
           severity: "info",
           category: "i18n",
           message: `${dates} dates using ISO format, consider Japanese format`,
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("date format") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4781,6 +6305,9 @@ var I18nCJKProfile = class {
         severity: "error",
         category: "execution",
         message: `CJK profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: "dom", selector: "body", snippet: sanitizeUntrusted("execution error") }
+        ],
         timestamp: Date.now(),
         isClassified: false
       });
@@ -4827,6 +6354,7 @@ var I18nMixedProfile = class {
           severity: "warning",
           category: "i18n",
           message: "Page lang attribute not set to Hindi",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("no hi lang") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4842,6 +6370,9 @@ var I18nMixedProfile = class {
           severity: "warning",
           category: "i18n",
           message: `Font stack "${fontFamily}" may not support Devanagari script`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("no devanagari font") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4858,6 +6389,9 @@ var I18nMixedProfile = class {
           severity: "info",
           category: "i18n",
           message: "Page contains no Devanagari diacritics/vowel signs",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("no diacritics") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4872,6 +6406,7 @@ var I18nMixedProfile = class {
           severity: "info",
           category: "i18n",
           message: "Ligatures disabled (font-variant-ligatures: none), needed for complex scripts",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("no ligatures") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4886,6 +6421,7 @@ var I18nMixedProfile = class {
           severity: "info",
           category: "i18n",
           message: "Consider explicit line-height > 1.2 for complex script readability",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("line height") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4900,6 +6436,9 @@ var I18nMixedProfile = class {
           severity: "info",
           category: "i18n",
           message: `text-rendering: "${textRendering}", consider optimizeLegibility for complex scripts`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("text rendering") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4914,6 +6453,7 @@ var I18nMixedProfile = class {
           severity: "info",
           category: "i18n",
           message: `word-spacing: "${wordSpacing}" may distort complex script rendering`,
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("word spacing") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4932,6 +6472,9 @@ var I18nMixedProfile = class {
           severity: "info",
           category: "i18n",
           message: "Page mixes Latin and Devanagari scripts, verify rendering",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("script mixing") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4950,6 +6493,7 @@ var I18nMixedProfile = class {
           severity: "info",
           category: "i18n",
           message: "Page has numbers but no rupee symbol (\u20B9), verify currency formatting",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("currency") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4972,6 +6516,7 @@ var I18nMixedProfile = class {
           severity: "info",
           category: "i18n",
           message: "Verify vowel sign placement in complex script rendering",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("vowel order") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -4983,6 +6528,9 @@ var I18nMixedProfile = class {
         severity: "error",
         category: "execution",
         message: `Mixed scripts profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: "dom", selector: "body", snippet: sanitizeUntrusted("execution error") }
+        ],
         timestamp: Date.now(),
         isClassified: false
       });
@@ -5076,6 +6624,9 @@ var BrowserFirefoxProfile = class {
           severity: "warning",
           category: "browser-compatibility",
           message: "Page uses ::-webkit-scrollbar without standard scrollbar-width / scrollbar-color, ignored in Firefox",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("webkit scrollbar") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5087,6 +6638,9 @@ var BrowserFirefoxProfile = class {
           severity: "warning",
           category: "browser-compatibility",
           message: "Page uses -webkit-backdrop-filter without standard backdrop-filter, will not render blur in Firefox",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("webkit backdrop") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5098,6 +6652,9 @@ var BrowserFirefoxProfile = class {
           severity: "info",
           category: "browser-compatibility",
           message: "Page uses -webkit-background-clip: text; verify text fill color fallback is defined for Firefox",
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("background clip text") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5124,6 +6681,7 @@ var BrowserFirefoxProfile = class {
           severity: "error",
           category: "browser-compatibility",
           message: `Script relies on WebKit-specific API "${issue}" without standard fallback, breaks in Firefox`,
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("check") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5150,6 +6708,9 @@ var BrowserFirefoxProfile = class {
           severity: "info",
           category: "browser-compatibility",
           message: `${formAppearanceIssues} controls use -webkit-appearance without standard appearance or -moz-appearance`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("appearance property") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5162,6 +6723,9 @@ var BrowserFirefoxProfile = class {
           category: "console-errors",
           message: `${consoleErrors.length} JavaScript console errors encountered in Firefox engine`,
           details: { errors: consoleErrors.slice(0, 5) },
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("console errors") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5173,6 +6737,9 @@ var BrowserFirefoxProfile = class {
         severity: "error",
         category: "execution",
         message: `Firefox profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: "dom", selector: "body", snippet: sanitizeUntrusted("execution error") }
+        ],
         timestamp: Date.now(),
         isClassified: false
       });
@@ -5251,6 +6818,9 @@ var BrowserEdgeProfile = class {
           severity: "warning",
           category: "accessibility",
           message: `${forcedColorsAudit.forcedColorsAdjustNone} elements disable forced colors (forced-color-adjust: none), may be unreadable in Windows High Contrast on Edge`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("forced colors none") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5262,6 +6832,9 @@ var BrowserEdgeProfile = class {
           severity: "info",
           category: "accessibility",
           message: `${forcedColorsAudit.svgIconsWithoutFillOrCurrentColor} SVG icons do not use currentColor, verify visibility in Windows High Contrast on Edge`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("svg high contrast") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5282,6 +6855,7 @@ var BrowserEdgeProfile = class {
           severity: "warning",
           category: "browser-compatibility",
           message: "Inline script appears to sniff for Chrome without checking for Edge (Edg/), risking incorrect feature branches",
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("ua sniffing") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5301,6 +6875,7 @@ var BrowserEdgeProfile = class {
           severity: "info",
           category: "browser-compatibility",
           message: 'Missing web app manifest (<link rel="manifest">) for Edge PWA and Windows installability',
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("pwa manifest") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5313,6 +6888,9 @@ var BrowserEdgeProfile = class {
           category: "console-errors",
           message: `${consoleErrors.length} JavaScript console errors encountered during Edge evaluation`,
           details: { errors: consoleErrors.slice(0, 5) },
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("console errors") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5324,6 +6902,9 @@ var BrowserEdgeProfile = class {
         severity: "error",
         category: "execution",
         message: `Edge profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: "dom", selector: "body", snippet: sanitizeUntrusted("execution error") }
+        ],
         timestamp: Date.now(),
         isClassified: false
       });
@@ -5372,6 +6953,13 @@ var BrowserLegacyProfile = class {
           severity: "info",
           category: "browser-compatibility",
           message: 'Missing <meta http-equiv="X-UA-Compatible" content="IE=edge"> tag to prevent IE compatibility view mode',
+          evidence: [
+            {
+              kind: "dom",
+              selector: "body",
+              snippet: sanitizeUntrusted("missing x ua compatible")
+            }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5407,6 +6995,9 @@ var BrowserLegacyProfile = class {
           category: "browser-compatibility",
           message: `CSS Custom Properties (var(--*)) detected in ${cssAudit.cssVarCount} rules; unsupported in IE11 and legacy browsers without build-time post-processing`,
           details: { count: cssAudit.cssVarCount },
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("css variables") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5419,6 +7010,7 @@ var BrowserLegacyProfile = class {
           category: "browser-compatibility",
           message: `Modern CSS Grid detected in ${cssAudit.cssGridCount} rules; IE11 requires -ms-grid prefixes or flexbox/float fallbacks`,
           details: { count: cssAudit.cssGridCount },
+          evidence: [{ kind: "dom", selector: "body", snippet: sanitizeUntrusted("css grid") }],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5431,6 +7023,9 @@ var BrowserLegacyProfile = class {
           category: "browser-compatibility",
           message: `CSS clamp(), min(), or max() functions used in ${cssAudit.cssClampCount} rules; ignored in IE11 and legacy browsers`,
           details: { count: cssAudit.cssClampCount },
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("css clamp min max") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5459,6 +7054,9 @@ var BrowserLegacyProfile = class {
           severity: "error",
           category: "browser-compatibility",
           message: `Untranspiled modern JavaScript syntax ("${feature}") detected in inline script; causes fatal syntax errors in legacy browsers / IE11`,
+          evidence: [
+            { kind: "dom", selector: "body", snippet: sanitizeUntrusted("untranspiled ") }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5476,6 +7074,13 @@ var BrowserLegacyProfile = class {
           severity: "info",
           category: "browser-compatibility",
           message: "No unsupported browser warning banner or <noscript> tag detected to gracefully notify legacy browser users",
+          evidence: [
+            {
+              kind: "dom",
+              selector: "body",
+              snippet: sanitizeUntrusted("no unsupported browser warning")
+            }
+          ],
           timestamp: Date.now(),
           isClassified: false
         });
@@ -5487,6 +7092,9 @@ var BrowserLegacyProfile = class {
         severity: "error",
         category: "execution",
         message: `Legacy browser profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: "dom", selector: "body", snippet: sanitizeUntrusted("execution error") }
+        ],
         timestamp: Date.now(),
         isClassified: false
       });
@@ -5510,89 +7118,6 @@ var BrowserLegacyProfile = class {
     };
   }
 };
-
-// src/types/contracts.ts
-import { z } from "zod";
-var RiteIdSchema = z.enum([
-  "full",
-  "mobile",
-  "tablet",
-  "desktop",
-  "image-failure",
-  "font-failure",
-  "js-disabled",
-  "reduced-motion",
-  "console-errors",
-  "offline",
-  "accessibility",
-  "broken-links",
-  "network-resilience",
-  "performance",
-  "security-hygiene",
-  "form-resilience"
-]);
-var SeveritySchema = z.enum(["info", "warning", "serious"]);
-var ConfidenceSchema = z.enum(["observed", "measured", "heuristic"]);
-function sanitizeUntrusted(raw) {
-  const stripped = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
-  return { untrusted: true, text: stripped.slice(0, 300) };
-}
-var ConcurrencyOptionsSchema = z.object({
-  concurrency: z.boolean().default(false),
-  concurrencyAmount: z.number().int().min(1).default(2)
-});
-
-// src/types/finding-utils.ts
-import { createHash as createHash3 } from "crypto";
-function assertValidSeverityConfidence(severity, confidence) {
-  if (confidence === "heuristic" && severity === "serious") {
-    throw new Error(
-      `Invalid combination: confidence 'heuristic' cannot be paired with severity 'serious'. Heuristic findings must be 'info' or 'warning'.`
-    );
-  }
-}
-function makeFindingId(ruleId, rite, normalizedLocator) {
-  return createHash3("sha256").update(ruleId + rite + normalizedLocator).digest("hex").slice(0, 16);
-}
-function buildFinding(params) {
-  const {
-    normalizedLocator,
-    ruleId,
-    rite,
-    severity,
-    confidence,
-    title,
-    summary,
-    where,
-    evidence,
-    investigate
-  } = params;
-  if (!evidence || evidence.length === 0) {
-    throw new Error(
-      `Finding '${ruleId}' on rite '${rite}' has no evidence. Every finding must carry at least one piece of evidence.`
-    );
-  }
-  assertValidSeverityConfidence(severity, confidence);
-  if (title.length > 90) {
-    throw new Error(
-      `Finding title exceeds 90 characters (${title.length}): "${title.slice(0, 50)}\u2026"`
-    );
-  }
-  const locator = normalizedLocator ?? where?.selector ?? where?.url ?? "";
-  const id = makeFindingId(ruleId, rite, locator);
-  return {
-    id,
-    ruleId,
-    rite,
-    severity,
-    confidence,
-    title,
-    summary,
-    ...where !== void 0 ? { where } : {},
-    evidence,
-    investigate: investigate ?? []
-  };
-}
 
 // src/profiles/image-failure.ts
 var ImageFailureProfile = class {
@@ -5663,6 +7188,7 @@ var ImageFailureProfile = class {
           severity: "warning",
           category: "accessibility",
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: {
             canonicalFinding: canonical,
             count: evalResult.missingAlt.length
@@ -5699,6 +7225,7 @@ var ImageFailureProfile = class {
           severity: "info",
           category: "performance",
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: {
             canonicalFinding: canonical,
             count: evalResult.missingDimensions.length
@@ -5714,6 +7241,7 @@ var ImageFailureProfile = class {
         severity: "error",
         category: "execution",
         message: `Image failure profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false
       });
@@ -5810,6 +7338,7 @@ var FontFailureProfile = class {
           severity: "warning",
           category: "performance",
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: {
             canonicalFinding: canonical,
             blockedFonts: blockedFontUrls.slice(0, 10),
@@ -5826,6 +7355,7 @@ var FontFailureProfile = class {
         severity: "error",
         category: "execution",
         message: `Font failure profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false
       });
@@ -5925,6 +7455,7 @@ var JsDisabledProfile = class {
           severity: "warning",
           category: "resilience",
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: { canonicalFinding: canonical, textLength: evalResult.textLen },
           timestamp: Date.now(),
           isClassified: false
@@ -5953,6 +7484,7 @@ var JsDisabledProfile = class {
           severity: "info",
           category: "resilience",
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: { canonicalFinding: canonical, textLength: evalResult.textLen },
           timestamp: Date.now(),
           isClassified: false
@@ -5965,6 +7497,7 @@ var JsDisabledProfile = class {
         severity: "error",
         category: "execution",
         message: `JS disabled profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false
       });
@@ -6071,6 +7604,7 @@ var ReducedMotionProfile = class {
           severity: "warning",
           category: "accessibility",
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: { canonicalFinding: canonical, runningAnimations: runningCount },
           timestamp: Date.now(),
           isClassified: false
@@ -6083,6 +7617,7 @@ var ReducedMotionProfile = class {
         severity: "error",
         category: "execution",
         message: `Reduced motion profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false
       });
@@ -6196,6 +7731,7 @@ var OfflineProfile = class {
           severity: "info",
           category: "resilience",
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: {
             canonicalFinding: canonical,
             serviceWorkerRegistered: swRegistered,
@@ -6212,6 +7748,7 @@ var OfflineProfile = class {
         severity: "error",
         category: "execution",
         message: `Offline profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false
       });
@@ -6370,6 +7907,7 @@ var BrokenLinksProfile = class {
             severity: "warning",
             category: "links",
             message: canonical.title,
+            evidence: [...canonical.evidence],
             details: { canonicalFinding: canonical },
             timestamp: Date.now(),
             isClassified: false
@@ -6402,6 +7940,7 @@ var BrokenLinksProfile = class {
             severity: "info",
             category: "links",
             message: canonical.title,
+            evidence: [...canonical.evidence],
             details: { canonicalFinding: canonical },
             timestamp: Date.now(),
             isClassified: false
@@ -6431,6 +7970,7 @@ var BrokenLinksProfile = class {
             severity: "warning",
             category: "links",
             message: canonical.title,
+            evidence: [...canonical.evidence],
             details: { canonicalFinding: canonical },
             timestamp: Date.now(),
             isClassified: false
@@ -6444,6 +7984,7 @@ var BrokenLinksProfile = class {
         severity: "error",
         category: "execution",
         message: `Broken links profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false
       });
@@ -6586,6 +8127,7 @@ var NetworkResilienceProfile = class {
           severity: "warning",
           category: "resilience",
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: {
             canonicalFinding: canonical,
             blockedRequests: failedUrls.length,
@@ -6603,6 +8145,7 @@ var NetworkResilienceProfile = class {
         severity: "error",
         category: "execution",
         message: `Network resilience profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false
       });
@@ -6730,6 +8273,7 @@ var SecurityHygieneProfile = class {
             severity: rule.severity,
             category: "security",
             message: canonical.title,
+            evidence: [...canonical.evidence],
             details: { canonicalFinding: canonical },
             timestamp: Date.now(),
             isClassified: false
@@ -6763,6 +8307,7 @@ var SecurityHygieneProfile = class {
           severity: "warning",
           category: "security",
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: { canonicalFinding: canonical },
           timestamp: Date.now(),
           isClassified: false
@@ -6775,6 +8320,7 @@ var SecurityHygieneProfile = class {
         severity: "error",
         category: "execution",
         message: `Security hygiene profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false
       });
@@ -6940,6 +8486,7 @@ var FormResilienceProfile = class {
               severity: "warning",
               category: "forms",
               message: canonical.title,
+              evidence: [...canonical.evidence],
               details: { canonicalFinding: canonical, selector },
               timestamp: Date.now(),
               isClassified: false
@@ -6971,6 +8518,7 @@ var FormResilienceProfile = class {
               severity: "info",
               category: "forms",
               message: canonical.title,
+              evidence: [...canonical.evidence],
               details: {
                 canonicalFinding: canonical,
                 selector,
@@ -6991,6 +8539,7 @@ var FormResilienceProfile = class {
         severity: "error",
         category: "execution",
         message: `Form resilience profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false
       });
@@ -7351,6 +8900,17 @@ var HauntViewEngine = class {
           for (const finding of result.findings) {
             if (!finding.details) finding.details = {};
             finding.details.screenshot = screenshotMeta.fileName;
+            if (!Array.isArray(finding.evidence)) {
+              finding.evidence = [];
+            }
+            finding.evidence.push({ kind: "screenshot", captureId: screenshotMeta.fileName });
+            const canonical = finding.details.canonicalFinding;
+            if (canonical && Array.isArray(canonical.evidence)) {
+              canonical.evidence.push({
+                kind: "screenshot",
+                captureId: screenshotMeta.fileName
+              });
+            }
           }
         } catch (screenshotErr) {
           console.warn(`Could not capture screenshot for profile ${profileId}:`, screenshotErr);
@@ -7671,7 +9231,7 @@ function saveTestReportToDb(report, paths, db) {
           finding.category,
           finding.message,
           finding.location ? JSON.stringify(finding.location) : null,
-          finding.details ? JSON.stringify(finding.details) : null,
+          JSON.stringify({ details: finding.details ?? null, evidence: finding.evidence }),
           finding.timestamp
         );
       }

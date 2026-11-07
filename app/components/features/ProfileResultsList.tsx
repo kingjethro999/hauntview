@@ -10,17 +10,20 @@ export interface ProfileResultsListProps {
 
 export const ProfileResultsList: React.FC<ProfileResultsListProps> = ({ profileResults }) => {
   return (
-    <Card variant="default" className="p-6 space-y-4 bg-[#1c1629] border-[#46334b]">
+    <Card
+      variant="default"
+      className="p-6 space-y-4 bg-[var(--ghost-mist)] border-[var(--tombstone-gray)]"
+    >
       <div>
         <div className="flex items-center gap-2">
-          <h3 className="font-display font-bold text-lg text-[#fff1dc]">
+          <h3 className="font-display font-bold text-lg text-[var(--bone-white)]">
             Rite Execution Breakdown ({profileResults.length})
           </h3>
           <Badge variant="outline" size="sm">
             Profiles
           </Badge>
         </div>
-        <p className="text-xs text-[#d9d3e0] mt-0.5">
+        <p className="text-xs text-[var(--spirit-smoke)] mt-0.5">
           Individual result status, execution duration, and detected omens per test profile
         </p>
       </div>
@@ -33,7 +36,7 @@ export const ProfileResultsList: React.FC<ProfileResultsListProps> = ({ profileR
           return (
             <div
               key={result.profileId}
-              className="p-4 rounded-[4px] border border-[#46334b] bg-[#0a0711]/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#b9acbf] transition-colors"
+              className="p-4 rounded-[4px] border border-[var(--tombstone-gray)] bg-[var(--midnight-veil)]/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[var(--grave-dust)] transition-colors"
             >
               <div className="flex items-start gap-3">
                 <div className="mt-0.5">
@@ -46,27 +49,29 @@ export const ProfileResultsList: React.FC<ProfileResultsListProps> = ({ profileR
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-[#fff1dc]">
+                    <span className="font-semibold text-sm text-[var(--bone-white)]">
                       {result.profileName}
                     </span>
                     <Badge variant={result.success ? 'success' : 'error'} size="sm">
                       {result.success ? 'PASSED' : 'FAILED'}
                     </Badge>
                   </div>
-                  <p className="text-xs font-mono text-[#d9d3e0] mt-0.5">{result.profileId}</p>
+                  <p className="text-xs font-mono text-[var(--spirit-smoke)] mt-0.5">
+                    {result.profileId}
+                  </p>
                 </div>
               </div>
 
               {/* Stats & Metadata */}
-              <div className="flex flex-wrap items-center gap-3 text-xs text-[#d9d3e0] pl-8 sm:pl-0">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--spirit-smoke)] pl-8 sm:pl-0">
                 <div className="flex items-center gap-1 font-mono">
-                  <ClockIcon className="w-3.5 h-3.5 text-[#ff791f]" />
+                  <ClockIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
                   <span>{(result.duration / 1000).toFixed(2)}s</span>
                 </div>
 
                 {result.screenshots && result.screenshots.length > 0 && (
                   <div className="flex items-center gap-1">
-                    <PhotoIcon className="w-3.5 h-3.5 text-[#9aff9a]" />
+                    <PhotoIcon className="w-3.5 h-3.5 text-[var(--ectoplasm-green)]" />
                     <span>{result.screenshots.length} plates</span>
                   </div>
                 )}

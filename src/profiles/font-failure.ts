@@ -5,7 +5,7 @@
 
 import { Page } from 'playwright';
 import { sanitizeUntrusted } from '../types/contracts';
-import { buildFinding } from '../types/finding-utils';
+import { buildFinding, executionErrorEvidence } from '../types/finding-utils';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -106,6 +106,7 @@ export class FontFailureProfile {
           severity: 'warning',
           category: 'performance',
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: {
             canonicalFinding: canonical,
             blockedFonts: blockedFontUrls.slice(0, 10),
@@ -122,6 +123,7 @@ export class FontFailureProfile {
         severity: 'error',
         category: 'execution',
         message: `Font failure profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false,
       });

@@ -93,7 +93,7 @@ export default function HomePage() {
           Desktop: Wide panoramic banner
           Mobile & Tablet: Vertical compact hero
       ═════════════════════════════════════════ */}
-      <section className="relative w-full overflow-hidden bg-[#0a0711]">
+      <section className="relative w-full overflow-hidden bg-[var(--midnight-veil)]">
         {/* Hidden screen-reader heading for WCAG & SEO */}
         <div className="sr-only">
           <h1>HauntView — Photograph your website twice</h1>
@@ -128,7 +128,7 @@ export default function HomePage() {
             className="absolute inset-x-0 bottom-0 h-16 md:h-28 lg:h-40 pointer-events-none"
             style={{
               background:
-                'linear-gradient(to bottom, transparent 0%, rgba(10, 7, 17, 0.3) 40%, rgba(10, 7, 17, 0.8) 75%, #0a0711 100%)',
+                'linear-gradient(to bottom, transparent 0%, rgba(10, 7, 17, 0.3) 40%, rgba(10, 7, 17, 0.8) 75%, var(--midnight-veil) 100%)',
             }}
             aria-hidden="true"
           />
@@ -151,7 +151,7 @@ export default function HomePage() {
             className="absolute inset-x-0 bottom-0 h-20 sm:h-28 pointer-events-none"
             style={{
               background:
-                'linear-gradient(to bottom, transparent 0%, rgba(10, 7, 17, 0.35) 35%, rgba(10, 7, 17, 0.85) 70%, #0a0711 100%)',
+                'linear-gradient(to bottom, transparent 0%, rgba(10, 7, 17, 0.35) 35%, rgba(10, 7, 17, 0.85) 70%, var(--midnight-veil) 100%)',
             }}
             aria-hidden="true"
           />

@@ -119,15 +119,15 @@ export default function CryptPage() {
         </div>
 
         {/* Crypt Header */}
-        <div className="pb-5 sm:pb-6 border-b border-[#46334b] flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4">
+        <div className="pb-5 sm:pb-6 border-b border-[var(--tombstone-gray)] flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <ArchiveBoxIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#ff791f] flex-shrink-0" />
-              <h1 className="font-serif font-extrabold text-xl sm:text-2xl md:text-3xl text-[#fff1dc] tracking-tight">
+              <ArchiveBoxIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--pumpkin-fire)] flex-shrink-0" />
+              <h1 className="font-serif font-extrabold text-xl sm:text-2xl md:text-3xl text-[var(--bone-white)] tracking-tight">
                 The Crypt · Graveyard of Séances
               </h1>
             </div>
-            <p className="text-xs sm:text-sm font-serif text-[#d9d3e0]">
+            <p className="text-xs sm:text-sm font-serif text-[var(--spirit-smoke)]">
               Browse past spirit photography sessions, exhuming previous findings and laid-to-rest
               apparitions.
             </p>
@@ -135,10 +135,10 @@ export default function CryptPage() {
 
           {/* Comparative Status Chips (§3.2 Lexicon) */}
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="px-2.5 sm:px-3 py-1 rounded-full bg-[#1c1629] border border-[#46334b] text-[#fff1dc] font-serif">
+            <span className="px-2.5 sm:px-3 py-1 rounded-full bg-[var(--ghost-mist)] border border-[var(--tombstone-gray)] text-[var(--bone-white)] font-serif">
               <strong>{reports.length}</strong> Past Séances
             </span>
-            <span className="px-2.5 sm:px-3 py-1 rounded-full bg-[#1c1629] border border-[#9aff9a]/40 text-[#9aff9a] font-serif">
+            <span className="px-2.5 sm:px-3 py-1 rounded-full bg-[var(--ghost-mist)] border border-[var(--ectoplasm-green)]/40 text-[var(--ectoplasm-green)] font-serif">
               Browser-persisted séances
             </span>
           </div>
@@ -155,8 +155,8 @@ export default function CryptPage() {
                 onClick={() => setFilter(mode)}
                 className={`px-2.5 sm:px-3 py-1.5 rounded-[6px] text-xs font-serif capitalize cursor-pointer transition-colors ${
                   filter === mode
-                    ? 'bg-[#ff791f] text-[#0a0711] font-bold shadow-[0_0_8px_rgba(255,121,31,0.3)]'
-                    : 'bg-[#1c1629] text-[#d9d3e0] hover:text-[#fff1dc] border border-[#46334b]'
+                    ? 'bg-[var(--pumpkin-fire)] text-[var(--midnight-veil)] font-bold shadow-[0_0_8px_rgba(255,121,31,0.3)]'
+                    : 'bg-[var(--ghost-mist)] text-[var(--spirit-smoke)] hover:text-[var(--bone-white)] border border-[var(--tombstone-gray)]'
                 }`}
               >
                 {mode === 'all'
@@ -169,14 +169,14 @@ export default function CryptPage() {
           </div>
 
           {/* View Toggle */}
-          <div className="inline-flex self-start sm:self-auto rounded-[6px] bg-[#1c1629] p-0.5 border border-[#46334b]">
+          <div className="inline-flex self-start sm:self-auto rounded-[6px] bg-[var(--ghost-mist)] p-0.5 border border-[var(--tombstone-gray)]">
             <button
               type="button"
               onClick={() => setViewStyle('tombstones')}
               className={`px-3 py-1 rounded-[4px] text-xs font-serif flex items-center gap-1.5 transition-colors cursor-pointer ${
                 viewStyle === 'tombstones'
-                  ? 'bg-[#ff791f] text-[#0a0711] font-bold'
-                  : 'text-[#d9d3e0] hover:text-[#fff1dc]'
+                  ? 'bg-[var(--pumpkin-fire)] text-[var(--midnight-veil)] font-bold'
+                  : 'text-[var(--spirit-smoke)] hover:text-[var(--bone-white)]'
               }`}
               title="Graveyard headstones view"
             >
@@ -188,8 +188,8 @@ export default function CryptPage() {
               onClick={() => setViewStyle('table')}
               className={`px-3 py-1 rounded-[4px] text-xs font-serif flex items-center gap-1.5 transition-colors cursor-pointer ${
                 viewStyle === 'table'
-                  ? 'bg-[#ff791f] text-[#0a0711] font-bold'
-                  : 'text-[#d9d3e0] hover:text-[#fff1dc]'
+                  ? 'bg-[var(--pumpkin-fire)] text-[var(--midnight-veil)] font-bold'
+                  : 'text-[var(--spirit-smoke)] hover:text-[var(--bone-white)]'
               }`}
               title="Ledger table view"
             >
@@ -202,17 +202,17 @@ export default function CryptPage() {
         {/* Séance Grid - with spacing */}
         <div className="mt-6 sm:mt-8">
           {isLoading ? (
-            <div className="p-12 sm:p-16 text-center text-xs text-[#d9d3e0] bg-[#1c1629]/40 rounded-[2px] border border-[#46334b] font-serif">
-              <SparklesIcon className="w-6 h-6 text-[#ff791f] mx-auto mb-2 animate-spin" />
+            <div className="p-12 sm:p-16 text-center text-xs text-[var(--spirit-smoke)] bg-[var(--ghost-mist)]/40 rounded-[2px] border border-[var(--tombstone-gray)] font-serif">
+              <SparklesIcon className="w-6 h-6 text-[var(--pumpkin-fire)] mx-auto mb-2 animate-spin" />
               Reading the crypt stones...
             </div>
           ) : filteredReports.length === 0 ? (
-            <div className="text-center py-12 sm:py-16 px-4 bg-[#1c1629]/30 rounded-[4px] border border-[#46334b] flex flex-col items-center">
+            <div className="text-center py-12 sm:py-16 px-4 bg-[var(--ghost-mist)]/30 rounded-[4px] border border-[var(--tombstone-gray)] flex flex-col items-center">
               <WispGhost state="napping" size="lg" className="mb-3" />
-              <h3 className="font-serif font-bold text-base sm:text-lg text-[#fff1dc] mb-1">
+              <h3 className="font-serif font-bold text-base sm:text-lg text-[var(--bone-white)] mb-1">
                 The Crypt is Silent
               </h3>
-              <p className="text-xs text-[#d9d3e0] max-w-sm mx-auto mb-5 font-serif">
+              <p className="text-xs text-[var(--spirit-smoke)] max-w-sm mx-auto mb-5 font-serif">
                 No matching séances found in the graveyard. Begin a new run from The Parlour.
               </p>
               <Link href="/">
@@ -230,10 +230,10 @@ export default function CryptPage() {
             </div>
           ) : (
             /* Traditional Ledger Table */
-            <div className="rounded-[4px] bg-[#1c1629] overflow-hidden border border-[#46334b]">
+            <div className="rounded-[4px] bg-[var(--ghost-mist)] overflow-hidden border border-[var(--tombstone-gray)]">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px] text-left text-xs font-serif">
-                  <thead className="bg-[#0a0711] text-[#d9d3e0] border-b border-[#46334b] font-mono uppercase text-[10px] tracking-wider">
+                  <thead className="bg-[var(--midnight-veil)] text-[var(--spirit-smoke)] border-b border-[var(--tombstone-gray)] font-mono uppercase text-[10px] tracking-wider">
                     <tr>
                       <th className="py-3 px-4">House (Target URL)</th>
                       <th className="py-3 px-4">Status & Omens</th>
@@ -243,13 +243,16 @@ export default function CryptPage() {
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#46334b] text-[#fff1dc]">
+                  <tbody className="divide-y divide-[var(--tombstone-gray)] text-[var(--bone-white)]">
                     {filteredReports.map((report) => (
-                      <tr key={report.id} className="hover:bg-[#0a0711]/40 transition-colors">
+                      <tr
+                        key={report.id}
+                        className="hover:bg-[var(--midnight-veil)]/40 transition-colors"
+                      >
                         <td className="py-3.5 px-4 font-medium max-w-xs truncate">
                           <Link
                             href={`/results/${report.id}`}
-                            className="hover:text-[#ff791f] transition-colors"
+                            className="hover:text-[var(--pumpkin-fire)] transition-colors"
                           >
                             {report.url}
                           </Link>
@@ -260,13 +263,13 @@ export default function CryptPage() {
                             {report.totalFindings} Omens
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-[#d9d3e0]">
+                        <td className="py-3.5 px-4 font-mono text-[var(--spirit-smoke)]">
                           {report.successfulProfiles} / {report.totalProfiles}
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-[#d9d3e0]">
+                        <td className="py-3.5 px-4 font-mono text-[var(--spirit-smoke)]">
                           {(report.duration / 1000).toFixed(1)}s
                         </td>
-                        <td className="py-3.5 px-4 text-[#d9d3e0]">
+                        <td className="py-3.5 px-4 text-[var(--spirit-smoke)]">
                           {new Date(report.startTime).toLocaleDateString()}
                         </td>
                         <td className="py-3.5 px-4 text-right">

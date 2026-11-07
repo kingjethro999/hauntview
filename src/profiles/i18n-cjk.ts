@@ -4,6 +4,7 @@
  */
 
 import { Page } from 'playwright';
+import { sanitizeUntrusted } from '../types/contracts';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -36,6 +37,7 @@ export class I18nCJKProfile {
           severity: 'warning',
           category: 'i18n',
           message: 'Page lang attribute not set to Japanese',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no ja lang') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -59,6 +61,7 @@ export class I18nCJKProfile {
           severity: 'info',
           category: 'i18n',
           message: `Font stack "${fontFamily}" may not include CJK support`,
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no cjk font') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -76,6 +79,9 @@ export class I18nCJKProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Consider word-break properties for CJK text',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('line breaking') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -90,6 +96,7 @@ export class I18nCJKProfile {
           severity: 'info',
           category: 'i18n',
           message: 'No ruby annotations (furigana) found, consider adding for kanji',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no ruby') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -109,6 +116,7 @@ export class I18nCJKProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Page contains no CJK-specific punctuation, may use ASCII substitutes',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no cjk punct') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -127,6 +135,9 @@ export class I18nCJKProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Page lacks vertical text support, common in Japanese',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('vertical text') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -144,6 +155,9 @@ export class I18nCJKProfile {
           severity: 'info',
           category: 'i18n',
           message: `Letter-spacing "${letterSpacing}" may distort CJK text`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('letter spacing') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -162,6 +176,9 @@ export class I18nCJKProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Page contains numbers, verify proper locale-specific formatting',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('number format') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -181,6 +198,7 @@ export class I18nCJKProfile {
           severity: 'info',
           category: 'i18n',
           message: `${dates} dates using ISO format, consider Japanese format`,
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('date format') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -192,6 +210,9 @@ export class I18nCJKProfile {
         severity: 'error',
         category: 'execution',
         message: `CJK profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('execution error') },
+        ],
         timestamp: Date.now(),
         isClassified: false,
       });

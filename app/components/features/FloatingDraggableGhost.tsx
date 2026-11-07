@@ -231,7 +231,7 @@ export const FloatingDraggableGhost: React.FC = () => {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      className={`fixed z-50 select-none touch-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff791f] rounded-full transition-transform ${
+      className={`fixed z-50 select-none touch-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pumpkin-fire)] rounded-full transition-transform ${
         isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab hover:scale-105'
       }`}
       style={{
@@ -247,11 +247,11 @@ export const FloatingDraggableGhost: React.FC = () => {
       {/* Playful Ghost Speech Bubble */}
       {quip && (
         <div
-          className="absolute -top-11 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#1a1126]/95 border border-[#ff791f]/80 rounded-md text-[#fff1dc] text-xs font-serif shadow-[0_4px_20px_rgba(255,121,31,0.35)] whitespace-nowrap animate-bounce pointer-events-none"
+          className="absolute -top-11 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#1a1126]/95 border border-[var(--pumpkin-fire)]/80 rounded-md text-[var(--bone-white)] text-xs font-serif shadow-[0_4px_20px_rgba(255,121,31,0.35)] whitespace-nowrap animate-bounce pointer-events-none"
           style={{ backdropFilter: 'blur(6px)' }}
         >
           {quip}
-          <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-[#1a1126] border-r border-b border-[#ff791f]/80 rotate-45" />
+          <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-[#1a1126] border-r border-b border-[var(--pumpkin-fire)]/80 rotate-45" />
         </div>
       )}
 

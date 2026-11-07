@@ -28,7 +28,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#0a0711',
+  themeColor: 'var(--midnight-veil)',
 };
 
 export const metadata: Metadata = {
@@ -81,16 +81,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body
         className="min-h-full flex flex-col antialiased"
-        style={{ background: '#100d13', color: '#fff1dc' }}
+        style={{ background: '#100d13', color: 'var(--bone-white)' }}
       >
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#ff791f] focus:text-[#0a0711] focus:font-semibold focus:rounded-md focus:shadow-lg focus:outline-none"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[var(--pumpkin-fire)] focus:text-[var(--midnight-veil)] focus:font-semibold focus:rounded-md focus:shadow-lg focus:outline-none"
         >
           Skip to main content
         </a>
         <NextTopLoader
-          color="#ff791f"
+          color="var(--pumpkin-fire)"
           initialPosition={0.08}
           crawlSpeed={200}
           height={3}
@@ -98,13 +98,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           showSpinner={false}
           easing="ease"
           speed={200}
-          shadow="0 0 10px #ff791f,0 0 5px #ff791f"
+          shadow="0 0 10px var(--pumpkin-fire),0 0 5px var(--pumpkin-fire)"
           zIndex={99999}
           showForHashAnchor={true}
         />
         <AtmosphereLayer />
         <HauntingEffects />
-        <Suspense fallback={<div className="h-16 bg-[#0a0711]" />}>
+        <Suspense fallback={<div className="h-16 bg-[var(--midnight-veil)]" />}>
           <Navbar />
         </Suspense>
         <main

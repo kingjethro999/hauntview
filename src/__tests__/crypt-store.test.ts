@@ -28,6 +28,7 @@ describe('useCryptStore', () => {
             category: 'device',
             message: 'Horizontal scroll detected',
             timestamp: 1700000001000,
+            evidence: [{ kind: 'metric', name: 'fixture', value: 1, unit: 'count' }],
             isClassified: true,
           },
         ],

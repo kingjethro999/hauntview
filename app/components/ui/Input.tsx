@@ -17,14 +17,17 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-semibold text-[#fff1dc] mb-1.5">
+          <label
+            htmlFor={inputId}
+            className="block text-sm font-semibold text-[var(--bone-white)] mb-1.5"
+          >
             {label}
-            {required && <span className="text-[#dc2626] ml-1">*</span>}
+            {required && <span className="text-[var(--severity-scream)] ml-1">*</span>}
           </label>
         )}
         <div className="relative">
           {icon && (
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#646478]">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--slate-epitaph)]">
               {icon}
             </div>
           )}
@@ -35,13 +38,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${inputId}-error` : undefined}
             className={`
-              w-full bg-[#2d1a4a]/50 text-[#fff1dc] placeholder-[#646478]
+              w-full bg-[var(--haunted-purple)]/50 text-[var(--bone-white)] placeholder-[var(--slate-epitaph)]
               border-2 rounded-lg text-sm transition-all duration-200
               ${icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5
               ${
                 error
-                  ? 'border-[#dc2626] bg-[#dc2626]/5 focus:border-[#dc2626] focus:ring-2 focus:ring-[#dc2626]/20'
-                  : 'border-[#6C3CAA] focus:border-[#ff791f] focus:ring-3 focus:ring-[#ff791f]/15'
+                  ? 'border-[var(--severity-scream)] bg-[var(--severity-scream)]/5 focus:border-[var(--severity-scream)] focus:ring-2 focus:ring-[var(--severity-scream)]/20'
+                  : 'border-[var(--witchcraft-violet)] focus:border-[var(--pumpkin-fire)] focus:ring-3 focus:ring-[var(--pumpkin-fire)]/15'
               }
               disabled:opacity-60 disabled:cursor-not-allowed
               outline-none
@@ -58,7 +61,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <span>•</span> {error}
           </p>
         ) : helperText ? (
-          <p className="text-xs text-[#646478] mt-1.5">{helperText}</p>
+          <p className="text-xs text-[var(--slate-epitaph)] mt-1.5">{helperText}</p>
         ) : null}
       </div>
     );

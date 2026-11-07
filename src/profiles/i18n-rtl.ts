@@ -4,6 +4,7 @@
  */
 
 import { Page } from 'playwright';
+import { sanitizeUntrusted } from '../types/contracts';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -37,6 +38,7 @@ export class I18nRTLProfile {
           severity: 'error',
           category: 'i18n',
           message: 'Missing or incorrect dir="rtl" attribute on html element',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no rtl dir') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -55,6 +57,9 @@ export class I18nRTLProfile {
           severity: 'warning',
           category: 'i18n',
           message: `Text align hardcoded to "${textAlign}", should use logical properties or start/end`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('hardcoded text align') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -87,6 +92,9 @@ export class I18nRTLProfile {
           severity: 'warning',
           category: 'i18n',
           message: `${stylesUseLR} elements use physical properties (left/right) instead of logical`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('physical properties') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -112,6 +120,9 @@ export class I18nRTLProfile {
           severity: 'info',
           category: 'i18n',
           message: `${arrowImages} directional images may need RTL-specific versions`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('directional images') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -130,6 +141,9 @@ export class I18nRTLProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Page uses border-radius, verify appearance in RTL context',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('rounded checks') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -158,6 +172,9 @@ export class I18nRTLProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Flexbox direction hardcoded, consider auto-direction in RTL',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('flexbox direction') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -182,6 +199,9 @@ export class I18nRTLProfile {
           severity: 'info',
           category: 'i18n',
           message: 'Page uses Latin numerals, consider Arabic numerals for RTL',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no arabic numerals') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -198,6 +218,9 @@ export class I18nRTLProfile {
             severity: 'info',
             category: 'i18n',
             message: 'Form elements should inherit or explicitly set dir attribute',
+            evidence: [
+              { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('form no dir') },
+            ],
             timestamp: Date.now(),
             isClassified: false,
           });
@@ -210,6 +233,9 @@ export class I18nRTLProfile {
         severity: 'error',
         category: 'execution',
         message: `RTL profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('execution error') },
+        ],
         timestamp: Date.now(),
         isClassified: false,
       });

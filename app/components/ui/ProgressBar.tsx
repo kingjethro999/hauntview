@@ -18,9 +18,11 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   return (
     <div className={`w-full ${className}`} {...props}>
       {(label || showPercent) && (
-        <div className="flex justify-between items-center text-xs text-[#646478] mb-1.5 font-medium">
+        <div className="flex justify-between items-center text-xs text-[var(--slate-epitaph)] mb-1.5 font-medium">
           {label && <span>{label}</span>}
-          {showPercent && <span className="font-mono text-[#fff1dc]">{Math.round(clamped)}%</span>}
+          {showPercent && (
+            <span className="font-mono text-[var(--bone-white)]">{Math.round(clamped)}%</span>
+          )}
         </div>
       )}
       <div
@@ -28,10 +30,10 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         aria-valuenow={clamped}
         aria-valuemin={0}
         aria-valuemax={100}
-        className="w-full bg-[#6C3CAA]/20 rounded-full h-2.5 overflow-hidden"
+        className="w-full bg-[var(--witchcraft-violet)]/20 rounded-full h-2.5 overflow-hidden"
       >
         <div
-          className="h-full bg-gradient-to-r from-[#4a2b8a] via-[#9333ea] to-[#ff791f] rounded-full transition-all duration-300 ease-out shadow-[0_0_10px_rgba(74,43,138,0.6)]"
+          className="h-full bg-gradient-to-r from-[var(--witchcraft-violet)] via-[#9333ea] to-[var(--pumpkin-fire)] rounded-full transition-all duration-300 ease-out shadow-[0_0_10px_rgba(74,43,138,0.6)]"
           style={{ width: `${clamped}%` }}
         />
       </div>

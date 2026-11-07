@@ -68,14 +68,14 @@ export default function ManualPage() {
   }, []);
 
   return (
-    <div className="min-h-screen py-8 md:py-12 bg-[#060309] text-[#d9d3e0]">
+    <div className="min-h-screen py-8 md:py-12 bg-[#060309] text-[var(--spirit-smoke)]">
       {/* On-Page Reading Scroll Progress Bar */}
       <div
         className="fixed top-0 left-0 z-[60] h-[3px] pointer-events-none transition-all duration-75 ease-out"
         style={{
           width: `${scrollProgress}%`,
-          background: 'linear-gradient(90deg, #ff791f 0%, #ffaa55 100%)',
-          boxShadow: '0 0 10px #ff791f, 0 0 5px #ff791f',
+          background: 'linear-gradient(90deg, var(--pumpkin-fire) 0%, #ffaa55 100%)',
+          boxShadow: '0 0 10px var(--pumpkin-fire), 0 0 5px var(--pumpkin-fire)',
         }}
         role="progressbar"
         aria-valuenow={Math.round(scrollProgress)}
@@ -98,11 +98,11 @@ export default function ManualPage() {
               {/* Navigation Group 1: Getting Started */}
               <div>
                 <div className="flex items-center justify-between mb-2.5 px-2">
-                  <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#ff791f]/80 font-semibold">
+                  <h4 className="text-[11px] font-mono uppercase tracking-wider text-[var(--pumpkin-fire)]/80 font-semibold">
                     Getting Started
                   </h4>
                   {scrollProgress > 0 && (
-                    <span className="text-[10px] font-mono text-[#ff791f]/90 bg-[#ff791f]/10 px-1.5 py-0.5 rounded border border-[#ff791f]/20">
+                    <span className="text-[10px] font-mono text-[var(--pumpkin-fire)]/90 bg-[var(--pumpkin-fire)]/10 px-1.5 py-0.5 rounded border border-[var(--pumpkin-fire)]/20">
                       {Math.round(scrollProgress)}% read
                     </span>
                   )}
@@ -112,8 +112,8 @@ export default function ManualPage() {
                     href="#overview"
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'overview'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#ff791f]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[var(--pumpkin-fire)]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
                     <span>Overview</span>
@@ -122,8 +122,8 @@ export default function ManualPage() {
                     href="#transports"
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'transports'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#ff791f]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[var(--pumpkin-fire)]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
                     <span>Remote URL vs. Stdio</span>
@@ -135,7 +135,7 @@ export default function ManualPage() {
               <div>
                 <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#a855f7]/80 mb-2.5 font-semibold px-2 flex items-center justify-between">
                   <span>Client Integration</span>
-                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ff791f]/20 text-[#ff791f] font-mono">
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--pumpkin-fire)]/20 text-[var(--pumpkin-fire)] font-mono">
                     Kiro First
                   </span>
                 </h4>
@@ -146,12 +146,12 @@ export default function ManualPage() {
                     onClick={() => setActiveTab('kiro')}
                     className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'clients' && activeTab === 'kiro'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#ff791f]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[var(--pumpkin-fire)]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
-                    <span className="text-[#fff1dc] font-semibold">Kiro IDE</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#ff791f]/20 text-[#ff791f] font-mono">
+                    <span className="text-[var(--bone-white)] font-semibold">Kiro IDE</span>
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-[var(--pumpkin-fire)]/20 text-[var(--pumpkin-fire)] font-mono">
                       Primary
                     </span>
                   </a>
@@ -160,12 +160,12 @@ export default function ManualPage() {
                     onClick={() => setActiveTab('remote')}
                     className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'clients' && activeTab === 'remote'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#a855f7]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[#a855f7]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
                     <span>Remote HTTP / SSE</span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#9aff9a]/20 text-[#9aff9a] font-mono">
+                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-[var(--ectoplasm-green)]/20 text-[var(--ectoplasm-green)] font-mono">
                       Cloud
                     </span>
                   </a>
@@ -174,8 +174,8 @@ export default function ManualPage() {
                     onClick={() => setActiveTab('claude')}
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'clients' && activeTab === 'claude'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#a855f7]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[#a855f7]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
                     <span>Claude Code CLI</span>
@@ -185,8 +185,8 @@ export default function ManualPage() {
                     onClick={() => setActiveTab('cursor')}
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'clients' && activeTab === 'cursor'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#a855f7]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[#a855f7]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
                     <span>Cursor IDE</span>
@@ -196,8 +196,8 @@ export default function ManualPage() {
                     onClick={() => setActiveTab('windsurf')}
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'clients' && activeTab === 'windsurf'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#a855f7]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[#a855f7]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
                     <span>Windsurf</span>
@@ -207,8 +207,8 @@ export default function ManualPage() {
                     onClick={() => setActiveTab('vscode')}
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'clients' && activeTab === 'vscode'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#a855f7]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[#a855f7]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
                     <span>VS Code</span>
@@ -218,7 +218,7 @@ export default function ManualPage() {
 
               {/* Navigation Group 3: Kiro Power & Reference */}
               <div>
-                <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#9aff9a]/80 mb-2.5 font-semibold px-2">
+                <h4 className="text-[11px] font-mono uppercase tracking-wider text-[var(--ectoplasm-green)]/80 mb-2.5 font-semibold px-2">
                   Kiro Power &amp; Reference
                 </h4>
                 <nav className="space-y-1">
@@ -226,19 +226,19 @@ export default function ManualPage() {
                     href="#kiro-power"
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'kiro-power'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#9aff9a]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[var(--ectoplasm-green)]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
-                    <SparklesIcon className="w-3.5 h-3.5 text-[#ff791f]" />
-                    <span className="text-[#fff1dc] font-semibold">Kiro Power Pack</span>
+                    <SparklesIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
+                    <span className="text-[var(--bone-white)] font-semibold">Kiro Power Pack</span>
                   </a>
                   <a
                     href="#tools"
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'tools'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#9aff9a]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[var(--ectoplasm-green)]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
                     <span>MCP Tools (6 Tools)</span>
@@ -247,8 +247,8 @@ export default function ManualPage() {
                     href="#local-setup"
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                       activeSection === 'local-setup'
-                        ? 'bg-[#1e1329] text-[#fff1dc] border-l-2 border-[#9aff9a]'
-                        : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#120a1c]'
+                        ? 'bg-[#1e1329] text-[var(--bone-white)] border-l-2 border-[var(--ectoplasm-green)]'
+                        : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#120a1c]'
                     }`}
                   >
                     <span>Local Self-Hosting</span>
@@ -258,17 +258,19 @@ export default function ManualPage() {
             </div>
 
             {/* Quick Link Card in Sidebar */}
-            <div className="p-3.5 rounded-lg border border-[#46334b]/40 bg-[#0d0714] text-xs space-y-2">
-              <div className="flex items-center justify-between text-[#b9acbf]">
-                <span className="font-mono text-[11px] text-[#ff791f]">Kiro Engine Live</span>
-                <span className="inline-block w-2 h-2 rounded-full bg-[#9aff9a] animate-pulse" />
+            <div className="p-3.5 rounded-lg border border-[var(--tombstone-gray)]/40 bg-[#0d0714] text-xs space-y-2">
+              <div className="flex items-center justify-between text-[var(--grave-dust)]">
+                <span className="font-mono text-[11px] text-[var(--pumpkin-fire)]">
+                  Kiro Engine Live
+                </span>
+                <span className="inline-block w-2 h-2 rounded-full bg-[var(--ectoplasm-green)] animate-pulse" />
               </div>
               <p className="text-[11px] text-[#7a6a82] leading-relaxed">
                 Render deployment active with Sparticuz Chromium runtime.
               </p>
               <Link
                 href="/"
-                className="inline-flex items-center gap-1 text-[11px] font-mono text-[#9aff9a] hover:underline"
+                className="inline-flex items-center gap-1 text-[11px] font-mono text-[var(--ectoplasm-green)] hover:underline"
               >
                 <span>Launch Parlour</span>
                 <ChevronRightIcon className="w-3 h-3" />
@@ -281,21 +283,21 @@ export default function ManualPage() {
           {/* ========================================================= */}
           <main className="flex-1 min-w-0 max-w-4xl space-y-16 pb-24">
             {/* Top Breadcrumb & Actions Bar */}
-            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#46334b]/40">
+            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[var(--tombstone-gray)]/40">
               <div className="flex items-center gap-2 text-xs text-[#7a6a82] font-mono">
-                <Link href="/" className="hover:text-[#ff791f] transition-colors">
+                <Link href="/" className="hover:text-[var(--pumpkin-fire)] transition-colors">
                   HauntView
                 </Link>
                 <span>/</span>
-                <span className="text-[#b9acbf]">Manual</span>
+                <span className="text-[var(--grave-dust)]">Manual</span>
                 <span>/</span>
-                <span className="text-[#ff791f]">Model Context Protocol</span>
+                <span className="text-[var(--pumpkin-fire)]">Model Context Protocol</span>
               </div>
 
               <div className="flex items-center gap-3">
                 {/* Reading time badge */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#120a1c] border border-[#46334b]/50 text-xs text-[#b9acbf] font-mono">
-                  <ClockIcon className="w-3.5 h-3.5 text-[#ff791f]" />
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#120a1c] border border-[var(--tombstone-gray)]/50 text-xs text-[var(--grave-dust)] font-mono">
+                  <ClockIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
                   <span>6 mins</span>
                 </div>
 
@@ -304,16 +306,16 @@ export default function ManualPage() {
                   type="button"
                   onClick={handleCopyPageAsMd}
                   aria-label="Copy entire manual as Markdown"
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-[#ff791f]/40 bg-[#ff791f]/10 hover:bg-[#ff791f]/20 text-[#ff791f] hover:text-[#fff1dc] text-xs font-mono transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(255,121,31,0.25)]"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-[var(--pumpkin-fire)]/40 bg-[var(--pumpkin-fire)]/10 hover:bg-[var(--pumpkin-fire)]/20 text-[var(--pumpkin-fire)] hover:text-[var(--bone-white)] text-xs font-mono transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(255,121,31,0.25)]"
                 >
                   {copiedMd ? (
                     <>
-                      <CheckIcon className="w-4 h-4 text-[#9aff9a]" />
-                      <span className="text-[#9aff9a] font-medium">Copied!</span>
+                      <CheckIcon className="w-4 h-4 text-[var(--ectoplasm-green)]" />
+                      <span className="text-[var(--ectoplasm-green)] font-medium">Copied!</span>
                     </>
                   ) : (
                     <>
-                      <DocumentDuplicateIcon className="w-4 h-4 text-[#ff791f]" />
+                      <DocumentDuplicateIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
                       <span>Copy</span>
                     </>
                   )}
@@ -324,7 +326,7 @@ export default function ManualPage() {
                   href="https://github.com/kingjethro999/hauntview"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-[#46334b]/60 bg-[#120a1c] hover:bg-[#1a0f26] text-xs text-[#b9acbf] hover:text-[#fff1dc] font-mono transition-all"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-[var(--tombstone-gray)]/60 bg-[#120a1c] hover:bg-[#1a0f26] text-xs text-[var(--grave-dust)] hover:text-[var(--bone-white)] font-mono transition-all"
                 >
                   <span>GitHub</span>
                   <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
@@ -337,10 +339,10 @@ export default function ManualPage() {
             {/* ========================================================= */}
             <section id="overview" className="space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(255,121,31,0.12)] text-[#ff791f] border border-[rgba(255,121,31,0.3)]">
+                <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(255,121,31,0.12)] text-[var(--pumpkin-fire)] border border-[rgba(255,121,31,0.3)]">
                   Kiro Hackathon Edition · v0.0.3
                 </span>
-                <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(154,255,154,0.12)] text-[#9aff9a] border border-[rgba(154,255,154,0.3)]">
+                <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(154,255,154,0.12)] text-[var(--ectoplasm-green)] border border-[rgba(154,255,154,0.3)]">
                   Hosted Service Active
                 </span>
                 <span className="font-mono text-xs px-2.5 py-1 rounded bg-[rgba(168,85,247,0.12)] text-[#a855f7] border border-[rgba(168,85,247,0.3)]">
@@ -348,11 +350,11 @@ export default function ManualPage() {
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-[#fff1dc]">
+              <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight text-[var(--bone-white)]">
                 HauntView Developer Manual
               </h1>
 
-              <p className="text-sm sm:text-base text-[#b9acbf] leading-relaxed max-w-3xl">
+              <p className="text-sm sm:text-base text-[var(--grave-dust)] leading-relaxed max-w-3xl">
                 The authoritative manual for orchestrating HauntView across autonomous coding
                 agents. Built for the <strong>Kiro Hackathon</strong> to equip your{' '}
                 <strong>Kiro agents</strong> with deterministic resilience testing, responsive
@@ -363,13 +365,16 @@ export default function ManualPage() {
             {/* ========================================================= */}
             {/* SECTION 2: CLIENT CONFIGURATION TABS (KIRO FIRST)         */}
             {/* ========================================================= */}
-            <section id="clients" className="space-y-6 pt-6 border-t border-[#46334b]/40">
+            <section
+              id="clients"
+              className="space-y-6 pt-6 border-t border-[var(--tombstone-gray)]/40"
+            >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-[#ff791f]/15 text-[#ff791f]">
+                <div className="p-2 rounded bg-[var(--pumpkin-fire)]/15 text-[var(--pumpkin-fire)]">
                   <BoltIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#fff1dc]">
+                  <h2 className="text-xl font-bold text-[var(--bone-white)]">
                     1. Client Integration Guides (Kiro First)
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
@@ -379,20 +384,20 @@ export default function ManualPage() {
               </div>
 
               {/* Tabs navigation - KIRO FIRST */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-lg bg-[#0e0717] border border-[#46334b]/50">
+              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-lg bg-[#0e0717] border border-[var(--tombstone-gray)]/50">
                 {/* 1. KIRO IDE (FIRST) */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('kiro')}
                   className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'kiro'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#ff791f]/50 text-[#ff791f]'
-                      : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
+                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[var(--pumpkin-fire)]/50 text-[var(--pumpkin-fire)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
                   }`}
                 >
-                  <SparklesIcon className="w-3.5 h-3.5 text-[#ff791f]" />
+                  <SparklesIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
                   <span>Kiro IDE</span>
-                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ff791f]/20 text-[#ff791f] font-mono">
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--pumpkin-fire)]/20 text-[var(--pumpkin-fire)] font-mono">
                     Primary
                   </span>
                 </button>
@@ -403,11 +408,11 @@ export default function ManualPage() {
                   onClick={() => setActiveTab('remote')}
                   className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'remote'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#9aff9a]/40 text-[#9aff9a]'
-                      : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
+                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[var(--ectoplasm-green)]/40 text-[var(--ectoplasm-green)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
                   }`}
                 >
-                  <GlobeAltIcon className="w-3.5 h-3.5 text-[#9aff9a]" />
+                  <GlobeAltIcon className="w-3.5 h-3.5 text-[var(--ectoplasm-green)]" />
                   <span>Remote HTTP / SSE</span>
                 </button>
 
@@ -417,8 +422,8 @@ export default function ManualPage() {
                   onClick={() => setActiveTab('claude')}
                   className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'claude'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40 text-[#fff1dc]'
-                      : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
+                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[#a855f7]/40 text-[var(--bone-white)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
                   }`}
                 >
                   Claude Code
@@ -430,8 +435,8 @@ export default function ManualPage() {
                   onClick={() => setActiveTab('cursor')}
                   className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'cursor'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40 text-[#fff1dc]'
-                      : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
+                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[#a855f7]/40 text-[var(--bone-white)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
                   }`}
                 >
                   Cursor
@@ -443,8 +448,8 @@ export default function ManualPage() {
                   onClick={() => setActiveTab('windsurf')}
                   className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'windsurf'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40 text-[#fff1dc]'
-                      : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
+                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[#a855f7]/40 text-[var(--bone-white)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
                   }`}
                 >
                   Windsurf
@@ -456,8 +461,8 @@ export default function ManualPage() {
                   onClick={() => setActiveTab('vscode')}
                   className={`px-3.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
                     activeTab === 'vscode'
-                      ? 'bg-[#251538] text-[#fff1dc] font-semibold shadow-sm border border-[#a855f7]/40 text-[#fff1dc]'
-                      : 'text-[#9c8ea3] hover:text-[#fff1dc] hover:bg-[#180e24]'
+                      ? 'bg-[#251538] text-[var(--bone-white)] font-semibold shadow-sm border border-[#a855f7]/40 text-[var(--bone-white)]'
+                      : 'text-[#9c8ea3] hover:text-[var(--bone-white)] hover:bg-[#180e24]'
                   }`}
                 >
                   VS Code
@@ -470,20 +475,22 @@ export default function ManualPage() {
                 {activeTab === 'kiro' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-[#fff1dc] flex items-center gap-2">
-                        <SparklesIcon className="w-4 h-4 text-[#ff791f]" />
+                      <h3 className="text-sm font-semibold text-[var(--bone-white)] flex items-center gap-2">
+                        <SparklesIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
                         Kiro IDE Configuration (Primary Hackathon Target)
                       </h3>
-                      <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
+                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
                         In your Kiro workspace, place this configuration directly inside{' '}
-                        <code className="text-[#ff791f] font-mono">.kiro/settings/mcp.json</code>.
-                        Your Kiro agent will instantly gain access to all HauntView chaos testing
+                        <code className="text-[var(--pumpkin-fire)] font-mono">
+                          .kiro/settings/mcp.json
+                        </code>
+                        . Your Kiro agent will instantly gain access to all HauntView chaos testing
                         tools.
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-xs text-[#9aff9a] font-mono mb-2">
+                      <p className="text-xs text-[var(--ectoplasm-green)] font-mono mb-2">
                         Option A: Remote Cloud (Zero local dependencies — Recommended)
                       </p>
                       <CodeBlock
@@ -500,7 +507,7 @@ export default function ManualPage() {
                     </div>
 
                     <div className="pt-2">
-                      <p className="text-xs text-[#ff791f] font-mono mb-2">
+                      <p className="text-xs text-[var(--pumpkin-fire)] font-mono mb-2">
                         Option B: Local Stdio Subprocess (With remote engine routing)
                       </p>
                       <CodeBlock
@@ -527,11 +534,11 @@ export default function ManualPage() {
                 {activeTab === 'remote' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-[#fff1dc] flex items-center gap-2">
-                        <GlobeAltIcon className="w-4 h-4 text-[#9aff9a]" />
+                      <h3 className="text-sm font-semibold text-[var(--bone-white)] flex items-center gap-2">
+                        <GlobeAltIcon className="w-4 h-4 text-[var(--ectoplasm-green)]" />
                         Universal Remote HTTP / SSE Endpoint (Zero-Install)
                       </h3>
-                      <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
+                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
                         Add this configuration to any MCP-compatible agent to execute tests against
                         HauntView&apos;s hosted engine. No local dependencies, Node.js installation,
                         or browser binaries required.
@@ -556,18 +563,19 @@ export default function ManualPage() {
                 {activeTab === 'claude' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-[#fff1dc]">
+                      <h3 className="text-sm font-semibold text-[var(--bone-white)]">
                         Claude Code CLI Configuration
                       </h3>
-                      <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
+                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
                         Add HauntView directly to Claude Code using the CLI. The command
                         automatically registers the tools in your global{' '}
-                        <code className="text-[#ff791f] font-mono">~/.claude.json</code>:
+                        <code className="text-[var(--pumpkin-fire)] font-mono">~/.claude.json</code>
+                        :
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-xs text-[#9aff9a] font-mono mb-2">
+                      <p className="text-xs text-[var(--ectoplasm-green)] font-mono mb-2">
                         Option A: Remote Streamable HTTP (Recommended)
                       </p>
                       <CodeBlock
@@ -578,7 +586,7 @@ export default function ManualPage() {
                     </div>
 
                     <div className="pt-2">
-                      <p className="text-xs text-[#ff791f] font-mono mb-2">
+                      <p className="text-xs text-[var(--pumpkin-fire)] font-mono mb-2">
                         Option B: Stdio Transport (Local Repository)
                       </p>
                       <CodeBlock
@@ -594,14 +602,19 @@ export default function ManualPage() {
                 {activeTab === 'cursor' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-[#fff1dc]">
+                      <h3 className="text-sm font-semibold text-[var(--bone-white)]">
                         Cursor IDE Configuration
                       </h3>
-                      <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
+                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
                         In Cursor, open <strong>Settings &gt; Features &gt; MCP</strong>, or paste
-                        into <code className="text-[#ff791f] font-mono">.cursor/mcp.json</code>{' '}
+                        into{' '}
+                        <code className="text-[var(--pumpkin-fire)] font-mono">
+                          .cursor/mcp.json
+                        </code>{' '}
                         (workspace) or{' '}
-                        <code className="text-[#ff791f] font-mono">~/.cursor/mcp.json</code>{' '}
+                        <code className="text-[var(--pumpkin-fire)] font-mono">
+                          ~/.cursor/mcp.json
+                        </code>{' '}
                         (global):
                       </p>
                     </div>
@@ -645,12 +658,12 @@ export default function ManualPage() {
                 {activeTab === 'windsurf' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-[#fff1dc]">
+                      <h3 className="text-sm font-semibold text-[var(--bone-white)]">
                         Windsurf Configuration
                       </h3>
-                      <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
+                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
                         Add to your Windsurf configuration at{' '}
-                        <code className="text-[#ff791f] font-mono">
+                        <code className="text-[var(--pumpkin-fire)] font-mono">
                           ~/.codeium/windsurf/mcp_config.json
                         </code>
                         :
@@ -675,12 +688,15 @@ export default function ManualPage() {
                 {activeTab === 'vscode' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-[#fff1dc]">
+                      <h3 className="text-sm font-semibold text-[var(--bone-white)]">
                         VS Code Configuration
                       </h3>
-                      <p className="text-xs text-[#b9acbf] mt-1 leading-relaxed">
+                      <p className="text-xs text-[var(--grave-dust)] mt-1 leading-relaxed">
                         Add to your workspace&apos;s{' '}
-                        <code className="text-[#ff791f] font-mono">.vscode/mcp.json</code> file:
+                        <code className="text-[var(--pumpkin-fire)] font-mono">
+                          .vscode/mcp.json
+                        </code>{' '}
+                        file:
                       </p>
                     </div>
 
@@ -703,13 +719,16 @@ export default function ManualPage() {
             {/* ========================================================= */}
             {/* SECTION 3: KIRO POWER EXTENSION                           */}
             {/* ========================================================= */}
-            <section id="kiro-power" className="space-y-6 pt-6 border-t border-[#46334b]/40">
+            <section
+              id="kiro-power"
+              className="space-y-6 pt-6 border-t border-[var(--tombstone-gray)]/40"
+            >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-[#ff791f]/15 text-[#ff791f]">
+                <div className="p-2 rounded bg-[var(--pumpkin-fire)]/15 text-[var(--pumpkin-fire)]">
                   <SparklesIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#fff1dc]">
+                  <h2 className="text-xl font-bold text-[var(--bone-white)]">
                     2. Installing as a Kiro Power
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
@@ -720,13 +739,13 @@ export default function ManualPage() {
               </div>
 
               <div className="victorian-panel p-6 space-y-4">
-                <p className="text-xs text-[#d9d3e0] leading-relaxed">
+                <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
                   HauntView ships a fully packaged Kiro Power in the{' '}
-                  <code className="font-mono text-[#ff791f]">power/</code> directory. You can import
-                  it directly into Kiro IDE using GitHub:
+                  <code className="font-mono text-[var(--pumpkin-fire)]">power/</code> directory.
+                  You can import it directly into Kiro IDE using GitHub:
                 </p>
 
-                <ol className="list-decimal list-inside space-y-2 text-xs text-[#d9d3e0]">
+                <ol className="list-decimal list-inside space-y-2 text-xs text-[var(--spirit-smoke)]">
                   <li>
                     Open Kiro IDE and open the <strong>Powers</strong> panel.
                   </li>
@@ -735,7 +754,7 @@ export default function ManualPage() {
                   </li>
                   <li>
                     Paste repository URL:
-                    <code className="ml-2 px-2 py-0.5 rounded bg-[#0a0711] text-[#9aff9a] font-mono border border-[#46334b]">
+                    <code className="ml-2 px-2 py-0.5 rounded bg-[var(--midnight-veil)] text-[var(--ectoplasm-green)] font-mono border border-[var(--tombstone-gray)]">
                       https://github.com/kingjethro999/hauntview
                     </code>
                   </li>
@@ -746,25 +765,25 @@ export default function ManualPage() {
                 </ol>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-                  <div className="p-3.5 rounded bg-[#0a0711] border border-[#46334b]">
-                    <div className="text-xs font-mono font-semibold text-[#ff791f] mb-1">
+                  <div className="p-3.5 rounded bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)]">
+                    <div className="text-xs font-mono font-semibold text-[var(--pumpkin-fire)] mb-1">
                       haunt-a-website
                     </div>
-                    <p className="text-[11px] text-[#b9acbf]">
+                    <p className="text-[11px] text-[var(--grave-dust)]">
                       Scans target website under failure rites and returns structured defect plates.
                     </p>
                   </div>
-                  <div className="p-3.5 rounded bg-[#0a0711] border border-[#46334b]">
-                    <div className="text-xs font-mono font-semibold text-[#9aff9a] mb-1">
+                  <div className="p-3.5 rounded bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)]">
+                    <div className="text-xs font-mono font-semibold text-[var(--ectoplasm-green)] mb-1">
                       exorcise-findings
                     </div>
-                    <p className="text-[11px] text-[#b9acbf]">
+                    <p className="text-[11px] text-[var(--grave-dust)]">
                       Takes findings from a run, inspects codebase, and patches root causes.
                     </p>
                   </div>
-                  <div className="p-3.5 rounded bg-[#0a0711] border border-[#46334b]">
+                  <div className="p-3.5 rounded bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)]">
                     <div className="text-xs font-mono font-semibold text-[#60a5fa] mb-1">setup</div>
-                    <p className="text-[11px] text-[#b9acbf]">
+                    <p className="text-[11px] text-[var(--grave-dust)]">
                       One-shot environment verifier and configuration helper.
                     </p>
                   </div>
@@ -775,13 +794,16 @@ export default function ManualPage() {
             {/* ========================================================= */}
             {/* SECTION 4: TRANSPORTS ARCHITECTURE                        */}
             {/* ========================================================= */}
-            <section id="transports" className="space-y-6 pt-6 border-t border-[#46334b]/40">
+            <section
+              id="transports"
+              className="space-y-6 pt-6 border-t border-[var(--tombstone-gray)]/40"
+            >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-[#9aff9a]/15 text-[#9aff9a]">
+                <div className="p-2 rounded bg-[var(--ectoplasm-green)]/15 text-[var(--ectoplasm-green)]">
                   <ServerStackIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#fff1dc]">
+                  <h2 className="text-xl font-bold text-[var(--bone-white)]">
                     3. MCP Transports: Remote URL vs. Local Stdio
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
@@ -793,47 +815,51 @@ export default function ManualPage() {
               {/* Explanatory cards side-by-side */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Remote HTTP / SSE Card */}
-                <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[#9aff9a]">
+                <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[var(--ectoplasm-green)]">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-[#9aff9a] font-semibold flex items-center gap-1.5">
+                    <span className="font-mono text-xs text-[var(--ectoplasm-green)] font-semibold flex items-center gap-1.5">
                       <GlobeAltIcon className="w-4 h-4" />
                       Remote HTTP / SSE (&quot;url&quot;)
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#9aff9a]/15 text-[#9aff9a] text-[10px] font-mono">
+                    <span className="px-1.5 py-0.5 rounded bg-[var(--ectoplasm-green)]/15 text-[var(--ectoplasm-green)] text-[10px] font-mono">
                       Cloud Gateway
                     </span>
                   </div>
-                  <p className="text-xs text-[#b9acbf] leading-relaxed">
+                  <p className="text-xs text-[var(--grave-dust)] leading-relaxed">
                     Connects directly over the web via Server-Sent Events (SSE) and HTTP POST.
                     <strong> Zero local installation</strong>: your agent simply talks to the remote
                     cloud URL. No Node.js, Playwright, or browser downloads on your machine.
                   </p>
-                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[#46334b]/40">
+                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[var(--tombstone-gray)]/40">
                     Endpoint:{' '}
-                    <span className="text-[#9aff9a]">https://hauntview.onrender.com/api/mcp</span>
+                    <span className="text-[var(--ectoplasm-green)]">
+                      https://hauntview.onrender.com/api/mcp
+                    </span>
                   </div>
                 </div>
 
                 {/* Local Stdio Subprocess Card */}
-                <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[#ff791f]">
+                <div className="victorian-panel p-5 space-y-3 border-l-2 border-l-[var(--pumpkin-fire)]">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-[#ff791f] font-semibold flex items-center gap-1.5">
+                    <span className="font-mono text-xs text-[var(--pumpkin-fire)] font-semibold flex items-center gap-1.5">
                       <CommandLineIcon className="w-4 h-4" />
                       Local Stdio Subprocess (&quot;command&quot;)
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#ff791f]/15 text-[#ff791f] text-[10px] font-mono">
+                    <span className="px-1.5 py-0.5 rounded bg-[var(--pumpkin-fire)]/15 text-[var(--pumpkin-fire)] text-[10px] font-mono">
                       Subprocess
                     </span>
                   </div>
-                  <p className="text-xs text-[#b9acbf] leading-relaxed">
+                  <p className="text-xs text-[var(--grave-dust)] leading-relaxed">
                     Spawns a local process on your computer communicating through standard
-                    input/output (<code className="text-[#ff791f]">stdio</code>). Ideal for running
-                    100% offline, inspecting local source files, or forwarding test executions to a
-                    private engine.
+                    input/output (<code className="text-[var(--pumpkin-fire)]">stdio</code>). Ideal
+                    for running 100% offline, inspecting local source files, or forwarding test
+                    executions to a private engine.
                   </p>
-                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[#46334b]/40">
+                  <div className="text-[11px] font-mono text-[#7a6a82] bg-[#07030c] p-2.5 rounded border border-[var(--tombstone-gray)]/40">
                     Command:{' '}
-                    <span className="text-[#ff791f]">node --import tsx/esm src/mcp/server.ts</span>
+                    <span className="text-[var(--pumpkin-fire)]">
+                      node --import tsx/esm src/mcp/server.ts
+                    </span>
                   </div>
                 </div>
               </div>
@@ -842,13 +868,16 @@ export default function ManualPage() {
             {/* ========================================================= */}
             {/* SECTION 5: MCP TOOLS REFERENCE                            */}
             {/* ========================================================= */}
-            <section id="tools" className="space-y-6 pt-6 border-t border-[#46334b]/40">
+            <section
+              id="tools"
+              className="space-y-6 pt-6 border-t border-[var(--tombstone-gray)]/40"
+            >
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded bg-[#a855f7]/15 text-[#a855f7]">
                   <CodeBracketIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#fff1dc]">
+                  <h2 className="text-xl font-bold text-[var(--bone-white)]">
                     4. Model Context Protocol Tools Reference
                   </h2>
                   <p className="text-xs text-[#7a6a82]">
@@ -863,14 +892,14 @@ export default function ManualPage() {
                 {/* Tool 1 */}
                 <div className="victorian-panel p-5 space-y-2">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span className="font-mono text-sm font-bold text-[#9aff9a]">
+                    <span className="font-mono text-sm font-bold text-[var(--ectoplasm-green)]">
                       list-test-profiles
                     </span>
-                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[#46334b]/40 self-start sm:self-auto">
+                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--tombstone-gray)]/40 self-start sm:self-auto">
                       args: (none)
                     </span>
                   </div>
-                  <p className="text-xs text-[#d9d3e0] leading-relaxed">
+                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
                     Returns all 25 supported failure-mode testing rites, viewport matrices, and
                     timeouts. Used by agents to discover which rites to run (e.g. mobile viewports,
                     high-contrast, disabled JS).
@@ -878,35 +907,36 @@ export default function ManualPage() {
                 </div>
 
                 {/* Tool 2 */}
-                <div className="victorian-panel p-5 space-y-2 border-l-2 border-l-[#ff791f]">
+                <div className="victorian-panel p-5 space-y-2 border-l-2 border-l-[var(--pumpkin-fire)]">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span className="font-mono text-sm font-bold text-[#ff791f]">
+                    <span className="font-mono text-sm font-bold text-[var(--pumpkin-fire)]">
                       run-test-profile
                     </span>
-                    <span className="text-[11px] font-mono text-[#ff791f] px-2 py-0.5 rounded bg-[#0a0512] border border-[#ff791f]/40 self-start sm:self-auto">
+                    <span className="text-[11px] font-mono text-[var(--pumpkin-fire)] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--pumpkin-fire)]/40 self-start sm:self-auto">
                       url (req), profileId (opt)
                     </span>
                   </div>
-                  <p className="text-xs text-[#d9d3e0] leading-relaxed">
+                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
                     Drives headless Chromium through the requested profile (e.g.{' '}
-                    <code className="text-[#9aff9a] font-mono">mobile-iphone15</code>,{' '}
-                    <code className="text-[#9aff9a] font-mono">js-disabled</code>,{' '}
-                    <code className="text-[#9aff9a] font-mono">reduced-motion</code>). Returns the
-                    unique run ID, total defect counts, and structured diagnostic findings.
+                    <code className="text-[var(--ectoplasm-green)] font-mono">mobile-iphone15</code>
+                    , <code className="text-[var(--ectoplasm-green)] font-mono">js-disabled</code>,{' '}
+                    <code className="text-[var(--ectoplasm-green)] font-mono">reduced-motion</code>
+                    ). Returns the unique run ID, total defect counts, and structured diagnostic
+                    findings.
                   </p>
                 </div>
 
                 {/* Tool 3 */}
                 <div className="victorian-panel p-5 space-y-2">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span className="font-mono text-sm font-bold text-[#9aff9a]">
+                    <span className="font-mono text-sm font-bold text-[var(--ectoplasm-green)]">
                       get-run-status
                     </span>
-                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[#46334b]/40 self-start sm:self-auto">
+                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--tombstone-gray)]/40 self-start sm:self-auto">
                       runId (req)
                     </span>
                   </div>
-                  <p className="text-xs text-[#d9d3e0] leading-relaxed">
+                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
                     Returns real-time execution progress, status, and severity counters (errors,
                     warnings, info) for an active or completed run.
                   </p>
@@ -915,14 +945,14 @@ export default function ManualPage() {
                 {/* Tool 4 */}
                 <div className="victorian-panel p-5 space-y-2">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span className="font-mono text-sm font-bold text-[#9aff9a]">
+                    <span className="font-mono text-sm font-bold text-[var(--ectoplasm-green)]">
                       get-latest-report
                     </span>
-                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[#46334b]/40 self-start sm:self-auto">
+                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--tombstone-gray)]/40 self-start sm:self-auto">
                       args: (none)
                     </span>
                   </div>
-                  <p className="text-xs text-[#d9d3e0] leading-relaxed">
+                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
                     Retrieves the complete structured JSON report and findings from the most recent
                     test run in the store.
                   </p>
@@ -936,7 +966,7 @@ export default function ManualPage() {
                       runId1 (req), runId2 (req)
                     </span>
                   </div>
-                  <p className="text-xs text-[#d9d3e0] leading-relaxed">
+                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
                     Differential regression analysis between two runs: computes new defects
                     introduced, persistent issues, and fixes laid to rest.
                   </p>
@@ -945,15 +975,15 @@ export default function ManualPage() {
                 {/* Tool 6 */}
                 <div className="victorian-panel p-5 space-y-2">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span className="font-mono text-sm font-bold text-[#9aff9a]">
+                    <span className="font-mono text-sm font-bold text-[var(--ectoplasm-green)]">
                       export-report
                     </span>
-                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[#46334b]/40 self-start sm:self-auto">
+                    <span className="text-[11px] font-mono text-[#7a6a82] px-2 py-0.5 rounded bg-[#0a0512] border border-[var(--tombstone-gray)]/40 self-start sm:self-auto">
                       runId (req), format: &apos;html&apos; | &apos;markdown&apos; |
                       &apos;json&apos;
                     </span>
                   </div>
-                  <p className="text-xs text-[#d9d3e0] leading-relaxed">
+                  <p className="text-xs text-[var(--spirit-smoke)] leading-relaxed">
                     Generates an interactive stand-alone HTML Grimoire report, clean Markdown
                     document, or JSON export.
                   </p>
@@ -964,13 +994,16 @@ export default function ManualPage() {
             {/* ========================================================= */}
             {/* SECTION 6: LOCAL REPOSITORY SETUP                         */}
             {/* ========================================================= */}
-            <section id="local-setup" className="space-y-6 pt-6 border-t border-[#46334b]/40">
+            <section
+              id="local-setup"
+              className="space-y-6 pt-6 border-t border-[var(--tombstone-gray)]/40"
+            >
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded bg-[#60a5fa]/15 text-[#60a5fa]">
                   <CpuChipIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#fff1dc]">
+                  <h2 className="text-xl font-bold text-[var(--bone-white)]">
                     5. Local Setup &amp; Repository Development
                   </h2>
                   <p className="text-xs text-[#7a6a82]">

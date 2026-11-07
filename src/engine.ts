@@ -455,6 +455,18 @@ export class HauntViewEngine {
           for (const finding of result.findings) {
             if (!finding.details) finding.details = {};
             finding.details.screenshot = screenshotMeta.fileName;
+            if (!Array.isArray(finding.evidence)) {
+              finding.evidence = [];
+            }
+            finding.evidence.push({ kind: 'screenshot', captureId: screenshotMeta.fileName });
+            const canonical = finding.details.canonicalFinding as
+              { evidence?: unknown[] } | undefined;
+            if (canonical && Array.isArray(canonical.evidence)) {
+              canonical.evidence.push({
+                kind: 'screenshot',
+                captureId: screenshotMeta.fileName,
+              });
+            }
           }
         } catch (screenshotErr) {
           console.warn(`Could not capture screenshot for profile ${profileId}:`, screenshotErr);

@@ -6,7 +6,7 @@
 import { Browser } from 'playwright';
 import { ScreenshotManager } from '../core/screenshot-manager';
 import { sanitizeUntrusted } from '../types/contracts';
-import { buildFinding } from '../types/finding-utils';
+import { buildFinding, executionErrorEvidence } from '../types/finding-utils';
 import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -156,6 +156,7 @@ export class NetworkResilienceProfile {
           severity: 'warning',
           category: 'resilience',
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: {
             canonicalFinding: canonical,
             blockedRequests: failedUrls.length,
@@ -173,6 +174,7 @@ export class NetworkResilienceProfile {
         severity: 'error',
         category: 'execution',
         message: `Network resilience profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false,
       });

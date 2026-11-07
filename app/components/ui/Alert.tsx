@@ -20,7 +20,7 @@ export const Alert: React.FC<AlertProps> = ({ type, title, children, onClose }) 
       icon: ExclamationCircleIcon,
       bg: 'rgba(220, 38, 38, 0.1)',
       border: 'rgba(220, 38, 38, 0.3)',
-      iconColor: '#dc2626',
+      iconColor: 'var(--severity-scream)',
       textColor: '#fca5a5',
     },
     warning: {
@@ -35,7 +35,7 @@ export const Alert: React.FC<AlertProps> = ({ type, title, children, onClose }) 
       bg: 'rgba(22, 163, 74, 0.1)',
       border: 'rgba(22, 163, 74, 0.3)',
       iconColor: '#16a34a',
-      textColor: '#86efac',
+      textColor: 'var(--success)',
     },
     info: {
       icon: InformationCircleIcon,

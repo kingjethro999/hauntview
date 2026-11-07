@@ -54,8 +54,11 @@ export function registerHauntViewTools(server: McpServer): void {
             type: 'text' as const,
             text: JSON.stringify(
               {
-                total: profiles.length,
-                profiles,
+                ok: true,
+                data: {
+                  total: profiles.length,
+                  profiles,
+                },
               },
               null,
               2
@@ -100,7 +103,18 @@ export function registerHauntViewTools(server: McpServer): void {
           content: [
             {
               type: 'text' as const,
-              text: `URL safety error: ${urlValidation.error}`,
+              text: JSON.stringify(
+                {
+                  ok: false,
+                  error: {
+                    code: 'INVALID_URL',
+                    message: `URL rejected: ${urlValidation.error}`,
+                    hint: 'Provide a valid http:// or https:// URL that is not a private/internal address.',
+                  },
+                },
+                null,
+                2
+              ),
             },
           ],
         };
@@ -194,7 +208,7 @@ export function registerHauntViewTools(server: McpServer): void {
           content: [
             {
               type: 'text' as const,
-              text: JSON.stringify(summary, null, 2),
+              text: JSON.stringify({ ok: true, data: summary }, null, 2),
             },
           ],
         };
@@ -205,7 +219,19 @@ export function registerHauntViewTools(server: McpServer): void {
           content: [
             {
               type: 'text' as const,
-              text: `Execution failed: ${err instanceof Error ? err.message : String(err)}`,
+              text: JSON.stringify(
+                {
+                  ok: false,
+                  error: {
+                    code: 'EXECUTION_FAILED',
+                    message:
+                      'Test execution failed. Check that the URL is reachable and try again.',
+                    hint: 'Verify the target URL loads in a browser, then retry with a smaller profile set.',
+                  },
+                },
+                null,
+                2
+              ),
             },
           ],
         };
@@ -232,18 +258,21 @@ export function registerHauntViewTools(server: McpServer): void {
               type: 'text' as const,
               text: JSON.stringify(
                 {
-                  id: dbRecord.run.id,
-                  url: dbRecord.run.targetUrl,
-                  status: dbRecord.run.status,
-                  startedAt: dbRecord.run.startedAt,
-                  durationMs: dbRecord.run.durationMs,
-                  totalFindings: dbRecord.run.totalFindings,
-                  severitySummary: {
-                    error: dbRecord.run.errorCount,
-                    warning: dbRecord.run.warningCount,
-                    info: dbRecord.run.infoCount,
+                  ok: true,
+                  data: {
+                    id: dbRecord.run.id,
+                    url: dbRecord.run.targetUrl,
+                    status: dbRecord.run.status,
+                    startedAt: dbRecord.run.startedAt,
+                    durationMs: dbRecord.run.durationMs,
+                    totalFindings: dbRecord.run.totalFindings,
+                    severitySummary: {
+                      error: dbRecord.run.errorCount,
+                      warning: dbRecord.run.warningCount,
+                      info: dbRecord.run.infoCount,
+                    },
+                    findingsCount: dbRecord.findings.length,
                   },
-                  findingsCount: dbRecord.findings.length,
                 },
                 null,
                 2
@@ -262,12 +291,15 @@ export function registerHauntViewTools(server: McpServer): void {
               type: 'text' as const,
               text: JSON.stringify(
                 {
-                  id: fileReport.id,
-                  url: fileReport.url,
-                  status: 'completed',
-                  durationMs: fileReport.duration,
-                  totalFindings: fileReport.summary.totalFindings,
-                  severitySummary: fileReport.summary.findingsBySeverity,
+                  ok: true,
+                  data: {
+                    id: fileReport.id,
+                    url: fileReport.url,
+                    status: 'completed',
+                    durationMs: fileReport.duration,
+                    totalFindings: fileReport.summary.totalFindings,
+                    severitySummary: fileReport.summary.findingsBySeverity,
+                  },
                 },
                 null,
                 2
@@ -279,7 +311,23 @@ export function registerHauntViewTools(server: McpServer): void {
 
       return {
         isError: true,
-        content: [{ type: 'text' as const, text: `Run not found: ${args.runId}` }],
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify(
+              {
+                ok: false,
+                error: {
+                  code: 'RUN_NOT_FOUND',
+                  message: `Run not found: ${args.runId}`,
+                  hint: 'Use get-latest-report or haunt_list_runs to find valid run IDs.',
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   );
@@ -301,8 +349,11 @@ export function registerHauntViewTools(server: McpServer): void {
               type: 'text' as const,
               text: JSON.stringify(
                 {
-                  run: latestDbRun,
-                  findings: details?.findings || [],
+                  ok: true,
+                  data: {
+                    run: latestDbRun,
+                    findings: details?.findings || [],
+                  },
                 },
                 null,
                 2
@@ -320,7 +371,7 @@ export function registerHauntViewTools(server: McpServer): void {
           content: [
             {
               type: 'text' as const,
-              text: JSON.stringify(fullReport, null, 2),
+              text: JSON.stringify({ ok: true, data: fullReport }, null, 2),
             },
           ],
         };
@@ -330,7 +381,7 @@ export function registerHauntViewTools(server: McpServer): void {
         content: [
           {
             type: 'text' as const,
-            text: JSON.stringify({ message: 'No completed runs found' }),
+            text: JSON.stringify({ ok: true, data: { message: 'No completed runs found' } }),
           },
         ],
       };
@@ -355,7 +406,18 @@ export function registerHauntViewTools(server: McpServer): void {
           content: [
             {
               type: 'text' as const,
-              text: `Could not compare runs ${args.runId1} and ${args.runId2}. Ensure both exist in storage.`,
+              text: JSON.stringify(
+                {
+                  ok: false,
+                  error: {
+                    code: 'COMPARE_FAILED',
+                    message: `Could not compare runs ${args.runId1} and ${args.runId2}`,
+                    hint: 'Ensure both run IDs exist; use get-run-status to verify each run.',
+                  },
+                },
+                null,
+                2
+              ),
             },
           ],
         };
@@ -365,7 +427,7 @@ export function registerHauntViewTools(server: McpServer): void {
         content: [
           {
             type: 'text' as const,
-            text: JSON.stringify(comparison, null, 2),
+            text: JSON.stringify({ ok: true, data: comparison }, null, 2),
           },
         ],
       };
@@ -388,13 +450,31 @@ export function registerHauntViewTools(server: McpServer): void {
       if (!report) {
         return {
           isError: true,
-          content: [{ type: 'text' as const, text: `Run not found: ${args.runId}` }],
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify(
+                {
+                  ok: false,
+                  error: {
+                    code: 'RUN_NOT_FOUND',
+                    message: `Run not found: ${args.runId}`,
+                    hint: 'Use get-latest-report or haunt_list_runs to find valid run IDs.',
+                  },
+                },
+                null,
+                2
+              ),
+            },
+          ],
         };
       }
 
       if (args.format === 'json') {
         return {
-          content: [{ type: 'text' as const, text: JSON.stringify(report, null, 2) }],
+          content: [
+            { type: 'text' as const, text: JSON.stringify({ ok: true, data: report }, null, 2) },
+          ],
         };
       }
 

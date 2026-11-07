@@ -22,7 +22,7 @@ export function Footer() {
             <span>·</span>
             <span>Kiroween 2026 Hackathon</span>
             <span>·</span>
-            <span className="font-mono text-xs text-[#ff791f]">
+            <span className="font-mono text-xs text-[var(--pumpkin-fire)]">
               {process.env.NEXT_PUBLIC_APP_VERSION || 'v0.0.3'}
             </span>
           </div>

@@ -4,6 +4,7 @@
  */
 
 import { Page } from 'playwright';
+import { sanitizeUntrusted } from '../types/contracts';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -102,6 +103,9 @@ export class AccessibilityVisualProfile {
           severity: failCount > 0 ? 'error' : 'warning',
           category: 'accessibility',
           message: `${contrastIssues.length} text elements have insufficient color contrast (< 4.5:1)`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('contrast ratio') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -139,6 +143,7 @@ export class AccessibilityVisualProfile {
           severity: 'warning',
           category: 'accessibility',
           message: `Found ${colorOnlyInfo.length} elements that may use color alone to convey meaning`,
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('color only') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -156,6 +161,9 @@ export class AccessibilityVisualProfile {
           severity: 'info',
           category: 'accessibility',
           message: 'Consider adding high-contrast mode support with prefers-contrast media query',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('high contrast') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -173,6 +181,9 @@ export class AccessibilityVisualProfile {
           severity: 'info',
           category: 'accessibility',
           message: 'Consider testing with forced colors mode (Windows High Contrast)',
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('forced colors') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -201,6 +212,9 @@ export class AccessibilityVisualProfile {
           severity: 'warning',
           category: 'accessibility',
           message: `${bgImageText} elements have text over background images, verify contrast`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('bg image text') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -220,6 +234,7 @@ export class AccessibilityVisualProfile {
           severity: 'warning',
           category: 'accessibility',
           message: 'Page disables user zoom, violates visual accessibility guidelines',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('no zoom') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -231,6 +246,9 @@ export class AccessibilityVisualProfile {
         severity: 'error',
         category: 'execution',
         message: `Visual profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('execution error') },
+        ],
         timestamp: Date.now(),
         isClassified: false,
       });

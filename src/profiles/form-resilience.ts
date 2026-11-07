@@ -7,7 +7,7 @@
 import { Browser } from 'playwright';
 import { ScreenshotManager } from '../core/screenshot-manager';
 import { sanitizeUntrusted } from '../types/contracts';
-import { buildFinding } from '../types/finding-utils';
+import { buildFinding, executionErrorEvidence } from '../types/finding-utils';
 import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -197,6 +197,7 @@ export class FormResilienceProfile {
               severity: 'warning',
               category: 'forms',
               message: canonical.title,
+              evidence: [...canonical.evidence],
               details: { canonicalFinding: canonical, selector },
               timestamp: Date.now(),
               isClassified: false,
@@ -229,6 +230,7 @@ export class FormResilienceProfile {
               severity: 'info',
               category: 'forms',
               message: canonical.title,
+              evidence: [...canonical.evidence],
               details: {
                 canonicalFinding: canonical,
                 selector,
@@ -250,6 +252,7 @@ export class FormResilienceProfile {
         severity: 'error',
         category: 'execution',
         message: `Form resilience profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false,
       });

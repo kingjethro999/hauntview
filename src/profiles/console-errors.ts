@@ -5,6 +5,9 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { sanitizeUntrusted } from '../types/contracts';
+import type { Severity } from '../types/contracts';
+import { buildFinding, buildProfileFinding, executionErrorEvidence } from '../types/finding-utils';
 import { navigateResilient } from './navigation';
 
 interface ConsoleMessage {
@@ -100,55 +103,117 @@ export class ConsoleErrorsProfile {
           continue;
         }
 
-        findings.push({
-          id: `${this.profileId}-${msg.type}-${findings.length}`,
-          profileId: this.profileId,
-          severity,
-          category: 'console',
-          message: `${msg.type.toUpperCase()}: ${msg.text}`,
-          location: msg.location ? { file: msg.location } : undefined,
-          timestamp: Date.now(),
-          isClassified: false,
+        const canonicalSeverity: Severity =
+          msg.type === 'error' ? 'serious' : msg.type === 'warn' ? 'warning' : 'info';
+        const canonical = buildFinding({
+          ruleId: `console-errors.${msg.type}-message`,
+          rite: 'console-errors',
+          severity: canonicalSeverity,
+          confidence: 'observed',
+          title: `Console ${msg.type} emitted during page load`,
+          summary: `The page logged a console.${msg.type} message during the test run. Console errors often indicate broken functionality; review the message text in evidence.`,
+          ...(msg.location ? { where: { url: sanitizeUntrusted(msg.location).text } } : {}),
+          evidence: [{ kind: 'console', level: msg.type, text: sanitizeUntrusted(msg.text) }],
+          investigate: [
+            'Open the browser DevTools console, reproduce the load, and trace the message to its source.',
+          ],
         });
+
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-${msg.type}-${findings.length}`,
+            profileId: this.profileId,
+            severity,
+            category: 'console',
+            message: `${msg.type.toUpperCase()}: ${msg.text}`,
+            location: msg.location ? { file: msg.location } : undefined,
+            details: { canonicalFinding: canonical, consoleType: msg.type },
+            evidence: [...canonical.evidence],
+          })
+        );
       }
 
       // Add service worker errors
       for (const swError of swErrors) {
-        findings.push({
-          id: `${this.profileId}-sw-error-${findings.length}`,
-          profileId: this.profileId,
+        const canonical = buildFinding({
+          ruleId: 'console-errors.service-worker-error',
+          rite: 'console-errors',
           severity: 'warning',
-          category: 'console',
-          message: `Service Worker: ${swError}`,
-          timestamp: Date.now(),
-          isClassified: false,
+          confidence: 'observed',
+          title: 'Service worker reported an error during registration',
+          summary: `A service worker issue was detected: ${swError}. Service worker failures can break offline support and caching.`,
+          where: { url },
+          evidence: [
+            {
+              kind: 'console',
+              level: 'error',
+              text: sanitizeUntrusted(`Service Worker: ${swError}`),
+            },
+          ],
+          investigate: [
+            'Check the service worker registration code and browser console for the underlying failure.',
+          ],
         });
+        findings.push(
+          buildProfileFinding({
+            id: `${this.profileId}-sw-error-${findings.length}`,
+            profileId: this.profileId,
+            severity: 'warning',
+            category: 'console',
+            message: `Service Worker: ${swError}`,
+            details: { canonicalFinding: canonical },
+            evidence: [...canonical.evidence],
+          })
+        );
       }
 
       // Check for unhandled promise rejections
       page.on('pageerror', (error) => {
         if (error.message.includes('Unhandled promise rejection')) {
-          findings.push({
-            id: `${this.profileId}-unhandled-rejection-${findings.length}`,
-            profileId: this.profileId,
-            severity: 'error',
-            category: 'console',
-            message: `Unhandled Promise Rejection: ${error.message}`,
-            timestamp: Date.now(),
-            isClassified: false,
+          const canonical = buildFinding({
+            ruleId: 'console-errors.unhandled-rejection',
+            rite: 'console-errors',
+            severity: 'warning',
+            confidence: 'observed',
+            title: 'Unhandled promise rejection during page load',
+            summary:
+              'A promise rejected without a catch handler. Unhandled rejections can leave UI in a broken state and are a common source of silent failures.',
+            where: { url },
+            evidence: [
+              {
+                kind: 'console',
+                level: 'error',
+                text: sanitizeUntrusted(error.message),
+              },
+            ],
+            investigate: [
+              'Add .catch() handlers or try/catch around the async code that rejected.',
+            ],
           });
+          findings.push(
+            buildProfileFinding({
+              id: `${this.profileId}-unhandled-rejection-${findings.length}`,
+              profileId: this.profileId,
+              severity: 'error',
+              category: 'console',
+              message: `Unhandled Promise Rejection: ${error.message}`,
+              details: { canonicalFinding: canonical },
+              evidence: [...canonical.evidence],
+            })
+          );
         }
       });
     } catch (error) {
-      findings.push({
-        id: `${this.profileId}-execution-error`,
-        profileId: this.profileId,
-        severity: 'error',
-        category: 'execution',
-        message: `Console errors profile execution error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: Date.now(),
-        isClassified: false,
-      });
+      findings.push(
+        buildProfileFinding({
+          id: `${this.profileId}-execution-error`,
+          profileId: this.profileId,
+          severity: 'error',
+          category: 'execution',
+          message: `Console errors profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+          evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
+        })
+      );
     } finally {
       // Clean up listeners
       page.removeAllListeners();

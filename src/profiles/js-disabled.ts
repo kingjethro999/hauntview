@@ -6,7 +6,7 @@
 import { Browser } from 'playwright';
 import { ScreenshotManager } from '../core/screenshot-manager';
 import { sanitizeUntrusted } from '../types/contracts';
-import { buildFinding } from '../types/finding-utils';
+import { buildFinding, executionErrorEvidence } from '../types/finding-utils';
 import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
 
 export class JsDisabledProfile {
@@ -101,6 +101,7 @@ export class JsDisabledProfile {
           severity: 'warning',
           category: 'resilience',
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: { canonicalFinding: canonical, textLength: evalResult.textLen },
           timestamp: Date.now(),
           isClassified: false,
@@ -131,6 +132,7 @@ export class JsDisabledProfile {
           severity: 'info',
           category: 'resilience',
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: { canonicalFinding: canonical, textLength: evalResult.textLen },
           timestamp: Date.now(),
           isClassified: false,
@@ -143,6 +145,7 @@ export class JsDisabledProfile {
         severity: 'error',
         category: 'execution',
         message: `JS disabled profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false,
       });

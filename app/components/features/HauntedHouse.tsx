@@ -201,15 +201,15 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
       {/* Top Status & Tooltip Ribbon - Fixed height to avoid ANY layout shift or hover jitter */}
       <div className="h-9 mb-2 flex items-center justify-center text-xs font-serif overflow-hidden select-none">
         {hoveredWindow ? (
-          <div className="flex items-center gap-2 px-3 py-1 bg-[#1c1629] border border-[#ff791f] rounded-[4px] text-[#fff1dc] shadow-[0_0_12px_rgba(255,121,31,0.25)]">
-            <span className="text-[#ff791f]">🕯️</span>
+          <div className="flex items-center gap-2 px-3 py-1 bg-[var(--ghost-mist)] border border-[var(--pumpkin-fire)] rounded-[4px] text-[var(--bone-white)] shadow-[0_0_12px_rgba(255,121,31,0.25)]">
+            <span className="text-[var(--pumpkin-fire)]">🕯️</span>
             <span className="font-bold">{hoveredWindow.name}</span>
-            <span className="text-[#d9d3e0]">
+            <span className="text-[var(--spirit-smoke)]">
               ({selectedProfiles.includes(hoveredWindow.id) ? 'Summoned Rite' : 'Click to summon'})
             </span>
           </div>
         ) : (
-          <div className="flex items-center gap-2 px-3 py-1 text-[#d9d3e0]">
+          <div className="flex items-center gap-2 px-3 py-1 text-[var(--spirit-smoke)]">
             <span>Click windows to summon rites • Click heavy front door to haunt with all</span>
           </div>
         )}
@@ -227,7 +227,7 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           {/* Candlelight glow inside lit windows */}
           <radialGradient id="windowLit" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#FFF275" stopOpacity="1" />
-            <stop offset="45%" stopColor="#ff791f" stopOpacity="0.95" />
+            <stop offset="45%" stopColor="var(--pumpkin-fire)" stopOpacity="0.95" />
             <stop offset="85%" stopColor="#D97706" stopOpacity="0.8" />
             <stop offset="100%" stopColor="#78350F" stopOpacity="0.7" />
           </radialGradient>
@@ -236,14 +236,14 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           <radialGradient id="windowOmen" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#FCA5A5" stopOpacity="1" />
             <stop offset="50%" stopColor="#F28B77" stopOpacity="0.95" />
-            <stop offset="85%" stopColor="#DC2626" stopOpacity="0.85" />
+            <stop offset="85%" stopColor="var(--severity-scream)" stopOpacity="0.85" />
             <stop offset="100%" stopColor="#7F1D1D" stopOpacity="0.75" />
           </radialGradient>
 
           {/* Porch Lantern Flame Gradient */}
           <radialGradient id="pumpkinGlow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#FEF08A" stopOpacity="1" />
-            <stop offset="40%" stopColor="#ff791f" stopOpacity="0.95" />
+            <stop offset="40%" stopColor="var(--pumpkin-fire)" stopOpacity="0.95" />
             <stop offset="80%" stopColor="#EA580C" stopOpacity="0.8" />
             <stop offset="100%" stopColor="#7C2D12" stopOpacity="0" />
           </radialGradient>
@@ -251,30 +251,35 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
 
         {/* ================= BACKGROUND: DUSK MOON & WEATHER VANE ================= */}
         {/* Full harvest moon behind gothic spire */}
-        <circle cx="340" cy="80" r="38" fill="#ff791f" opacity="0.12" />
-        <circle cx="340" cy="80" r="32" fill="#fff1dc" opacity="0.18" />
+        <circle cx="340" cy="80" r="38" fill="var(--pumpkin-fire)" opacity="0.12" />
+        <circle cx="340" cy="80" r="32" fill="var(--bone-white)" opacity="0.18" />
 
         {/* Spire Weather Vane */}
-        <path d="M 270 20 L 270 65" stroke="#46334b" strokeWidth="2" strokeLinecap="round" />
-        <path d="M 262 35 L 278 35" stroke="#46334b" strokeWidth="1.5" />
-        <circle cx="270" cy="22" r="3" fill="#ff791f" />
+        <path
+          d="M 270 20 L 270 65"
+          stroke="var(--tombstone-gray)"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path d="M 262 35 L 278 35" stroke="var(--tombstone-gray)" strokeWidth="1.5" />
+        <circle cx="270" cy="22" r="3" fill="var(--pumpkin-fire)" />
 
         {/* Chimney & Curling Smoke */}
         <path
           d="M 120 70 L 142 70 L 142 125 L 120 125 Z"
           fill="#0C1B2A"
-          stroke="#46334b"
+          stroke="var(--tombstone-gray)"
           strokeWidth="2"
         />
         <path
           d="M 116 66 L 146 66 L 146 72 L 116 72 Z"
-          fill="#1c1629"
-          stroke="#46334b"
+          fill="var(--ghost-mist)"
+          stroke="var(--tombstone-gray)"
           strokeWidth="1.5"
         />
         <path
           d="M 131 64 C 131 52, 122 45, 127 34 C 132 23, 126 15, 133 8"
-          stroke="#b9acbf"
+          stroke="var(--grave-dust)"
           strokeWidth="1.5"
           strokeDasharray="2 2"
           fill="none"
@@ -289,7 +294,7 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           width="440"
           height="25"
           fill="#08131E"
-          stroke="#46334b"
+          stroke="var(--tombstone-gray)"
           strokeWidth="2"
           rx="2"
         />
@@ -301,8 +306,8 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           y="280"
           width="424"
           height="102"
-          fill="#0a0711"
-          stroke="#46334b"
+          fill="var(--midnight-veil)"
+          stroke="var(--tombstone-gray)"
           strokeWidth="2.5"
         />
 
@@ -312,8 +317,8 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           y="274"
           width="436"
           height="8"
-          fill="#1c1629"
-          stroke="#46334b"
+          fill="var(--ghost-mist)"
+          stroke="var(--tombstone-gray)"
           strokeWidth="1.5"
         />
 
@@ -324,7 +329,7 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           width="412"
           height="96"
           fill="#0D1E2D"
-          stroke="#46334b"
+          stroke="var(--tombstone-gray)"
           strokeWidth="2"
         />
 
@@ -334,45 +339,50 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           y="174"
           width="424"
           height="8"
-          fill="#1c1629"
-          stroke="#46334b"
+          fill="var(--ghost-mist)"
+          stroke="var(--tombstone-gray)"
           strokeWidth="1.5"
         />
 
         {/* Main Mansard / Gable Roof */}
-        <polygon points="270,60 58,176 482,176" fill="#091622" stroke="#46334b" strokeWidth="2.5" />
+        <polygon
+          points="270,60 58,176 482,176"
+          fill="#091622"
+          stroke="var(--tombstone-gray)"
+          strokeWidth="2.5"
+        />
 
         {/* Center Spire Dormer Pediment */}
         <polygon
           points="270,82 242,125 298,125"
-          fill="#1c1629"
-          stroke="#ff791f"
+          fill="var(--ghost-mist)"
+          stroke="var(--pumpkin-fire)"
           strokeWidth="1.5"
         />
 
         {/* Left & Right Roof Dormer Gables */}
         <polygon
           points="122,118 96,145 148,145"
-          fill="#0a0711"
-          stroke="#46334b"
+          fill="var(--midnight-veil)"
+          stroke="var(--tombstone-gray)"
           strokeWidth="1.5"
         />
         <polygon
           points="182,118 156,145 208,145"
-          fill="#0a0711"
-          stroke="#46334b"
+          fill="var(--midnight-veil)"
+          stroke="var(--tombstone-gray)"
           strokeWidth="1.5"
         />
         <polygon
           points="358,118 332,145 384,145"
-          fill="#0a0711"
-          stroke="#46334b"
+          fill="var(--midnight-veil)"
+          stroke="var(--tombstone-gray)"
           strokeWidth="1.5"
         />
         <polygon
           points="418,118 392,145 444,145"
-          fill="#0a0711"
-          stroke="#46334b"
+          fill="var(--midnight-veil)"
+          stroke="var(--tombstone-gray)"
           strokeWidth="1.5"
         />
 
@@ -406,8 +416,10 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
                 width={win.width + 6}
                 height={win.height + 6}
                 rx={win.floor === 'attic' ? 14 : 3}
-                fill="#1c1629"
-                stroke={isHovered ? '#ff791f' : isSelected ? '#b9acbf' : '#1A334B'}
+                fill="var(--ghost-mist)"
+                stroke={
+                  isHovered ? 'var(--pumpkin-fire)' : isSelected ? 'var(--grave-dust)' : '#1A334B'
+                }
                 strokeWidth={isHovered ? '2' : '1'}
                 pointerEvents="none"
               />
@@ -426,7 +438,13 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
                       : 'url(#windowLit)'
                     : '#08131E'
                 }
-                stroke={isSelected ? (hasFindings ? '#F28B77' : '#ff791f') : '#46334b'}
+                stroke={
+                  isSelected
+                    ? hasFindings
+                      ? '#F28B77'
+                      : 'var(--pumpkin-fire)'
+                    : 'var(--tombstone-gray)'
+                }
                 strokeWidth={isSelected ? '2' : '1'}
                 pointerEvents="none"
               />
@@ -464,13 +482,13 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
                     cx={win.x + win.width / 2 - 3}
                     cy={win.y + win.height / 2}
                     r="1.5"
-                    fill="#0a0711"
+                    fill="var(--midnight-veil)"
                   />
                   <circle
                     cx={win.x + win.width / 2 + 3}
                     cy={win.y + win.height / 2}
                     r="1.5"
-                    fill="#0a0711"
+                    fill="var(--midnight-veil)"
                   />
                 </g>
               )}
@@ -481,7 +499,7 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
                 y1={win.y + win.height + 2}
                 x2={win.x + win.width + 4}
                 y2={win.y + win.height + 2}
-                stroke="#46334b"
+                stroke="var(--tombstone-gray)"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 pointerEvents="none"
@@ -520,18 +538,18 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           {/* Stone Archway Over Door */}
           <path
             d="M 240 382 L 240 300 C 240 282, 300 282, 300 300 L 300 382 Z"
-            fill="#0a0711"
-            stroke="#46334b"
+            fill="var(--midnight-veil)"
+            stroke="var(--tombstone-gray)"
             strokeWidth="2"
           />
 
           {/* Heavy Victorian Oak Door */}
           <path
             d="M 246 382 L 246 304 C 246 290, 294 290, 294 304 L 294 382 Z"
-            fill={isAllSelected ? '#1c1629' : '#0B1724'}
-            stroke={isAllSelected ? '#ff791f' : '#46334b'}
+            fill={isAllSelected ? 'var(--ghost-mist)' : '#0B1724'}
+            stroke={isAllSelected ? 'var(--pumpkin-fire)' : 'var(--tombstone-gray)'}
             strokeWidth="2"
-            className="transition-colors group-hover:fill-[#1c1629]"
+            className="transition-colors group-hover:fill-[var(--ghost-mist)]"
           />
 
           {/* Door Panels */}
@@ -573,7 +591,7 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           />
 
           {/* Brass Door Knob */}
-          <circle cx="288" cy="344" r="2.5" fill="#ff791f" />
+          <circle cx="288" cy="344" r="2.5" fill="var(--pumpkin-fire)" />
 
           {/* Door Header Banner: "HAUNT ALL" */}
           <rect
@@ -581,8 +599,8 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
             y="286"
             width="50"
             height="12"
-            fill="#0a0711"
-            stroke="#ff791f"
+            fill="var(--midnight-veil)"
+            stroke="var(--pumpkin-fire)"
             strokeWidth="1"
             rx="2"
           />
@@ -590,7 +608,7 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
             x="270"
             y="295"
             textAnchor="middle"
-            fill="#ff791f"
+            fill="var(--pumpkin-fire)"
             fontSize="7"
             fontFamily="monospace"
             fontWeight="bold"
@@ -602,7 +620,12 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
 
         {/* ================= PORCH LANTERN (JACK-O'-LANTERN) ================= */}
         {/* Iron Hook Arm */}
-        <path d="M 230 338 L 220 338 L 220 348" stroke="#46334b" strokeWidth="2" fill="none" />
+        <path
+          d="M 230 338 L 220 338 L 220 348"
+          stroke="var(--tombstone-gray)"
+          strokeWidth="2"
+          fill="none"
+        />
 
         {/* Ambient warm light cast on porch when URL is valid */}
         {isUrlValid && (
@@ -634,7 +657,7 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
             rx="11"
             ry="9"
             fill={isUrlValid ? '#EA580C' : '#451A03'}
-            stroke={isUrlValid ? '#ff791f' : '#46334b'}
+            stroke={isUrlValid ? 'var(--pumpkin-fire)' : 'var(--tombstone-gray)'}
             strokeWidth="1.5"
             className="transition-colors duration-300"
           />
@@ -644,21 +667,21 @@ export const HauntedHouse: React.FC<HauntedHouseProps> = ({
           <polygon
             points="7,6 9,9 5,9"
             fill={isUrlValid ? '#FEF08A' : '#1C1917'}
-            stroke={isUrlValid ? '#ff791f' : '#292524'}
+            stroke={isUrlValid ? 'var(--pumpkin-fire)' : '#292524'}
             strokeWidth="0.5"
           />
           {/* Right Eye */}
           <polygon
             points="17,6 19,9 15,9"
             fill={isUrlValid ? '#FEF08A' : '#1C1917'}
-            stroke={isUrlValid ? '#ff791f' : '#292524'}
+            stroke={isUrlValid ? 'var(--pumpkin-fire)' : '#292524'}
             strokeWidth="0.5"
           />
           {/* Carved Jagged Grin */}
           <path
             d="M 6 12 L 8 14 L 10 12 L 12 14 L 14 12 L 16 14 L 18 12 L 16 16 L 8 16 Z"
             fill={isUrlValid ? '#FEF08A' : '#1C1917'}
-            stroke={isUrlValid ? '#ff791f' : '#292524'}
+            stroke={isUrlValid ? 'var(--pumpkin-fire)' : '#292524'}
             strokeWidth="0.5"
           />
         </g>

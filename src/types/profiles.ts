@@ -3,6 +3,8 @@
  * Defines the structure of all 16 testing profiles and their execution models
  */
 
+import type { Evidence } from './contracts';
+
 /**
  * Profile execution environment context
  */
@@ -58,6 +60,12 @@ export interface Finding {
   timestamp: number;
   isClassified: boolean;
   canonicalHash?: string;
+  /**
+   * Evidence backing this finding. Must never be empty for findings produced
+   * by a profile — enforced at construction by `buildProfileFinding` /
+   * `buildFinding` and at runtime by `FindingClassifier.classify`.
+   */
+  evidence: Evidence[];
 }
 
 /**

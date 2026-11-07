@@ -4,6 +4,7 @@
  */
 
 import { Page } from 'playwright';
+import { sanitizeUntrusted } from '../types/contracts';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -75,6 +76,9 @@ export class BrowserEdgeProfile {
           severity: 'warning',
           category: 'accessibility',
           message: `${forcedColorsAudit.forcedColorsAdjustNone} elements disable forced colors (forced-color-adjust: none), may be unreadable in Windows High Contrast on Edge`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('forced colors none') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -87,6 +91,9 @@ export class BrowserEdgeProfile {
           severity: 'info',
           category: 'accessibility',
           message: `${forcedColorsAudit.svgIconsWithoutFillOrCurrentColor} SVG icons do not use currentColor, verify visibility in Windows High Contrast on Edge`,
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('svg high contrast') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -114,6 +121,7 @@ export class BrowserEdgeProfile {
           category: 'browser-compatibility',
           message:
             'Inline script appears to sniff for Chrome without checking for Edge (Edg/), risking incorrect feature branches',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('ua sniffing') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -138,6 +146,7 @@ export class BrowserEdgeProfile {
           category: 'browser-compatibility',
           message:
             'Missing web app manifest (<link rel="manifest">) for Edge PWA and Windows installability',
+          evidence: [{ kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('pwa manifest') }],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -152,6 +161,9 @@ export class BrowserEdgeProfile {
           category: 'console-errors',
           message: `${consoleErrors.length} JavaScript console errors encountered during Edge evaluation`,
           details: { errors: consoleErrors.slice(0, 5) },
+          evidence: [
+            { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('console errors') },
+          ],
           timestamp: Date.now(),
           isClassified: false,
         });
@@ -163,6 +175,9 @@ export class BrowserEdgeProfile {
         severity: 'error',
         category: 'execution',
         message: `Edge profile execution error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: [
+          { kind: 'dom', selector: 'body', snippet: sanitizeUntrusted('execution error') },
+        ],
         timestamp: Date.now(),
         isClassified: false,
       });

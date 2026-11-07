@@ -46,11 +46,11 @@ export const AtmosphereToggle: React.FC = () => {
     <button
       type="button"
       onClick={cycleAtmosphere}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-serif border border-[#46334b] bg-[#1c1629]/80 text-[#fff1dc] hover:border-[#ff791f] hover:text-[#ff791f] transition-colors cursor-pointer select-none"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-xs font-serif border border-[var(--tombstone-gray)] bg-[var(--ghost-mist)]/80 text-[var(--bone-white)] hover:border-[var(--pumpkin-fire)] hover:text-[var(--pumpkin-fire)] transition-colors cursor-pointer select-none"
       title="Toggle haunting ambient effects (Off, Subtle, Full)"
       aria-label={labels[current]}
     >
-      <SparklesIcon className="w-3.5 h-3.5 text-[#ff791f]" />
+      <SparklesIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
       <span>{labels[current]}</span>
       <span className="text-xs" aria-hidden="true">
         {statusIcons[current]}

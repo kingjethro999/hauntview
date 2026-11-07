@@ -104,7 +104,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
   const getPinColor = (sev: OmenPin['severity']) => {
     switch (sev) {
       case 'serious':
-        return 'bg-[#dc2626] text-white border-[#991b1b] shadow-[0_0_12px_rgba(220,38,38,0.6)]';
+        return 'bg-[var(--severity-scream)] text-white border-[#991b1b] shadow-[0_0_12px_rgba(220,38,38,0.6)]';
       case 'warning':
         return 'bg-[var(--candle-primary)] text-[#1a0c06] border-[#8a330d] shadow-[0_0_12px_rgba(255,121,31,0.6)]';
       case 'info':
@@ -147,7 +147,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
             onClick={() => setMode('ectoplasm')}
             className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors ${
               mode === 'ectoplasm'
-                ? 'bg-[#9aff9a] text-[#0a0711]'
+                ? 'bg-[var(--ectoplasm-green)] text-[var(--midnight-veil)]'
                 : 'text-[var(--phantom-gray)] hover:text-[var(--ghost-white)] hover:bg-[rgba(154,255,154,0.08)]'
             }`}
           >
@@ -190,7 +190,10 @@ export const TheVeil: React.FC<TheVeilProps> = ({
             className="border rounded-lg p-3 space-y-2"
             style={{ borderColor: 'rgba(255, 121, 31, 0.15)', background: 'rgba(10, 7, 17, 0.5)' }}
           >
-            <span className="text-xs font-semibold block" style={{ color: '#9aff9a' }}>
+            <span
+              className="text-xs font-semibold block"
+              style={{ color: 'var(--ectoplasm-green)' }}
+            >
               {livingLabel}
             </span>
             <div
@@ -215,7 +218,10 @@ export const TheVeil: React.FC<TheVeilProps> = ({
             className="border rounded-lg p-3 space-y-2"
             style={{ borderColor: 'rgba(255, 121, 31, 0.15)', background: 'rgba(10, 7, 17, 0.5)' }}
           >
-            <span className="text-xs font-semibold block" style={{ color: '#dc2626' }}>
+            <span
+              className="text-xs font-semibold block"
+              style={{ color: 'var(--severity-scream)' }}
+            >
               {apparitionLabel}
             </span>
             <div
@@ -242,7 +248,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
           style={{ borderColor: 'rgba(255, 121, 31, 0.15)', background: 'rgba(10, 7, 17, 0.5)' }}
         >
           <div className="flex items-center justify-between mb-2 text-xs">
-            <span className="font-semibold" style={{ color: '#9aff9a' }}>
+            <span className="font-semibold" style={{ color: 'var(--ectoplasm-green)' }}>
               Ectoplasm Pixel Diff
             </span>
             <span style={{ color: 'var(--phantom-gray)' }}>Green highlights = Altered pixels</span>
@@ -312,7 +318,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
               onChange={(e) => setPosition(Number(e.target.value))}
               className="flex-1 accent-[var(--candle-primary)]"
             />
-            <span className="text-xs" style={{ color: '#dc2626' }}>
+            <span className="text-xs" style={{ color: 'var(--severity-scream)' }}>
               Apparition (100%)
             </span>
           </div>
@@ -394,7 +400,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
               aria-valuenow={position}
               aria-valuetext={`${position}% living page, ${100 - position}% apparition`}
               onKeyDown={handleKeyDown}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-[#0a0711] border-2 border-[var(--candle-primary)] flex items-center justify-center shadow-[0_0_12px_rgba(255,121,31,0.4)] focus:outline-none cursor-ew-resize pointer-events-auto hover:scale-110 active:scale-95 transition-transform"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-[var(--midnight-veil)] border-2 border-[var(--candle-primary)] flex items-center justify-center shadow-[0_0_12px_rgba(255,121,31,0.4)] focus:outline-none cursor-ew-resize pointer-events-auto hover:scale-110 active:scale-95 transition-transform"
             >
               <ArrowsRightLeftIcon className="w-4 h-4" style={{ color: 'var(--candle-primary)' }} />
             </div>
@@ -405,7 +411,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
             className="absolute bottom-3 left-3 px-2.5 py-1 rounded-md text-xs font-semibold backdrop-blur-sm z-10"
             style={{
               background: 'rgba(10, 7, 17, 0.8)',
-              color: '#9aff9a',
+              color: 'var(--ectoplasm-green)',
               border: '1px solid rgba(154, 255, 154, 0.2)',
             }}
           >
@@ -415,7 +421,7 @@ export const TheVeil: React.FC<TheVeilProps> = ({
             className="absolute bottom-3 right-3 px-2.5 py-1 rounded-md text-xs font-semibold backdrop-blur-sm z-10"
             style={{
               background: 'rgba(10, 7, 17, 0.8)',
-              color: '#dc2626',
+              color: 'var(--severity-scream)',
               border: '1px solid rgba(220, 38, 38, 0.2)',
             }}
           >
@@ -497,7 +503,7 @@ function EctoplasmPlate() {
           border: '1px solid rgba(154, 255, 154, 0.3)',
         }}
       >
-        <SparklesIcon className="w-8 h-8" style={{ color: '#9aff9a' }} />
+        <SparklesIcon className="w-8 h-8" style={{ color: 'var(--ectoplasm-green)' }} />
       </div>
       <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--ghost-white)' }}>
         Ectoplasm Diff

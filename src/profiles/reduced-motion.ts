@@ -5,7 +5,7 @@
 
 import { Browser } from 'playwright';
 import { ScreenshotManager } from '../core/screenshot-manager';
-import { buildFinding } from '../types/finding-utils';
+import { buildFinding, executionErrorEvidence } from '../types/finding-utils';
 import { Finding, ProfileResult, ProfileContext, ScreenshotMetadata } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -97,6 +97,7 @@ export class ReducedMotionProfile {
           severity: 'warning',
           category: 'accessibility',
           message: canonical.title,
+          evidence: [...canonical.evidence],
           details: { canonicalFinding: canonical, runningAnimations: runningCount },
           timestamp: Date.now(),
           isClassified: false,
@@ -109,6 +110,7 @@ export class ReducedMotionProfile {
         severity: 'error',
         category: 'execution',
         message: `Reduced motion profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false,
       });

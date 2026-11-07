@@ -225,9 +225,9 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
               {isUrlValid ? (
                 <div
                   className="flex items-center gap-1.5 text-xs font-medium"
-                  style={{ color: '#9aff9a' }}
+                  style={{ color: 'var(--ectoplasm-green)' }}
                 >
-                  <div className="w-2 h-2 rounded-full bg-[#9aff9a] ember-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-[var(--ectoplasm-green)] ember-pulse" />
                   <span>Valid</span>
                 </div>
               ) : (
@@ -363,7 +363,7 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
         {/* Hosted execution notice */}
         <p className="text-xs text-[var(--phantom-gray)] text-center sm:text-right pt-2 font-mono">
           Full 25-rite runs take ~70s on the hosted sandbox. Install the{' '}
-          <code className="text-[#ff791f]">haunt</code> CLI for parallel runs.
+          <code className="text-[var(--pumpkin-fire)]">haunt</code> CLI for parallel runs.
         </p>
 
         {/* Error alert */}

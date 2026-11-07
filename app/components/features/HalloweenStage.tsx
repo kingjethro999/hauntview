@@ -24,12 +24,12 @@ export function Ghost({ className = '', style = {}, ...props }: React.SVGProps<S
         {/* left eye */}
         <path
           d="M12.964,6.687C12.638,6.676 12.329,6.839 12.154,7.115C11.937,7.438 11.824,7.94 11.824,8.577C11.824,9.282 11.974,10.467 12.964,10.467L12.972,10.467C13.729,10.467 14.186,9.762 14.186,8.577C14.186,7.955 14.059,7.452 13.819,7.122C13.625,6.843 13.304,6.68 12.964,6.687Z"
-          fill="#0a0711"
+          fill="var(--midnight-veil)"
         />
         {/* right eye */}
         <path
           d="M17.044,6.687C16.718,6.676 16.409,6.839 16.234,7.115C16.017,7.438 15.904,7.94 15.904,8.577C15.904,9.282 16.054,10.467 17.044,10.467L17.052,10.467C17.809,10.467 18.267,9.762 18.267,8.577C18.267,7.955 18.139,7.452 17.899,7.122C17.705,6.843 17.384,6.68 17.044,6.687Z"
-          fill="#0a0711"
+          fill="var(--midnight-veil)"
         />
       </g>
     </svg>
@@ -403,7 +403,7 @@ export default function HalloweenStage({ isRunning = false }: HalloweenStageProp
         .halloween-stage { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
         .halloween-stage button { pointer-events: auto; position: absolute; padding: 0; background: none; border: none; cursor: pointer; transition: filter .2s, transform .2s; }
         .halloween-stage button:hover  { filter: brightness(1.25); }
-        .halloween-stage button:focus-visible { outline: 2px solid #ff791f; outline-offset: 4px; }
+        .halloween-stage button:focus-visible { outline: 2px solid var(--pumpkin-fire); outline-offset: 4px; }
 
         .stage-ghost     { width: 74px; right: 39%; top: 57px; color: #fff4ed; animation: ghost-hover 5s ease-in-out infinite; filter: drop-shadow(0 0 18px rgba(193,139,255,0.4)); }
         .stage-ghost span { font: 6px monospace; white-space: nowrap; color: #d9b5ee; display: block; margin-top: -3px; }

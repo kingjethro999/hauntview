@@ -30,7 +30,7 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-[6px] border border-[#46334b] bg-[#1c1629]/70 backdrop-blur-sm print:hidden">
+    <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-[6px] border border-[var(--tombstone-gray)] bg-[var(--ghost-mist)]/70 backdrop-blur-sm print:hidden">
       <Link href="/">
         <Button variant="ghost" size="sm" icon={<ArrowLeftIcon className="w-4 h-4" />}>
           The Parlour · New Séance
@@ -44,7 +44,7 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
           onClick={copyJson}
           icon={
             copied ? (
-              <ClipboardDocumentCheckIcon className="w-4 h-4 text-[#86efac]" />
+              <ClipboardDocumentCheckIcon className="w-4 h-4 text-[var(--success)]" />
             ) : (
               <ClipboardDocumentIcon className="w-4 h-4" />
             )
@@ -58,7 +58,7 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
           variant="outline"
           size="sm"
           onClick={printReport}
-          icon={<PrinterIcon className="w-4 h-4 text-[#ff791f]" />}
+          icon={<PrinterIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />}
         >
           Print Grimoire
         </Button>
@@ -68,7 +68,7 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
           <Button
             variant="outline"
             size="sm"
-            icon={<DocumentTextIcon className="w-4 h-4 text-[#ff791f]" />}
+            icon={<DocumentTextIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />}
           >
             Export Markdown
           </Button>
@@ -78,8 +78,8 @@ export const ReportActions: React.FC<ReportActionsProps> = ({ report }) => {
           <Button
             variant="secondary"
             size="sm"
-            icon={<ArrowDownTrayIcon className="w-4 h-4 text-[#0a0711]" />}
-            className="bg-[#ff791f] hover:bg-[#ff791f]/90 text-[#0a0711] font-bold shadow-[0_0_12px_rgba(255,121,31,0.3)]"
+            icon={<ArrowDownTrayIcon className="w-4 h-4 text-[var(--midnight-veil)]" />}
+            className="bg-[var(--pumpkin-fire)] hover:bg-[var(--pumpkin-fire)]/90 text-[var(--midnight-veil)] font-bold shadow-[0_0_12px_rgba(255,121,31,0.3)]"
           >
             Download Package (.zip + screenshots)
           </Button>

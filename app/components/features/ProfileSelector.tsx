@@ -351,7 +351,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
           return (
             <div
               key={category}
-              className="rounded-lg border border-[#46334b]/40 bg-[#140d1e]/40 p-2.5 sm:p-3"
+              className="rounded-lg border border-[var(--tombstone-gray)]/40 bg-[#140d1e]/40 p-2.5 sm:p-3"
             >
               <div
                 onClick={() => toggleCollapse(category)}
@@ -370,7 +370,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                   >
                     {category}
                   </span>
-                  <span className="text-[10px] sm:text-xs font-mono px-1.5 sm:px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
+                  <span className="text-[10px] sm:text-xs font-mono px-1.5 sm:px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[var(--pumpkin-fire)]">
                     {selectedCount}/{profiles.length} selected
                   </span>
                 </div>
@@ -382,13 +382,13 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                   {isCollapsed ? (
                     <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />
                   ) : (
-                    <ChevronDownIcon className="w-4 h-4 text-[#ff791f]" />
+                    <ChevronDownIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
                   )}
                 </button>
               </div>
 
               {!isCollapsed && (
-                <div className="space-y-2 mt-2 sm:mt-3 pt-2 border-t border-[#46334b]/30">
+                <div className="space-y-2 mt-2 sm:mt-3 pt-2 border-t border-[var(--tombstone-gray)]/30">
                   {profiles.map((profile) => (
                     <label
                       key={profile.id}
@@ -444,7 +444,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
         return (
           <div
             key={category}
-            className="rounded-lg border border-[#46334b]/40 bg-[#140d1e]/30 p-2.5 sm:p-3.5 transition-all"
+            className="rounded-lg border border-[var(--tombstone-gray)]/40 bg-[#140d1e]/30 p-2.5 sm:p-3.5 transition-all"
           >
             {/* Collapsible Category Header */}
             <div
@@ -464,7 +464,7 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                 >
                   {category}
                 </div>
-                <span className="text-[10px] sm:text-xs font-mono px-1.5 sm:px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[#ff791f]">
+                <span className="text-[10px] sm:text-xs font-mono px-1.5 sm:px-2 py-0.5 rounded bg-[rgba(255,121,31,0.1)] text-[var(--pumpkin-fire)]">
                   {selectedCount}/{profiles.length} selected
                 </span>
               </div>
@@ -478,14 +478,14 @@ export const ProfileSelector: React.FC<ProfileSelectorProps> = ({
                 {isCollapsed ? (
                   <ChevronRightIcon className="w-4 h-4 text-[var(--phantom-gray)]" />
                 ) : (
-                  <ChevronDownIcon className="w-4 h-4 text-[#ff791f]" />
+                  <ChevronDownIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
                 )}
               </button>
             </div>
 
             {/* Profile Tiles Grid (hidden when collapsed) */}
             {!isCollapsed && (
-              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 mt-3 pt-3 border-t border-[#46334b]/30">
+              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 mt-3 pt-3 border-t border-[var(--tombstone-gray)]/30">
                 {profiles.map((profile) => (
                   <button
                     key={profile.id}

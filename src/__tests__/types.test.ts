@@ -26,6 +26,7 @@ describe('Type Definitions', () => {
       category: 'performance',
       message: 'Test finding',
       timestamp: Date.now(),
+      evidence: [{ kind: 'metric', name: 'fixture', value: 1, unit: 'count' }],
       isClassified: false,
     };
 

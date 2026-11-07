@@ -112,13 +112,13 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
         </div>
 
         {/* Wisp Ghost Folio Host Banner */}
-        <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-[6px] border border-[#46334b] bg-[#1c1629]/60 backdrop-blur-sm flex items-center gap-3 sm:gap-4">
+        <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-[6px] border border-[var(--tombstone-gray)] bg-[var(--ghost-mist)]/60 backdrop-blur-sm flex items-center gap-3 sm:gap-4">
           <div className="flex-shrink-0">
             <WispGhost state={wispState} size="sm" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-display font-semibold text-xs sm:text-sm text-[#ff791f]">
+              <span className="font-display font-semibold text-xs sm:text-sm text-[var(--pumpkin-fire)]">
                 Wisp • Séance Host
               </span>
               <Badge
@@ -128,13 +128,13 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                 {errorCount > 0 ? 'ALARMED' : warningCount > 0 ? 'WATCHFUL' : 'DELIGHTED'}
               </Badge>
             </div>
-            <p className="text-xs text-[#fff1dc] mt-0.5 leading-relaxed">{wispQuote}</p>
+            <p className="text-xs text-[var(--bone-white)] mt-0.5 leading-relaxed">{wispQuote}</p>
           </div>
           {allFindings.length > 0 && (
             <button
               type="button"
               onClick={() => setExorciseFinding(allFindings[0])}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#ff791f]/15 border border-[#ff791f]/50 text-[#ff791f] hover:bg-[#ff791f] hover:text-[#0a0711] text-xs font-semibold transition-all cursor-pointer flex-shrink-0"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[var(--pumpkin-fire)]/15 border border-[var(--pumpkin-fire)]/50 text-[var(--pumpkin-fire)] hover:bg-[var(--pumpkin-fire)] hover:text-[var(--midnight-veil)] text-xs font-semibold transition-all cursor-pointer flex-shrink-0"
             >
               <SparklesIcon className="w-4 h-4" />
               <span>Exorcise with Kiro</span>
@@ -148,7 +148,7 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
         </div>
 
         {/* Grimoire Tab Navigation */}
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 border-b border-[#46334b] pb-3 mb-6">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 border-b border-[var(--tombstone-gray)] pb-3 mb-6">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -160,8 +160,8 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-[6px] text-xs font-semibold transition-all cursor-pointer
                 ${
                   activeTab === tab.id
-                    ? 'bg-[#1c1629] text-[#ff791f] border border-[#ff791f]/60 shadow-[0_2px_12px_rgba(255,121,31,0.2)]'
-                    : 'text-[#d9d3e0] hover:text-[#fff1dc] hover:bg-[#1c1629]/40 border border-transparent'
+                    ? 'bg-[var(--ghost-mist)] text-[var(--pumpkin-fire)] border border-[var(--pumpkin-fire)]/60 shadow-[0_2px_12px_rgba(255,121,31,0.2)]'
+                    : 'text-[var(--spirit-smoke)] hover:text-[var(--bone-white)] hover:bg-[var(--ghost-mist)]/40 border border-transparent'
                 }
               `}
             >
@@ -182,17 +182,20 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
         {/* Tab 2: Gallery of Apparitions & The Veil */}
         {activeTab === 'apparitions' && (
           <div className="space-y-6">
-            <Card variant="default" className="p-6 bg-[#1c1629]/70 border-[#46334b]">
+            <Card
+              variant="default"
+              className="p-6 bg-[var(--ghost-mist)]/70 border-[var(--tombstone-gray)]"
+            >
               <div className="mb-4">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-display font-bold text-lg text-[#fff1dc]">
+                  <h3 className="font-display font-bold text-lg text-[var(--bone-white)]">
                     Gallery of Apparitions
                   </h3>
                   <Badge variant="outline" size="sm">
                     Spirit Photography Plates
                   </Badge>
                 </div>
-                <p className="text-xs text-[#d9d3e0] mt-1">
+                <p className="text-xs text-[var(--spirit-smoke)] mt-1">
                   Select an apparition plate to inspect visual captures and diagnostic omens.
                 </p>
               </div>
@@ -224,19 +227,22 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
 
             {/* Apparition Plate Inspector for Selected Profile */}
             {selectedProfile && (
-              <Card variant="default" className="p-6 bg-[#1c1629]/90 border-[#46334b]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-[#46334b]">
+              <Card
+                variant="default"
+                className="p-6 bg-[var(--ghost-mist)]/90 border-[var(--tombstone-gray)]"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-[var(--tombstone-gray)]">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs uppercase tracking-wider font-mono text-[#ff791f]">
+                      <span className="text-xs uppercase tracking-wider font-mono text-[var(--pumpkin-fire)]">
                         Apparition Plate
                       </span>
-                      <span className="text-[#b9acbf]">•</span>
-                      <h4 className="font-display font-bold text-base text-[#fff1dc]">
+                      <span className="text-[var(--grave-dust)]">•</span>
+                      <h4 className="font-display font-bold text-base text-[var(--bone-white)]">
                         {selectedProfile.profileName} ({selectedProfile.profileId})
                       </h4>
                     </div>
-                    <p className="text-xs text-[#d9d3e0] mt-0.5">
+                    <p className="text-xs text-[var(--spirit-smoke)] mt-0.5">
                       Visual capture and diagnostic findings recorded during this testing rite.
                     </p>
                   </div>
@@ -269,7 +275,7 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
 
                 {/* Display Screenshot Plate if captured */}
                 {apparitionSrc && (
-                  <div className="max-w-4xl mx-auto rounded border border-[#46334b] overflow-hidden bg-[#0a0711] mb-6">
+                  <div className="max-w-4xl mx-auto rounded border border-[var(--tombstone-gray)] overflow-hidden bg-[var(--midnight-veil)] mb-6">
                     <Image
                       src={apparitionSrc}
                       alt={selectedProfile.profileName}
@@ -283,15 +289,15 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
 
                 {/* Profile Findings List under the Veil */}
                 {selectedProfile.findings.length > 0 && (
-                  <div className="mt-6 pt-5 border-t border-[#46334b]">
-                    <h5 className="font-display font-semibold text-xs uppercase tracking-wider text-[#ff791f] mb-3">
+                  <div className="mt-6 pt-5 border-t border-[var(--tombstone-gray)]">
+                    <h5 className="font-display font-semibold text-xs uppercase tracking-wider text-[var(--pumpkin-fire)] mb-3">
                       Omens Detected in this Rite ({selectedProfile.findings.length})
                     </h5>
                     <div className="space-y-2">
                       {selectedProfile.findings.map((finding, idx) => (
                         <div
                           key={`${finding.id}-${idx}`}
-                          className="p-3 rounded-[4px] bg-[#0a0711] border border-[#46334b] flex items-center justify-between gap-3"
+                          className="p-3 rounded-[4px] bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)] flex items-center justify-between gap-3"
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             <Badge
@@ -306,14 +312,14 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                             >
                               {finding.severity.toUpperCase()}
                             </Badge>
-                            <span className="text-xs text-[#fff1dc] truncate">
+                            <span className="text-xs text-[var(--bone-white)] truncate">
                               {finding.message}
                             </span>
                           </div>
                           <button
                             type="button"
                             onClick={() => setExorciseFinding(finding)}
-                            className="text-xs text-[#ff791f] hover:underline font-semibold flex-shrink-0 cursor-pointer"
+                            className="text-xs text-[var(--pumpkin-fire)] hover:underline font-semibold flex-shrink-0 cursor-pointer"
                           >
                             Exorcise
                           </button>
@@ -332,13 +338,16 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
 
         {/* Tab 4: Raw JSON Grimoire Ledger */}
         {activeTab === 'raw' && (
-          <Card variant="default" className="p-6 bg-[#1c1629] border-[#46334b] space-y-3">
+          <Card
+            variant="default"
+            className="p-6 bg-[var(--ghost-mist)] border-[var(--tombstone-gray)] space-y-3"
+          >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-display font-bold text-lg text-[#fff1dc]">
+                <h3 className="font-display font-bold text-lg text-[var(--bone-white)]">
                   Grimoire Ledger Data
                 </h3>
-                <p className="text-xs text-[#d9d3e0]">
+                <p className="text-xs text-[var(--spirit-smoke)]">
                   Full serialised TestReport object with complete profile breakdown and metrics
                 </p>
               </div>
@@ -346,7 +355,7 @@ export const ReportViewClient: React.FC<ReportViewClientProps> = ({ report }) =>
                 {(JSON.stringify(report).length / 1024).toFixed(1)} KB
               </Badge>
             </div>
-            <pre className="p-4 rounded-[4px] bg-[#0a0711] border border-[#46334b] text-xs font-mono text-[#9aff9a] overflow-x-auto max-h-[600px] scrollbar-thin">
+            <pre className="p-4 rounded-[4px] bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)] text-xs font-mono text-[var(--ectoplasm-green)] overflow-x-auto max-h-[600px] scrollbar-thin">
               {JSON.stringify(report, null, 2)}
             </pre>
           </Card>

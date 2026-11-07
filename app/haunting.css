@@ -55,7 +55,7 @@
   right: 8%;
   top: 8%;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #e5e3da, #8c7e96);
+  background: radial-gradient(circle at 35% 30%, var(--grave-dust), var(--slate-epitaph));
   box-shadow:
     0 0 50px rgba(154, 142, 148, 0.3),
     inset -24px -10px 0 rgba(91, 81, 99, 0.5);
@@ -97,7 +97,7 @@
   right: 32%;
   top: 12%;
   width: 74px;
-  color: #d7d2db;
+  color: var(--spirit-smoke);
   animation: ghost-hover 5s ease-in-out infinite;
   filter: drop-shadow(0 0 15px rgba(219, 215, 222, 0.3));
 }
@@ -391,7 +391,7 @@
 /* Cursor ember (follows clicks) */
 .cursor-ember {
   position: absolute;
-  color: #ffac56;
+  color: var(--ember-glow);
   font:
     13px 'Georgia',
     serif;
@@ -444,7 +444,7 @@
 /* Graveyard footer */
 .graveyard-footer {
   position: relative;
-  background: linear-gradient(to bottom, #0a0711, #050508);
+  background: linear-gradient(to bottom, var(--midnight-veil), #050508);
   border-top: 1px solid rgba(255, 121, 31, 0.15);
   padding: 48px 0 32px;
   overflow: hidden;
@@ -460,7 +460,7 @@
 .tombstone {
   position: absolute;
   bottom: 0;
-  background: linear-gradient(to top, #1a151c, #0d0a10);
+  background: linear-gradient(to top, var(--crypt-shadow), var(--midnight-veil));
   border-radius: 50% 50% 0 0;
   opacity: 0.3;
 }

@@ -38,19 +38,19 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
         <div className="flex items-center gap-3">
           <Spinner size="md" />
           <div>
-            <h4 className="font-display font-bold text-base text-[#fff1dc]">
+            <h4 className="font-display font-bold text-base text-[var(--bone-white)]">
               HauntView Engine Executing Tests
             </h4>
-            <p className="text-xs text-[#646478]">
+            <p className="text-xs text-[var(--slate-epitaph)]">
               Automating Playwright headless instances against{' '}
-              <code className="text-[#ff791f]">{url}</code>
+              <code className="text-[var(--pumpkin-fire)]">{url}</code>
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs text-[#fff1dc] font-mono bg-[#0a0711]/60 px-3 py-1.5 rounded-lg border border-[#6C3CAA]/30">
-            <ClockIcon className="w-4 h-4 text-[#ff791f]" />
+          <div className="flex items-center gap-1.5 text-xs text-[var(--bone-white)] font-mono bg-[var(--midnight-veil)]/60 px-3 py-1.5 rounded-lg border border-[var(--witchcraft-violet)]/30">
+            <ClockIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
             <span>{elapsed}s elapsed</span>
           </div>
 
@@ -73,7 +73,7 @@ export const ProgressTracker: React.FC<ProgressTrackerProps> = ({
         showPercent
       />
 
-      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#6C3CAA]/20 text-xs text-[#646478]">
+      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[var(--witchcraft-violet)]/20 text-xs text-[var(--slate-epitaph)]">
         <Badge variant="primary" size="sm">
           Playwright WebKit
         </Badge>

@@ -39,7 +39,9 @@ export function ReportDetailClient({ id, initialReport }: ReportDetailClientProp
     return (
       <div className="py-24 text-center flex flex-col items-center justify-center gap-3">
         <Spinner size="lg" />
-        <p className="text-sm text-[#646478]">Consulting local séance crypt archives...</p>
+        <p className="text-sm text-[var(--slate-epitaph)]">
+          Consulting local séance crypt archives...
+        </p>
       </div>
     );
   }
@@ -49,7 +51,7 @@ export function ReportDetailClient({ id, initialReport }: ReportDetailClientProp
       <div className="py-12 sm:py-20">
         <Container size="sm">
           <EmptyState
-            icon={<ExclamationCircleIcon className="w-10 h-10 text-[#dc2626]" />}
+            icon={<ExclamationCircleIcon className="w-10 h-10 text-[var(--severity-scream)]" />}
             title="Report Not Found"
             description={`Could not find test report with ID "${id}" in local browser storage or server memory.`}
             action={

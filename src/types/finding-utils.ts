@@ -8,6 +8,8 @@
 
 import { createHash } from 'crypto';
 import type { AtomicRiteId, CanonicalFinding, Confidence, Evidence, Severity } from './contracts';
+import { sanitizeUntrusted } from './contracts';
+import type { Finding } from './profiles';
 
 // ---------------------------------------------------------------------------
 // assertValidSeverityConfidence
@@ -117,5 +119,84 @@ export function buildFinding(params: BuildFindingParams): CanonicalFinding {
     ...(where !== undefined ? { where } : {}),
     evidence: evidence as [Evidence, ...Evidence[]],
     investigate: investigate ?? [],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Legacy Finding helpers (profiles.ts Finding shape)
+// ---------------------------------------------------------------------------
+
+/** Maximum length for a legacy finding message after sanitization. */
+export const FINDING_MESSAGE_MAX_LENGTH = 500;
+
+/**
+ * Strip control characters and truncate a message string.
+ * Used for legacy `Finding.message`, which may embed page-originated text.
+ */
+export function sanitizeMessage(raw: string): string {
+  const stripped = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  return stripped.slice(0, FINDING_MESSAGE_MAX_LENGTH);
+}
+
+/**
+ * Throws if a legacy Finding carries no evidence.
+ * Runtime guard per .kiro/steering/type_and_schema_guardrails.md.
+ */
+export function assertFindingHasEvidence(finding: Finding): void {
+  if (!finding.evidence || finding.evidence.length === 0) {
+    throw new Error(
+      `Finding ${finding.id} (profile '${finding.profileId}') has no evidence — refused`
+    );
+  }
+}
+
+/**
+ * Evidence for profile execution failures (navigation errors, evaluate
+ * exceptions, etc.). The error text is page/engine-originated, so it is
+ * wrapped as UntrustedText.
+ */
+export function executionErrorEvidence(message: string): Evidence[] {
+  return [{ kind: 'console', level: 'error', text: sanitizeUntrusted(message) }];
+}
+
+/** Parameters accepted by buildProfileFinding. */
+export interface BuildProfileFindingParams {
+  id: string;
+  profileId: string;
+  severity: 'error' | 'warning' | 'info';
+  category: string;
+  message: string;
+  /** Must contain at least one item. */
+  evidence: Evidence[];
+  location?: Finding['location'];
+  details?: Record<string, unknown>;
+  timestamp?: number;
+}
+
+/**
+ * Builds a legacy `Finding` with a guaranteed non-empty evidence array.
+ * Sanitizes `message` (control characters stripped, length capped).
+ *
+ * Throws if `evidence` is empty.
+ */
+export function buildProfileFinding(params: BuildProfileFindingParams): Finding {
+  if (!params.evidence || params.evidence.length === 0) {
+    throw new Error(
+      `Profile finding '${params.id}' has no evidence. ` +
+        `Every finding must carry at least one piece of evidence.`
+    );
+  }
+
+  return {
+    id: params.id,
+    profileId: params.profileId,
+    severity: params.severity,
+    category: params.category,
+    message: sanitizeMessage(params.message),
+    ...(params.location !== undefined ? { location: params.location } : {}),
+    ...(params.details !== undefined ? { details: params.details } : {}),
+    timestamp: params.timestamp ?? Date.now(),
+    isClassified: false,
+    evidence: params.evidence,
   };
 }

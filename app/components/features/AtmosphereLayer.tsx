@@ -59,13 +59,13 @@ export const AtmosphereLayer: React.FC = () => {
       <div className="absolute -bottom-10 left-0 right-0 h-44 opacity-35 overflow-hidden">
         {/* Fog Wave Layer 1 */}
         <div
-          className={`absolute bottom-0 -left-[100%] w-[300%] h-36 bg-gradient-to-t from-[#9aff9a]/20 via-[#1c1629]/40 to-transparent blur-2xl ${
+          className={`absolute bottom-0 -left-[100%] w-[300%] h-36 bg-gradient-to-t from-[var(--ectoplasm-green)]/20 via-[var(--ghost-mist)]/40 to-transparent blur-2xl ${
             isFull ? 'animate-[drift_45s_linear_infinite]' : ''
           }`}
         />
         {/* Fog Wave Layer 2 */}
         <div
-          className={`absolute bottom-0 -left-[50%] w-[250%] h-28 bg-gradient-to-t from-[#ff791f]/10 via-[#0a0711]/50 to-transparent blur-xl ${
+          className={`absolute bottom-0 -left-[50%] w-[250%] h-28 bg-gradient-to-t from-[var(--pumpkin-fire)]/10 via-[var(--midnight-veil)]/50 to-transparent blur-xl ${
             isFull ? 'animate-[drift-reverse_60s_linear_infinite]' : ''
           }`}
         />
@@ -79,22 +79,22 @@ export const AtmosphereLayer: React.FC = () => {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#B9AEE0">
               <path d="M12 10 C8 3, 2 5, 4 12 C5 16, 10 13, 12 11 Z" opacity="0.7" />
               <path d="M12 10 C16 3, 22 5, 20 12 C19 16, 14 13, 12 11 Z" opacity="0.7" />
-              <ellipse cx="12" cy="11" rx="1.5" ry="4" fill="#ff791f" />
+              <ellipse cx="12" cy="11" rx="1.5" ry="4" fill="var(--pumpkin-fire)" />
             </svg>
           </div>
 
           {/* Moth 2 */}
           <div className="absolute top-1/3 right-1/5 animate-[mothFlight2_24s_ease-in-out_infinite] opacity-35">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff1dc">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--bone-white)">
               <path d="M12 10 C8 4, 3 6, 5 12 C6 15, 10 13, 12 11 Z" opacity="0.7" />
               <path d="M12 10 C16 4, 21 6, 19 12 C18 15, 14 13, 12 11 Z" opacity="0.7" />
-              <ellipse cx="12" cy="11" rx="1.2" ry="3.5" fill="#ff791f" />
+              <ellipse cx="12" cy="11" rx="1.2" ry="3.5" fill="var(--pumpkin-fire)" />
             </svg>
           </div>
 
           {/* Embers drifting upwards */}
-          <div className="absolute bottom-20 left-1/3 w-1.5 h-1.5 rounded-full bg-[#ff791f] shadow-[0_0_8px_#ff791f] animate-[emberFloat_9s_ease-in-out_infinite] opacity-60" />
-          <div className="absolute bottom-28 right-1/3 w-1 h-1 rounded-full bg-[#9aff9a] shadow-[0_0_6px_#9aff9a] animate-[emberFloat_12s_ease-in-out_infinite_2s] opacity-50" />
+          <div className="absolute bottom-20 left-1/3 w-1.5 h-1.5 rounded-full bg-[var(--pumpkin-fire)] shadow-[0_0_8px_var(--pumpkin-fire)] animate-[emberFloat_9s_ease-in-out_infinite] opacity-60" />
+          <div className="absolute bottom-28 right-1/3 w-1 h-1 rounded-full bg-[var(--ectoplasm-green)] shadow-[0_0_6px_var(--ectoplasm-green)] animate-[emberFloat_12s_ease-in-out_infinite_2s] opacity-50" />
         </>
       )}
     </div>

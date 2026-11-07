@@ -7,11 +7,11 @@
 ───────────────────────────────────────────── */
 :root {
   color-scheme: dark;
-  --background: #0a0711;
+  --background: var(--midnight-veil);
   --foreground: #f5f0e8;
 
   /* Candlelit palette */
-  --candle-primary: #ff791f;
+  --candle-primary: var(--pumpkin-fire);
   --candle-glow: rgba(255, 121, 31, 0.35);
   --candle-dim: rgba(255, 121, 31, 0.15);
 
@@ -22,7 +22,7 @@
   --phantom-gray: #c5bad2;
 
   /* Severity colors */
-  --omen-serious: #dc2626;
+  --omen-serious: var(--severity-scream);
   --omen-warning: #ea580c;
   --omen-whisper: #3b82f6;
   --omen-silence: #6b7280;
@@ -33,7 +33,7 @@
    Fine grain + subtle purple fog + warm ember glow
 ───────────────────────────────────────────── */
 body {
-  background-color: #0a0711;
+  background-color: var(--midnight-veil);
   color: var(--ghost-white);
   font-family:
     var(--font-inter, 'Inter'),
@@ -123,7 +123,7 @@ h6 {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0711;
+  background: var(--midnight-veil);
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(45, 31, 61, 0.6);
@@ -142,7 +142,7 @@ h6 {
 .landing-bay {
   position: relative;
   isolation: isolate;
-  background: linear-gradient(180deg, #0d0a12 0%, #0a0711 100%);
+  background: linear-gradient(180deg, #0d0a12 0%, var(--midnight-veil) 100%);
   border-bottom: 1px solid rgba(255, 121, 31, 0.15);
   overflow: hidden;
 }
@@ -212,7 +212,7 @@ h6 {
   Warm glow, press depth, ember animation
 ───────────────────────────────────────────── */
 .btn-candle {
-  background: linear-gradient(180deg, #ff8a35 0%, #ff791f 100%);
+  background: linear-gradient(180deg, #ff8a35 0%, var(--pumpkin-fire) 100%);
   color: #1a0c06;
   font-weight: 600;
   font-family: var(--font-space-grotesk, 'Space Grotesk', sans-serif);

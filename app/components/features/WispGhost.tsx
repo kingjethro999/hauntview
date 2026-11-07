@@ -59,10 +59,10 @@ export const WispGhost: React.FC<WispGhostProps> = ({
       {/* Playful Speech Bubble */}
       {(clickedBoo || (showSpeechBubble && message)) && (
         <div
-          className={`absolute -top-10 z-20 px-3 py-1 bg-[#1c1629] border border-[#ff791f] rounded-[6px] shadow-[0_4px_16px_rgba(255,121,31,0.3)] text-[#fff1dc] ${textSize} font-serif whitespace-nowrap animate-bounce`}
+          className={`absolute -top-10 z-20 px-3 py-1 bg-[var(--ghost-mist)] border border-[var(--pumpkin-fire)] rounded-[6px] shadow-[0_4px_16px_rgba(255,121,31,0.3)] text-[var(--bone-white)] ${textSize} font-serif whitespace-nowrap animate-bounce`}
         >
           {clickedBoo ? 'Boo! 👻✨' : message}
-          <div className="absolute left-1/2 -bottom-1.5 -translate-x-1/2 w-2.5 h-2.5 bg-[#1c1629] border-r border-b border-[#ff791f] rotate-45" />
+          <div className="absolute left-1/2 -bottom-1.5 -translate-x-1/2 w-2.5 h-2.5 bg-[var(--ghost-mist)] border-r border-b border-[var(--pumpkin-fire)] rotate-45" />
         </div>
       )}
 
@@ -89,14 +89,14 @@ export const WispGhost: React.FC<WispGhostProps> = ({
           >
             <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
             <stop offset="50%" stopColor="#E0F2FE" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="#9aff9a" stopOpacity="0.65" />
+            <stop offset="100%" stopColor="var(--ectoplasm-green)" stopOpacity="0.65" />
           </linearGradient>
 
           {/* Candle Flame Radial Glow */}
           <radialGradient id="candleGlow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#FFF275" stopOpacity="1" />
-            <stop offset="50%" stopColor="#ff791f" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#ff791f" stopOpacity="0" />
+            <stop offset="50%" stopColor="var(--pumpkin-fire)" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="var(--pumpkin-fire)" stopOpacity="0" />
           </radialGradient>
 
           {/* Ghost Aura Blur */}
@@ -116,7 +116,13 @@ export const WispGhost: React.FC<WispGhostProps> = ({
              C 85 95, 80 85, 80 65 
              C 80 40, 75 15, 50 15 Z"
           fill="none"
-          stroke={state === 'delighted' ? '#9aff9a' : state === 'alarmed' ? '#F28B77' : '#ff791f'}
+          stroke={
+            state === 'delighted'
+              ? 'var(--ectoplasm-green)'
+              : state === 'alarmed'
+                ? '#F28B77'
+                : 'var(--pumpkin-fire)'
+          }
           strokeWidth="2"
           strokeOpacity={state === 'delighted' || state === 'conjuring' ? '0.8' : '0.3'}
           filter="url(#wispAura)"
@@ -132,7 +138,7 @@ export const WispGhost: React.FC<WispGhostProps> = ({
              C 82 92, 77 83, 77 66 
              C 77 42, 72 16, 50 16 Z"
           fill="url(#wispBodyGrad)"
-          stroke="#fff1dc"
+          stroke="var(--bone-white)"
           strokeWidth="1.5"
         />
 
@@ -142,14 +148,14 @@ export const WispGhost: React.FC<WispGhostProps> = ({
             {/* Sleeping Eyes (curved arches) */}
             <path
               d="M 37 54 Q 42 58 47 54"
-              stroke="#0a0711"
+              stroke="var(--midnight-veil)"
               strokeWidth="2.5"
               strokeLinecap="round"
               fill="none"
             />
             <path
               d="M 53 54 Q 58 58 63 54"
-              stroke="#0a0711"
+              stroke="var(--midnight-veil)"
               strokeWidth="2.5"
               strokeLinecap="round"
               fill="none"
@@ -158,7 +164,7 @@ export const WispGhost: React.FC<WispGhostProps> = ({
             <text
               x="68"
               y="36"
-              fill="#ff791f"
+              fill="var(--pumpkin-fire)"
               fontSize="12"
               fontWeight="bold"
               fontFamily="serif"
@@ -169,7 +175,7 @@ export const WispGhost: React.FC<WispGhostProps> = ({
             <text
               x="76"
               y="24"
-              fill="#ff791f"
+              fill="var(--pumpkin-fire)"
               fontSize="15"
               fontWeight="bold"
               fontFamily="serif"
@@ -181,23 +187,23 @@ export const WispGhost: React.FC<WispGhostProps> = ({
         ) : state === 'alarmed' ? (
           <>
             {/* Wide, shocked eyes */}
-            <ellipse cx="40" cy="50" rx="5" ry="7" fill="#0a0711" />
+            <ellipse cx="40" cy="50" rx="5" ry="7" fill="var(--midnight-veil)" />
             <circle cx="39" cy="48" r="1.5" fill="#FFFFFF" />
-            <ellipse cx="60" cy="50" rx="5" ry="7" fill="#0a0711" />
+            <ellipse cx="60" cy="50" rx="5" ry="7" fill="var(--midnight-veil)" />
             <circle cx="59" cy="48" r="1.5" fill="#FFFFFF" />
             {/* Open mouth (Scream) */}
-            <ellipse cx="50" cy="64" rx="4" ry="6" fill="#0a0711" />
+            <ellipse cx="50" cy="64" rx="4" ry="6" fill="var(--midnight-veil)" />
             {/* Little arms raised */}
             <path
               d="M 23 58 Q 12 48 16 38"
-              stroke="#fff1dc"
+              stroke="var(--bone-white)"
               strokeWidth="3"
               strokeLinecap="round"
               fill="none"
             />
             <path
               d="M 77 58 Q 88 48 84 38"
-              stroke="#fff1dc"
+              stroke="var(--bone-white)"
               strokeWidth="3"
               strokeLinecap="round"
               fill="none"
@@ -208,14 +214,14 @@ export const WispGhost: React.FC<WispGhostProps> = ({
             {/* Happy smiling eyes */}
             <path
               d="M 36 50 Q 41 45 46 50"
-              stroke="#0a0711"
+              stroke="var(--midnight-veil)"
               strokeWidth="2.5"
               strokeLinecap="round"
               fill="none"
             />
             <path
               d="M 54 50 Q 59 45 64 50"
-              stroke="#0a0711"
+              stroke="var(--midnight-veil)"
               strokeWidth="2.5"
               strokeLinecap="round"
               fill="none"
@@ -223,59 +229,59 @@ export const WispGhost: React.FC<WispGhostProps> = ({
             {/* Joyful smile */}
             <path
               d="M 43 58 Q 50 65 57 58"
-              stroke="#0a0711"
+              stroke="var(--midnight-veil)"
               strokeWidth="2.5"
               strokeLinecap="round"
               fill="none"
             />
             {/* Rosy cheeks */}
-            <ellipse cx="34" cy="56" rx="4" ry="2" fill="#ff791f" opacity="0.6" />
-            <ellipse cx="66" cy="56" rx="4" ry="2" fill="#ff791f" opacity="0.6" />
+            <ellipse cx="34" cy="56" rx="4" ry="2" fill="var(--pumpkin-fire)" opacity="0.6" />
+            <ellipse cx="66" cy="56" rx="4" ry="2" fill="var(--pumpkin-fire)" opacity="0.6" />
             {/* Sparkles */}
             <path
               d="M 82 28 L 84 22 L 86 28 L 92 30 L 86 32 L 84 38 L 82 32 L 76 30 Z"
-              fill="#9aff9a"
+              fill="var(--ectoplasm-green)"
             />
             <path
               d="M 16 32 L 17 28 L 18 32 L 22 33 L 18 34 L 17 38 L 16 34 L 12 33 Z"
-              fill="#ff791f"
+              fill="var(--pumpkin-fire)"
             />
           </>
         ) : state === 'curious' ? (
           <>
             {/* Inquisitive eyes looking forward-down */}
-            <ellipse cx="43" cy="52" rx="4" ry="5.5" fill="#0a0711" />
+            <ellipse cx="43" cy="52" rx="4" ry="5.5" fill="var(--midnight-veil)" />
             <circle cx="44" cy="51" r="1.5" fill="#FFFFFF" />
-            <ellipse cx="61" cy="52" rx="4" ry="5.5" fill="#0a0711" />
+            <ellipse cx="61" cy="52" rx="4" ry="5.5" fill="var(--midnight-veil)" />
             <circle cx="62" cy="51" r="1.5" fill="#FFFFFF" />
             {/* Curious tilted small mouth */}
-            <ellipse cx="53" cy="62" rx="2.5" ry="3" fill="#0a0711" />
+            <ellipse cx="53" cy="62" rx="2.5" ry="3" fill="var(--midnight-veil)" />
           </>
         ) : state === 'pleased' ? (
           <>
             {/* Pleased eyes */}
-            <ellipse cx="40" cy="50" rx="3.5" ry="5" fill="#0a0711" />
+            <ellipse cx="40" cy="50" rx="3.5" ry="5" fill="var(--midnight-veil)" />
             <circle cx="41" cy="48" r="1.2" fill="#FFFFFF" />
-            <ellipse cx="60" cy="50" rx="3.5" ry="5" fill="#0a0711" />
+            <ellipse cx="60" cy="50" rx="3.5" ry="5" fill="var(--midnight-veil)" />
             <circle cx="61" cy="48" r="1.2" fill="#FFFFFF" />
             {/* Contented smile */}
             <path
               d="M 44 59 Q 50 64 56 59"
-              stroke="#0a0711"
+              stroke="var(--midnight-veil)"
               strokeWidth="2"
               strokeLinecap="round"
               fill="none"
             />
-            <ellipse cx="34" cy="55" rx="3" ry="1.5" fill="#ff791f" opacity="0.5" />
-            <ellipse cx="66" cy="55" rx="3" ry="1.5" fill="#ff791f" opacity="0.5" />
+            <ellipse cx="34" cy="55" rx="3" ry="1.5" fill="var(--pumpkin-fire)" opacity="0.5" />
+            <ellipse cx="66" cy="55" rx="3" ry="1.5" fill="var(--pumpkin-fire)" opacity="0.5" />
           </>
         ) : state === 'conjuring' ? (
           <>
             {/* Conjuring focused eyes */}
-            <ellipse cx="40" cy="50" rx="4" ry="5.5" fill="#0a0711" />
-            <circle cx="41" cy="48" r="1.5" fill="#9aff9a" />
-            <ellipse cx="60" cy="50" rx="4" ry="5.5" fill="#0a0711" />
-            <circle cx="61" cy="48" r="1.5" fill="#9aff9a" />
+            <ellipse cx="40" cy="50" rx="4" ry="5.5" fill="var(--midnight-veil)" />
+            <circle cx="41" cy="48" r="1.5" fill="var(--ectoplasm-green)" />
+            <ellipse cx="60" cy="50" rx="4" ry="5.5" fill="var(--midnight-veil)" />
+            <circle cx="61" cy="48" r="1.5" fill="var(--ectoplasm-green)" />
             {/* Candle being held */}
             <rect
               x="70"
@@ -284,25 +290,32 @@ export const WispGhost: React.FC<WispGhostProps> = ({
               height="22"
               rx="1.5"
               fill="#EDE6D6"
-              stroke="#b9acbf"
+              stroke="var(--grave-dust)"
               strokeWidth="1"
             />
             <ellipse cx="74" cy="48" rx="6" ry="8" fill="url(#candleGlow)" />
             <circle cx="74" cy="48" r="2.5" fill="#FFFFFF" />
             {/* Small glowing trail */}
-            <circle cx="20" cy="70" r="3" fill="#9aff9a" opacity="0.7" className="animate-ping" />
+            <circle
+              cx="20"
+              cy="70"
+              r="3"
+              fill="var(--ectoplasm-green)"
+              opacity="0.7"
+              className="animate-ping"
+            />
           </>
         ) : (
           /* Default Idle / Standard friendly pose */
           <>
-            <ellipse cx="40" cy="50" rx="3.5" ry="5" fill="#0a0711" />
+            <ellipse cx="40" cy="50" rx="3.5" ry="5" fill="var(--midnight-veil)" />
             <circle cx="41" cy="48" r="1.2" fill="#FFFFFF" />
-            <ellipse cx="60" cy="50" rx="3.5" ry="5" fill="#0a0711" />
+            <ellipse cx="60" cy="50" rx="3.5" ry="5" fill="var(--midnight-veil)" />
             <circle cx="61" cy="48" r="1.2" fill="#FFFFFF" />
             {/* Small friendly curve */}
             <path
               d="M 46 60 Q 50 63 54 60"
-              stroke="#0a0711"
+              stroke="var(--midnight-veil)"
               strokeWidth="2"
               strokeLinecap="round"
               fill="none"

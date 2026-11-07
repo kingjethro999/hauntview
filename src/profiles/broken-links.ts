@@ -6,7 +6,7 @@
 import { Page } from 'playwright';
 import pLimit from 'p-limit';
 import { sanitizeUntrusted } from '../types/contracts';
-import { buildFinding } from '../types/finding-utils';
+import { buildFinding, executionErrorEvidence } from '../types/finding-utils';
 import { Finding, ProfileResult } from '../types';
 import { navigateResilient } from './navigation';
 
@@ -161,6 +161,7 @@ export class BrokenLinksProfile {
             severity: 'warning',
             category: 'links',
             message: canonical.title,
+            evidence: [...canonical.evidence],
             details: { canonicalFinding: canonical },
             timestamp: Date.now(),
             isClassified: false,
@@ -193,6 +194,7 @@ export class BrokenLinksProfile {
             severity: 'info',
             category: 'links',
             message: canonical.title,
+            evidence: [...canonical.evidence],
             details: { canonicalFinding: canonical },
             timestamp: Date.now(),
             isClassified: false,
@@ -222,6 +224,7 @@ export class BrokenLinksProfile {
             severity: 'warning',
             category: 'links',
             message: canonical.title,
+            evidence: [...canonical.evidence],
             details: { canonicalFinding: canonical },
             timestamp: Date.now(),
             isClassified: false,
@@ -235,6 +238,7 @@ export class BrokenLinksProfile {
         severity: 'error',
         category: 'execution',
         message: `Broken links profile error: ${error instanceof Error ? error.message : String(error)}`,
+        evidence: executionErrorEvidence(error instanceof Error ? error.message : String(error)),
         timestamp: Date.now(),
         isClassified: false,
       });

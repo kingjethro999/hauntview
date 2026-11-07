@@ -83,4 +83,82 @@ union pattern was applied consistently across all five tools.
 
 ---
 
+## Entry 4 — 2026-11-18 — Evidence Contract Migration (`src/types/finding-utils.ts`, `src/profiles/*`)
+
+**Prompt:**
+
+> "Every finding must carry non-empty structured evidence — metric, DOM, console,
+> header, screenshot, request, or axe items. Legacy profiles that push bare
+> `{ message }` findings violate the invariant. Migrate all 25 profiles, sanitize
+> every page-originated string through `UntrustedText`, and keep the
+> heuristic-confidence-never-serious policy. Don't compromise code quality."
+
+**Generated:** `src/types/finding-utils.ts` (`buildProfileFinding`,
+`assertFindingHasEvidence`, `executionErrorEvidence`, `sanitizeMessage`),
+`evidence: Evidence[]` on `Finding` in `src/types/profiles.ts`, runtime guard in
+`src/core/finding-classifier.ts`, screenshot-evidence attachment in `src/engine.ts`,
+persistence in `src/lib/server/database.ts`, and evidence-bearing findings across
+all 25 profile modules.
+
+**Spec criteria satisfied:** `type_and_schema_guardrails` evidence invariant,
+`architecture_boundaries` (core owns contracts; faces stay thin)
+
+**Steering files active:** `type_and_schema_guardrails.md`, `architecture_boundaries.md`
+
+**Outcome:** Kiro established the bridge pattern — canonical `CanonicalFinding`s
+built via `buildFinding` embedded in `details.canonicalFinding`, mirrored onto the
+legacy `Finding.evidence` field so reports, the classifier, and storage all consume
+the same evidence. `exactOptionalPropertyTypes` forced conditional spreads for
+optional `where`/`location` fields. Non-rite profiles (i18n, browser-*) received
+typed DOM evidence without extending the spec-fixed 16-rite `RiteIdSchema`.
+
+---
+
+## Entry 5 — 2026-11-19 — MCP Response Contract Hardening (`src/mcp/register-tools.ts`)
+
+**Prompt:**
+
+> "MCP tools must return the discriminated union `{ ok: true, data } |
+{ ok: false, error: { code, message, hint } }`. No raw `err.message`, no stack
+> traces, every error needs an actionable hint."
+
+**Generated:** `src/mcp/register-tools.ts`
+
+**Spec criteria satisfied:** `type_and_schema_guardrails` ApiResponse contract,
+`medium-mcp-server` error hygiene
+
+**Steering files active:** `type_and_schema_guardrails.md`, `architecture_boundaries.md`
+
+**Outcome:** All six tools (`list-test-profiles`, `run-test-profile`,
+`get-run-status`, `get-latest-report`, `compare-runs`, `export-report`) now emit
+the ok/error envelope inside the MCP `content` payload. Internal error details
+were replaced with stable codes (`INVALID_URL`, `EXECUTION_FAILED`,
+`RUN_NOT_FOUND`, `COMPARE_FAILED`) plus recovery hints.
+
+---
+
+## Entry 6 — 2026-11-19 — Property-Based Invariant Tests (`src/types/__tests__/invariants.test.ts`)
+
+**Prompt:**
+
+> "Add fast-check property tests for every named invariant: evidence never empty,
+> heuristic confidence never produces serious severity, UntrustedText always
+> ≤300 chars with control chars stripped, and changedRatio alone never produces
+> a finding."
+
+**Generated:** `src/types/__tests__/invariants.test.ts`
+
+**Spec criteria satisfied:** `type_and_schema_guardrails` §property-based
+verification, AGENTS.md test requirements
+
+**Steering files active:** `type_and_schema_guardrails.md`
+
+**Outcome:** Eight properties at 100 runs each covering `buildFinding`,
+`buildProfileFinding`, `assertFindingHasEvidence`,
+`assertValidSeverityConfidence`, `sanitizeUntrusted`, `sanitizeMessage`, and the
+diff/finding separation. Arbitraries respect `exactOptionalPropertyTypes` by
+omitting optional fields rather than passing `undefined`.
+
+---
+
 <!-- Add new entries below as the build progresses -->

@@ -40,6 +40,9 @@ jobs:
       - name: Verify version consistency across carriers
         run: pnpm version:check
 
+      - name: Pre-submission compliance audit
+        run: pnpm presubmit
+
       - name: Type check
         run: pnpm typecheck
 

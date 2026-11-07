@@ -206,7 +206,7 @@ export function saveTestReportToDb(
           finding.category,
           finding.message,
           finding.location ? JSON.stringify(finding.location) : null,
-          finding.details ? JSON.stringify(finding.details) : null,
+          JSON.stringify({ details: finding.details ?? null, evidence: finding.evidence }),
           finding.timestamp
         );
       }
@@ -253,17 +253,38 @@ export function getRunById(
     .prepare('SELECT * FROM findings WHERE run_id = ?')
     .all(runId) as Array<Record<string, unknown>>;
 
-  const findings: Finding[] = findingRows.map((f) => ({
-    id: String(f.id),
-    profileId: String(f.profile_id),
-    severity: f.severity as Finding['severity'],
-    category: String(f.category),
-    message: String(f.message),
-    timestamp: Number(f.timestamp),
-    isClassified: true,
-    location: f.location ? JSON.parse(String(f.location)) : undefined,
-    details: f.evidence ? JSON.parse(String(f.evidence)) : undefined,
-  }));
+  const findings: Finding[] = findingRows.map((f) => {
+    // The `evidence` column stores { details, evidence } for new rows.
+    // Legacy rows stored the raw details object directly.
+    let details: Record<string, unknown> | undefined;
+    let evidence: Finding['evidence'] = [];
+
+    if (f.evidence) {
+      const parsed = JSON.parse(String(f.evidence)) as Record<string, unknown> | null;
+      if (parsed && typeof parsed === 'object' && Array.isArray(parsed.evidence)) {
+        details = (parsed.details as Record<string, unknown>) ?? undefined;
+        evidence = parsed.evidence as Finding['evidence'];
+      } else if (parsed && typeof parsed === 'object') {
+        details = parsed;
+        const canonical = details.canonicalFinding as
+          { evidence?: Finding['evidence'] } | undefined;
+        evidence = canonical?.evidence ?? [];
+      }
+    }
+
+    return {
+      id: String(f.id),
+      profileId: String(f.profile_id),
+      severity: f.severity as Finding['severity'],
+      category: String(f.category),
+      message: String(f.message),
+      timestamp: Number(f.timestamp),
+      isClassified: true,
+      location: f.location ? JSON.parse(String(f.location)) : undefined,
+      ...(details !== undefined ? { details } : {}),
+      evidence,
+    };
+  });
 
   return { run: storedRun, findings };
 }

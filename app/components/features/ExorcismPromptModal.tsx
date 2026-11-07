@@ -57,7 +57,7 @@ Please examine our codebase, find the source element corresponding to this selec
       size="lg"
       footer={
         <div className="flex items-center justify-between w-full">
-          <span className="text-xs text-[#d9d3e0]">
+          <span className="text-xs text-[var(--spirit-smoke)]">
             Paste this prompt into your Kiro prompt box
           </span>
           <div className="flex items-center gap-2">
@@ -70,7 +70,7 @@ Please examine our codebase, find the source element corresponding to this selec
               onClick={copyToClipboard}
               icon={
                 copied ? (
-                  <ClipboardDocumentCheckIcon className="w-4 h-4 text-[#86efac]" />
+                  <ClipboardDocumentCheckIcon className="w-4 h-4 text-[var(--success)]" />
                 ) : (
                   <ClipboardDocumentIcon className="w-4 h-4" />
                 )
@@ -82,10 +82,10 @@ Please examine our codebase, find the source element corresponding to this selec
         </div>
       }
     >
-      <div className="space-y-4 text-xs text-[#fff1dc]">
-        <div className="p-3 rounded bg-[#0a0711] border border-[#46334b] flex items-start gap-2.5">
-          <SparklesIcon className="w-5 h-5 text-[#ff791f] flex-shrink-0 mt-0.5" />
-          <p className="leading-relaxed text-[#d9d3e0]">
+      <div className="space-y-4 text-xs text-[var(--bone-white)]">
+        <div className="p-3 rounded bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)] flex items-start gap-2.5">
+          <SparklesIcon className="w-5 h-5 text-[var(--pumpkin-fire)] flex-shrink-0 mt-0.5" />
+          <p className="leading-relaxed text-[var(--spirit-smoke)]">
             This structured prompt packages the raw omen evidence, DOM selector, and failure
             condition so your Kiro agent can identify the source file and generate the fix in one
             loop.
@@ -93,10 +93,10 @@ Please examine our codebase, find the source element corresponding to this selec
         </div>
 
         <div>
-          <span className="text-[#d9d3e0] font-semibold block mb-1.5 font-display text-sm">
+          <span className="text-[var(--spirit-smoke)] font-semibold block mb-1.5 font-display text-sm">
             Generated Exorcism Prompt:
           </span>
-          <pre className="p-3.5 rounded bg-[#0a0711] border border-[#46334b] font-mono text-[11px] text-[#9aff9a] whitespace-pre-wrap overflow-x-auto max-h-72">
+          <pre className="p-3.5 rounded bg-[var(--midnight-veil)] border border-[var(--tombstone-gray)] font-mono text-[11px] text-[var(--ectoplasm-green)] whitespace-pre-wrap overflow-x-auto max-h-72">
             {promptText}
           </pre>
         </div>

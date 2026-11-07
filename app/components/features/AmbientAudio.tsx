@@ -148,8 +148,8 @@ export const AmbientAudio: React.FC = () => {
       }
       className={`px-2.5 py-1 rounded-[6px] text-xs font-serif transition-colors flex items-center gap-1.5 cursor-pointer ${
         isPlaying
-          ? 'bg-[#ff791f] text-[#0a0711] font-bold shadow-[0_0_8px_rgba(255,121,31,0.4)]'
-          : 'bg-[#0a0711] text-[#d9d3e0] hover:text-[#fff1dc] border border-[#46334b]'
+          ? 'bg-[var(--pumpkin-fire)] text-[var(--midnight-veil)] font-bold shadow-[0_0_8px_rgba(255,121,31,0.4)]'
+          : 'bg-[var(--midnight-veil)] text-[var(--spirit-smoke)] hover:text-[var(--bone-white)] border border-[var(--tombstone-gray)]'
       }`}
     >
       <span>{isPlaying ? '♪ Séance Tone On' : '♪ Tone Off'}</span>

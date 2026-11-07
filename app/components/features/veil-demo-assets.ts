@@ -24,7 +24,7 @@ const LIVING_SVG = `
 
   <!-- Navigation Bar -->
   <rect y="40" width="800" height="52" fill="#130c1e" stroke="#26173a" stroke-width="1" />
-  <circle cx="48" cy="66" r="12" fill="#ff791f" />
+  <circle cx="48" cy="66" r="12" fill="var(--pumpkin-fire)" />
   <text x="70" y="71" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="bold" font-size="15">ExampleSite</text>
   <text x="540" y="70" fill="#9e91ac" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">Documentation</text>
   <text x="635" y="70" fill="#9e91ac" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">API Reference</text>
@@ -44,8 +44,8 @@ const LIVING_SVG = `
     </defs>
     <rect x="16" y="16" width="368" height="160" rx="4" fill="url(#livingPlateGrad)" />
     <!-- Graphical Geometric Elements -->
-    <circle cx="200" cy="96" r="42" fill="#ff791f" fill-opacity="0.2" stroke="#ff791f" stroke-width="1.5" />
-    <path d="M 175 106 L 200 76 L 225 106 Z" fill="#ff791f" />
+    <circle cx="200" cy="96" r="42" fill="var(--pumpkin-fire)" fill-opacity="0.2" stroke="var(--pumpkin-fire)" stroke-width="1.5" />
+    <path d="M 175 106 L 200 76 L 225 106 Z" fill="var(--pumpkin-fire)" />
     
     <text x="16" y="205" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600">Hero Media Component</text>
     <text x="16" y="226" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">Dimensions reserved (368x160) · Valid alt description · CDN 200 OK</text>
@@ -58,7 +58,7 @@ const LIVING_SVG = `
     <path d="M 31 36 L 35 40 L 42 32" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
     <text x="60" y="36" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600">Interactive Targets</text>
     <text x="60" y="54" fill="#8d7f9e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Minimum 48x48px touch boundaries.</text>
-    <rect x="60" y="70" width="120" height="32" rx="4" fill="#ff791f" />
+    <rect x="60" y="70" width="120" height="32" rx="4" fill="var(--pumpkin-fire)" />
     <text x="88" y="90" fill="#0d0914" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="bold">Action Button</text>
   </g>
 
@@ -87,12 +87,12 @@ const APPARITION_SVG = `
   <rect x="75" y="9" width="360" height="22" rx="4" fill="#0d0914" stroke="#2e2142" stroke-width="1" />
   <text x="88" y="24" fill="#a79db5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">https://examplesite.com</text>
   
-  <rect x="660" y="10" width="120" height="20" rx="3" fill="#dc2626" fill-opacity="0.2" stroke="#dc2626" stroke-width="1" />
+  <rect x="660" y="10" width="120" height="20" rx="3" fill="var(--severity-scream)" fill-opacity="0.2" stroke="var(--severity-scream)" stroke-width="1" />
   <text x="672" y="24" fill="#f87171" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="bold">IMAGES BLOCKED</text>
 
   <!-- Navigation Bar -->
   <rect y="40" width="800" height="52" fill="#130c1e" stroke="#26173a" stroke-width="1" />
-  <circle cx="48" cy="66" r="12" fill="#ff791f" />
+  <circle cx="48" cy="66" r="12" fill="var(--pumpkin-fire)" />
   <text x="70" y="71" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="bold" font-size="15">ExampleSite</text>
   <text x="540" y="70" fill="#9e91ac" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">Documentation</text>
   <text x="635" y="70" fill="#9e91ac" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12">API Reference</text>
@@ -104,22 +104,22 @@ const APPARITION_SVG = `
   <!-- Left: COLLAPSED Image Component (Failure Condition) -->
   <g transform="translate(48, 180)">
     <!-- Broken Outline Box -->
-    <rect width="400" height="120" rx="6" fill="#140a1b" stroke="#dc2626" stroke-dasharray="5 5" stroke-width="1.5" />
-    <circle cx="40" cy="40" r="14" fill="#dc2626" fill-opacity="0.15" stroke="#dc2626" stroke-width="1" />
-    <path d="M 33 40 L 47 40 M 40 33 L 40 47" stroke="#dc2626" stroke-width="2" stroke-linecap="round" transform="rotate(45, 40, 40)" />
+    <rect width="400" height="120" rx="6" fill="#140a1b" stroke="var(--severity-scream)" stroke-dasharray="5 5" stroke-width="1.5" />
+    <circle cx="40" cy="40" r="14" fill="var(--severity-scream)" fill-opacity="0.15" stroke="var(--severity-scream)" stroke-width="1" />
+    <path d="M 33 40 L 47 40 M 40 33 L 40 47" stroke="var(--severity-scream)" stroke-width="2" stroke-linecap="round" transform="rotate(45, 40, 40)" />
     
     <text x="68" y="36" fill="#f87171" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600">Asset Load Failure (HTTP 404 / Blocked)</text>
     <text x="68" y="54" fill="#8d7f9e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">&lt;img&gt; missing explicit width/height attributes</text>
-    <text x="68" y="74" fill="#ff791f" font-family="monospace" font-size="10">Layout collapsed 140px — Cumulative Layout Shift: 0.32</text>
+    <text x="68" y="74" fill="var(--pumpkin-fire)" font-family="monospace" font-size="10">Layout collapsed 140px — Cumulative Layout Shift: 0.32</text>
   </g>
 
   <!-- Shifted Content beneath collapsed element -->
   <g transform="translate(48, 315)">
-    <rect width="400" height="125" rx="6" fill="#171024" stroke="#ff791f" stroke-width="1" />
-    <text x="16" y="32" fill="#ff791f" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="bold">Notice: Unintended Layout Displacement</text>
-    <text x="16" y="52" fill="#d9d3e0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Content shifted upwards due to collapsed parent container.</text>
-    <rect x="16" y="68" width="160" height="34" rx="4" fill="#2d1f3d" stroke="#ff791f" stroke-width="1" />
-    <text x="32" y="89" fill="#ff791f" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600">Displaced Action</text>
+    <rect width="400" height="125" rx="6" fill="#171024" stroke="var(--pumpkin-fire)" stroke-width="1" />
+    <text x="16" y="32" fill="var(--pumpkin-fire)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="bold">Notice: Unintended Layout Displacement</text>
+    <text x="16" y="52" fill="var(--spirit-smoke)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Content shifted upwards due to collapsed parent container.</text>
+    <rect x="16" y="68" width="160" height="34" rx="4" fill="#2d1f3d" stroke="var(--pumpkin-fire)" stroke-width="1" />
+    <text x="32" y="89" fill="var(--pumpkin-fire)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600">Displaced Action</text>
   </g>
 
   <!-- Right: Side Inspection Panels with Collision Defect -->
@@ -129,7 +129,7 @@ const APPARITION_SVG = `
     <text x="60" y="36" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600">Interactive Targets</text>
     <text x="60" y="54" fill="#8d7f9e" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Minimum 48x48px touch boundaries.</text>
     <!-- Truncated/Sub-minimum touch target -->
-    <rect x="60" y="70" width="80" height="24" rx="3" fill="#dc2626" />
+    <rect x="60" y="70" width="80" height="24" rx="3" fill="var(--severity-scream)" />
     <text x="74" y="86" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="bold">Action</text>
     <text x="150" y="86" fill="#f87171" font-family="monospace" font-size="10">24px &lt; 44px</text>
   </g>
@@ -163,16 +163,16 @@ const DIFF_SVG = `
 
   <!-- Ectoplasm Region 1: Exact Missing Hero Canvas -->
   <g filter="url(#ectoGlow)">
-    <rect x="48" y="180" width="400" height="260" rx="6" fill="rgba(154, 255, 154, 0.08)" stroke="#9aff9a" stroke-width="1.5" />
-    <rect x="64" y="196" width="368" height="160" rx="4" fill="rgba(154, 255, 154, 0.22)" stroke="#9aff9a" stroke-width="1" />
-    <text x="76" y="240" fill="#9aff9a" font-family="monospace" font-size="12" font-weight="bold">ECTOPLASM DIFF #1 · 14,280 PIXELS ALTERED</text>
-    <text x="76" y="260" fill="#9aff9a" font-family="monospace" font-size="10">Missing Image Plate · Bounding Dimension Collapse</text>
+    <rect x="48" y="180" width="400" height="260" rx="6" fill="rgba(154, 255, 154, 0.08)" stroke="var(--ectoplasm-green)" stroke-width="1.5" />
+    <rect x="64" y="196" width="368" height="160" rx="4" fill="rgba(154, 255, 154, 0.22)" stroke="var(--ectoplasm-green)" stroke-width="1" />
+    <text x="76" y="240" fill="var(--ectoplasm-green)" font-family="monospace" font-size="12" font-weight="bold">ECTOPLASM DIFF #1 · 14,280 PIXELS ALTERED</text>
+    <text x="76" y="260" fill="var(--ectoplasm-green)" font-family="monospace" font-size="10">Missing Image Plate · Bounding Dimension Collapse</text>
   </g>
 
   <!-- Ectoplasm Region 2: Touch Target Mutation -->
   <g filter="url(#ectoGlow)">
-    <rect x="530" y="250" width="120" height="34" rx="4" fill="rgba(154, 255, 154, 0.25)" stroke="#9aff9a" stroke-width="1.5" />
-    <text x="540" y="272" fill="#9aff9a" font-family="monospace" font-size="10" font-weight="bold">DIFF #2 · TARGET COLLISION</text>
+    <rect x="530" y="250" width="120" height="34" rx="4" fill="rgba(154, 255, 154, 0.25)" stroke="var(--ectoplasm-green)" stroke-width="1.5" />
+    <text x="540" y="272" fill="var(--ectoplasm-green)" font-family="monospace" font-size="10" font-weight="bold">DIFF #2 · TARGET COLLISION</text>
   </g>
 </svg>
 `.trim();
