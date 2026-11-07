@@ -63,7 +63,8 @@ export function runSelfUpdate(): void {
   }
 
   const pm = detectPackageManager();
-  const installCmd = pm === 'yarn' ? 'yarn global add hauntview' : `${pm} install -g hauntview`;
+  const installCmd =
+    pm === 'yarn' ? 'yarn global add hauntview@latest' : `${pm} install -g hauntview@latest`;
 
   console.log(`\n   Updating ${VERSION} → ${latest} using ${pm}...`);
   console.log(`   Running: ${installCmd}\n`);

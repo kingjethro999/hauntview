@@ -43,6 +43,21 @@ program
       program.help();
       return;
     }
+
+    // Safety fallback: if invoked as root argument with a subcommand keyword
+    if (url === 'self-update' || url === 'update' || url === 'upgrade') {
+      runSelfUpdate();
+      return;
+    }
+    if (url === 'doctor') {
+      runDoctor();
+      return;
+    }
+    if (url === 'setup') {
+      await runSetup(options);
+      return;
+    }
+
     await runHaunt(url, options);
   });
 
@@ -71,6 +86,8 @@ program
 // Self-update command: haunt self-update
 program
   .command('self-update')
+  .alias('update')
+  .alias('upgrade')
   .description('Update HauntView to the latest version published on npm')
   .action(() => {
     runSelfUpdate();

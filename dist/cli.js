@@ -4,7 +4,7 @@
 import { Command } from "commander";
 
 // src/version.ts
-var VERSION = "0.1.4";
+var VERSION = "0.1.5";
 
 // src/cli/runner.ts
 import * as fs8 from "fs";
@@ -10220,7 +10220,7 @@ function runSelfUpdate() {
     return;
   }
   const pm = detectPackageManager();
-  const installCmd = pm === "yarn" ? "yarn global add hauntview" : `${pm} install -g hauntview`;
+  const installCmd = pm === "yarn" ? "yarn global add hauntview@latest" : `${pm} install -g hauntview@latest`;
   console.log(`
    Updating ${VERSION} \u2192 ${latest} using ${pm}...`);
   console.log(`   Running: ${installCmd}
@@ -10254,6 +10254,18 @@ program.argument("[url]", "Target website URL to test (e.g. http://localhost:300
     program.help();
     return;
   }
+  if (url === "self-update" || url === "update" || url === "upgrade") {
+    runSelfUpdate();
+    return;
+  }
+  if (url === "doctor") {
+    runDoctor();
+    return;
+  }
+  if (url === "setup") {
+    await runSetup(options);
+    return;
+  }
   await runHaunt(url, options);
 });
 program.command("setup").description(
@@ -10266,7 +10278,7 @@ program.command("doctor").description(
 ).action(() => {
   runDoctor();
 });
-program.command("self-update").description("Update HauntView to the latest version published on npm").action(() => {
+program.command("self-update").alias("update").alias("upgrade").description("Update HauntView to the latest version published on npm").action(() => {
   runSelfUpdate();
 });
 program.parseAsync(process.argv).catch((err) => {

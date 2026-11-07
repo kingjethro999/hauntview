@@ -1,6 +1,6 @@
 {
   "name": "hauntview",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Local-first website resilience, accessibility, failure-mode and visual regression testing with Playwright and MCP.",
   "bin": {
@@ -27,11 +27,11 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "dev": "node init && next dev --hostname 127.0.0.1",
+    "dev": "next dev --hostname 127.0.0.1",
     "postinstall": "node scripts/postinstall.mjs",
     "build:cli": "node scripts/build-cli.mjs",
-    "build": "node init && node scripts/build-cli.mjs && next build",
-    "start": "node init && next start --hostname 0.0.0.0",
+    "build": "node scripts/build-cli.mjs && next build",
+    "start": "next start --hostname 0.0.0.0",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
