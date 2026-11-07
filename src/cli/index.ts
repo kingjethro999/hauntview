@@ -10,6 +10,7 @@ import { VERSION } from '../version';
 import { runHaunt } from './runner';
 import { runSetup } from './setup';
 import { runDoctor } from './doctor';
+import { runSelfUpdate } from './self-update';
 
 const program = new Command();
 
@@ -64,6 +65,14 @@ program
   )
   .action(() => {
     runDoctor();
+  });
+
+// Self-update command: haunt self-update
+program
+  .command('self-update')
+  .description('Update HauntView to the latest version published on npm')
+  .action(() => {
+    runSelfUpdate();
   });
 
 program.parseAsync(process.argv).catch((err) => {

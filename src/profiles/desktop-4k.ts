@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult, ProfileContext } from '../types';
+import { navigateResilient } from './navigation';
 
 interface PerformanceEntryWithHadRecentInput extends PerformanceEntry {
   hadRecentInput?: boolean;
@@ -29,8 +30,7 @@ export class Desktop4KProfile {
     const viewportWidth = context?.viewport?.width ?? 3840;
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForLoadState('domcontentloaded');
+      await navigateResilient(page, url);
 
       // 1. Image scaling & high-DPI quality checks
       const imageQualityIssues = await page.evaluate(() => {

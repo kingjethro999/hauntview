@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class I18nRTLProfile {
   private profileId: string;
@@ -25,7 +26,7 @@ export class I18nRTLProfile {
         Object.defineProperty(navigator, 'language', { value: 'ar-SA', writable: false });
       });
 
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       // Check for dir attribute
       const dir = await page.locator('html').getAttribute('dir');

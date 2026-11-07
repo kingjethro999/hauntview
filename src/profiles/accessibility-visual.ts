@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class AccessibilityVisualProfile {
   private profileId: string;
@@ -20,7 +21,7 @@ export class AccessibilityVisualProfile {
     const findings: Finding[] = [];
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       // Calculate contrast ratio
       const contrastIssues = await page.evaluate(() => {

@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class AccessibilityCognitiveProfile {
   private profileId: string;
@@ -20,7 +21,7 @@ export class AccessibilityCognitiveProfile {
     const findings: Finding[] = [];
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      await navigateResilient(page, url);
 
       // Analyze page complexity
       const complexity = await page.evaluate(() => {

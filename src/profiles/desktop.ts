@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult, ProfileContext } from '../types';
+import { navigateResilient } from './navigation';
 
 interface PerformanceEntryWithHadRecentInput extends PerformanceEntry {
   hadRecentInput?: boolean;
@@ -28,9 +29,8 @@ export class DesktopProfile {
     const findings: Finding[] = [];
 
     try {
-      // Navigate to page
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForLoadState('domcontentloaded');
+      // Navigate to page safely without stalling on streaming/websockets
+      await navigateResilient(page, url);
 
       // Check for layout stability (Cumulative Layout Shift)
       const clsValue = await page.evaluate(() => {

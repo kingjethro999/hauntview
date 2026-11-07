@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class I18nMixedProfile {
   private profileId: string;

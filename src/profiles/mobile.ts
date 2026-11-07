@@ -5,6 +5,7 @@
 
 import { Page } from 'playwright';
 import { Finding, ProfileResult } from '../types';
+import { navigateResilient } from './navigation';
 
 export class MobileProfile {
   private profileId: string;
@@ -24,11 +25,8 @@ export class MobileProfile {
     const findings: Finding[] = [];
 
     try {
-      // Navigate to page
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-
-      // Wait for page to be interactive
-      await page.waitForLoadState('domcontentloaded');
+      // Navigate to page safely without stalling on streaming/websockets
+      await navigateResilient(page, url);
 
       // Check for viewport meta tag
       const viewportMeta = await page.locator('meta[name="viewport"]').count();
