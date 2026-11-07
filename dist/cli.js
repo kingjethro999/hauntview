@@ -4,7 +4,7 @@
 import { Command } from "commander";
 
 // src/version.ts
-var VERSION = "0.0.8";
+var VERSION = "0.1.3";
 
 // src/cli/runner.ts
 import * as fs8 from "fs";
