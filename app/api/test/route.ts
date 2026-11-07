@@ -8,6 +8,7 @@ import { TestReport } from '@/src/types';
 import { ReportStore } from '@/src/core/report-store';
 import { saveTestReportToDb } from '@/src/lib/server/database';
 import { validateTargetUrl } from '@/src/lib/server/url-safety';
+import { isHostedEnvironment, isConcurrencyAllowedInHosted } from '@/src/core/concurrency-resolver';
 import { VERSION } from '@/src/version';
 
 interface TestApiResponse {
@@ -30,10 +31,21 @@ interface TestApiResponse {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { url, profiles, format } = body;
+    const { url, profiles, format, concurrency, concurrencyAmount } = body;
 
     if (!url) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
+    }
+
+    // Hosted-environment guard: reject request-level concurrency on hosted instances (Render / HAUNT_HOSTED)
+    if (concurrency && isHostedEnvironment() && !isConcurrencyAllowedInHosted()) {
+      return NextResponse.json(
+        {
+          error:
+            'Concurrent execution is disabled on the hosted deployment to prevent resource exhaustion on limited container instances. Run tests sequentially, or use the local HauntView CLI for high-concurrency runs.',
+        },
+        { status: 400 }
+      );
     }
 
     const urlValidation = validateTargetUrl(url, { allowLocal: true });
@@ -54,6 +66,8 @@ export async function POST(request: NextRequest) {
       url: safeUrl,
       profiles,
       includeScreenshots: true,
+      concurrency,
+      concurrencyAmount,
     });
 
     // Save report to store & SQLite

@@ -78,6 +78,18 @@ export function registerHauntViewTools(server: McpServer): void {
           .string()
           .optional()
           .describe('Specific profile ID to run, or omit for default smoke suite'),
+        concurrency: z
+          .boolean()
+          .optional()
+          .describe(
+            'Enable parallel profile execution (recommended only on capable local machines)'
+          ),
+        concurrencyAmount: z
+          .number()
+          .int()
+          .min(1)
+          .optional()
+          .describe('Max profiles running at once when concurrency is true (default: 2)'),
       },
     },
     async (args) => {
@@ -118,7 +130,12 @@ export function registerHauntViewTools(server: McpServer): void {
               const res = await fetch(`${remoteUrl}/api/test`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: targetUrl, profiles: requestedProfiles }),
+                body: JSON.stringify({
+                  url: targetUrl,
+                  profiles: requestedProfiles,
+                  concurrency: args.concurrency,
+                  concurrencyAmount: args.concurrencyAmount,
+                }),
               });
               if (res.ok) {
                 const data = await res.json();
@@ -141,6 +158,8 @@ export function registerHauntViewTools(server: McpServer): void {
           return await engine.executeTests({
             url: targetUrl,
             profiles: requestedProfiles,
+            concurrency: args.concurrency,
+            concurrencyAmount: args.concurrencyAmount,
           });
         });
 

@@ -360,6 +360,12 @@ export const TestLauncher: React.FC<TestLauncherProps> = ({
           </Button>
         </div>
 
+        {/* Hosted execution notice */}
+        <p className="text-xs text-[var(--phantom-gray)] text-center sm:text-right pt-2 font-mono">
+          Full 25-rite runs take ~70s on the hosted sandbox. Install the{' '}
+          <code className="text-[#ff791f]">haunt</code> CLI for parallel runs.
+        </p>
+
         {/* Error alert */}
         {error && (
           <Alert type="error" title="Launch Error" onClose={() => setError(null)}>
