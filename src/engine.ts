@@ -114,6 +114,23 @@ export class HauntViewEngine {
             args: options.args,
           });
         }
+      } else if (browserType === 'msedge') {
+        try {
+          launchedBrowser = await chromium.launch({
+            channel: 'msedge',
+            headless: true,
+          });
+        } catch {
+          console.warn(
+            '[engine] Microsoft Edge native channel not available. Falling back to Chromium for Edge profile.'
+          );
+          const options = await getChromiumLaunchOptions();
+          launchedBrowser = await chromium.launch({
+            headless: true,
+            executablePath: options.executablePath,
+            args: options.args,
+          });
+        }
       } else {
         const options = await getChromiumLaunchOptions();
         launchedBrowser = await chromium.launch({
@@ -268,6 +285,8 @@ export class HauntViewEngine {
       browserType = 'webkit';
     } else if (profileId === 'browser-firefox') {
       browserType = 'firefox';
+    } else if (profileId === 'browser-edge') {
+      browserType = 'msedge';
     }
 
     const browser = await this.getOrLaunchBrowser(browserType);

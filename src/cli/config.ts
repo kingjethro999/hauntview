@@ -2,11 +2,17 @@
  * src/cli/config.ts
  *
  * User configuration management and cross-platform path utilities for HauntView CLI.
+ * Supports Windows (win32) and Unix systems (Linux, macOS, BSD) with environment
+ * variable expansion (%VAR% and $VAR) and probe-based writability verification.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
+import {
+  getPlatformConfigDir,
+  expandEnvironmentPath,
+  probeDirectoryWritability,
+} from '../core/platform';
 
 export type ReportFormat = 'zip' | 'html' | 'markdown' | 'json';
 
@@ -27,30 +33,12 @@ export const DEFAULT_CLI_CONFIG: CliConfig = {
 /**
  * Returns the OS-appropriate config directory:
  * - Environment override: HAUNT_CONFIG_DIR
- * - Windows: %APPDATA%/hauntview
+ * - Windows: %APPDATA%\hauntview
  * - macOS: ~/Library/Preferences/hauntview
- * - Linux: $XDG_CONFIG_HOME/hauntview or ~/.config/hauntview
+ * - Linux / Unix: $XDG_CONFIG_HOME/hauntview or ~/.config/hauntview
  */
 export function getCliConfigDir(): string {
-  if (process.env.HAUNT_CONFIG_DIR) {
-    return path.resolve(process.env.HAUNT_CONFIG_DIR);
-  }
-
-  const platform = process.platform;
-  const home = os.homedir();
-
-  if (platform === 'win32') {
-    const appData = process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
-    return path.join(appData, 'hauntview');
-  }
-
-  if (platform === 'darwin') {
-    return path.join(home, 'Library', 'Preferences', 'hauntview');
-  }
-
-  // Linux / BSD / Unix default
-  const xdgConfig = process.env.XDG_CONFIG_HOME || path.join(home, '.config');
-  return path.join(xdgConfig, 'hauntview');
+  return getPlatformConfigDir();
 }
 
 /**
@@ -110,7 +98,8 @@ export function resetCliConfig(): void {
 }
 
 /**
- * Expands ~, ., relative, and absolute paths cross-platform and validates writability.
+ * Expands ~, ., relative, absolute, Windows %VAR%, and Unix $VAR paths cross-platform
+ * and validates directory writability via probe-write.
  */
 export function expandAndValidatePath(
   rawPath: string,
@@ -124,21 +113,7 @@ export function expandAndValidatePath(
     };
   }
 
-  const trimmed = rawPath.trim();
-  let expanded: string;
-
-  if (trimmed === '.') {
-    expanded = process.cwd();
-  } else if (trimmed === '~' || trimmed === '~/' || trimmed === '~\\') {
-    expanded = os.homedir();
-  } else if (trimmed.startsWith('~/') || trimmed.startsWith('~\\')) {
-    expanded = path.join(os.homedir(), trimmed.slice(2));
-  } else {
-    expanded = path.resolve(process.cwd(), trimmed);
-  }
-
-  expanded = path.normalize(expanded);
-
+  const expanded = expandEnvironmentPath(rawPath, process.cwd());
   const createIfMissing = options?.createIfMissing ?? true;
 
   try {
@@ -164,8 +139,15 @@ export function expandAndValidatePath(
       };
     }
 
-    // Check write permission
-    fs.accessSync(expanded, fs.constants.W_OK);
+    // Probe-based writability check (guaranteed accurate on Windows & Unix)
+    const probe = probeDirectoryWritability(expanded);
+    if (!probe.writable) {
+      return {
+        valid: false,
+        resolvedPath: expanded,
+        error: `Directory is not accessible or writable: ${probe.error || 'Access denied'}`,
+      };
+    }
 
     return {
       valid: true,

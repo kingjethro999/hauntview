@@ -2,6 +2,8 @@
  * src/cli/setup.ts
  *
  * Interactive configuration wizard for HauntView CLI.
+ * Full cross-platform support for Windows and Unix paths, environment variables,
+ * hardware capability analysis, and adaptive terminal symbols.
  */
 
 import { checkbox, input, confirm } from '@inquirer/prompts';
@@ -14,8 +16,12 @@ import {
   CliConfig,
 } from './config';
 import { evaluateSystemCapability, validateConcurrencyAmount } from '../core/system-capability';
+import { getAdaptiveGlyphs, getPlatformInfo } from '../core/platform';
 
 export async function runSetup(options?: { show?: boolean; reset?: boolean }): Promise<void> {
+  const glyphs = getAdaptiveGlyphs();
+  const platform = getPlatformInfo();
+
   if (options?.show) {
     const config = loadCliConfig();
     console.log('\nCurrent HauntView CLI Configuration:');
@@ -25,12 +31,12 @@ export async function runSetup(options?: { show?: boolean; reset?: boolean }): P
 
   if (options?.reset) {
     resetCliConfig();
-    console.log('\n✓ HauntView configuration has been reset to factory defaults.');
+    console.log(`\n${glyphs.tick} HauntView configuration has been reset to factory defaults.`);
     console.log(JSON.stringify(loadCliConfig(), null, 2));
     return;
   }
 
-  console.log('\n🔮 HauntView Configuration Wizard\n');
+  console.log(`\n${glyphs.ghost} HauntView Configuration Wizard (${platform.osName})\n`);
   const existing = loadCliConfig();
 
   // 1. Export types
@@ -57,9 +63,13 @@ export async function runSetup(options?: { show?: boolean; reset?: boolean }): P
       choices.length > 0 ? true : 'Please select at least one default format.',
   })) as ReportFormat[];
 
-  // 2. Export destination
+  // 2. Export destination (mention %USERPROFILE% on Windows)
+  const pathHint = platform.isWindows
+    ? 'Enter default export folder (. for current dir, ~/Downloads, %USERPROFILE%\\Downloads, or full path):'
+    : 'Enter default export folder (. for current dir, ~/Downloads, $HOME/Downloads, or full path):';
+
   const exportDir = await input({
-    message: 'Enter default export folder (. for launch folder, ~/Downloads, or full path):',
+    message: pathHint,
     default: existing.exportDir,
     validate: (val) => {
       const check = expandAndValidatePath(val, { createIfMissing: true });
@@ -78,7 +88,7 @@ export async function runSetup(options?: { show?: boolean; reset?: boolean }): P
   if (enableConcurrency) {
     const cap = evaluateSystemCapability();
     if (cap.isConstrained) {
-      console.log(`\n! ${cap.constraintReason}`);
+      console.log(`\n${glyphs.warn} ${cap.constraintReason}`);
       concurrencyAmount = 1;
     } else {
       console.log(
@@ -100,21 +110,20 @@ export async function runSetup(options?: { show?: boolean; reset?: boolean }): P
           return res.valid ? true : res.errorMessage || 'Invalid amount.';
         },
       });
-
       concurrencyAmount = parseInt(chosenAmountStr, 10);
     }
   }
 
-  const updatedConfig: CliConfig = {
+  const newConfig: CliConfig = {
     defaultFormats,
     exportDir,
     concurrency: enableConcurrency,
     concurrencyAmount,
   };
 
-  saveCliConfig(updatedConfig);
+  saveCliConfig(newConfig);
 
-  console.log('\n✓ HauntView CLI configuration saved successfully:');
-  console.log(JSON.stringify(updatedConfig, null, 2));
-  console.log('\nYou can re-run this wizard anytime with `haunt setup`.\n');
+  console.log(`\n${glyphs.tick} Settings saved successfully to configuration store:\n`);
+  console.log(JSON.stringify(newConfig, null, 2));
+  console.log();
 }

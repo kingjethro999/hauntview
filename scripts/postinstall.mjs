@@ -2,18 +2,11 @@
 /**
  * postinstall.mjs
  *
- * Installs Playwright's Chromium browser in local development only,
- * and only when it isn't already installed for the current Playwright version.
+ * Installs Playwright's Chromium browser in local development or global install,
+ * only when it isn't already installed for the current Playwright version.
+ * Supports Windows (npx.cmd, shell execution) and Unix (Linux, macOS, BSD).
  *
- * Skip conditions:
- *   - RENDER=true   → Render build/runtime (uses @sparticuz/chromium instead)
- *   - CI=true       → GitHub Actions and most hosted CI (no browsers needed for lint/build)
- *   - SKIP_PLAYWRIGHT_INSTALL=1 → manual opt-out
- *
- * Idempotency:
- *   We ask `playwright install --dry-run chromium` first. If it exits 0 with
- *   no output (nothing to install), we skip. This avoids re-downloading on
- *   every `pnpm install` when the binary is already cached.
+ * Safe: Wrapped in try/catch to ensure postinstall never fails npm install.
  */
 
 import { execSync, spawnSync } from 'node:child_process';
@@ -28,20 +21,33 @@ if (isRender || isCI || isSkipped) {
   process.exit(0);
 }
 
-// Check if Chromium is already installed for this exact Playwright version.
-// `playwright install --dry-run` prints what *would* be downloaded.
-// If stdout is empty (or only whitespace), everything is already cached.
-const dryRun = spawnSync('pnpm', ['exec', 'playwright', 'install', '--dry-run', 'chromium'], {
-  encoding: 'utf8',
-});
+try {
+  const isWin = process.platform === 'win32';
+  const npxCmd = isWin ? 'npx.cmd' : 'npx';
 
-const dryRunOutput = (dryRun.stdout ?? '').trim();
-const alreadyInstalled = dryRun.status === 0 && dryRunOutput === '';
+  // Check if Chromium is already installed for this exact Playwright version.
+  const dryRun = spawnSync(npxCmd, ['playwright', 'install', '--dry-run', 'chromium'], {
+    encoding: 'utf8',
+    shell: isWin,
+  });
 
-if (alreadyInstalled) {
-  console.log('[postinstall] Playwright Chromium already installed — nothing to do.');
+  const dryRunOutput = (dryRun.stdout ?? '').trim();
+  const alreadyInstalled = dryRun.status === 0 && dryRunOutput === '';
+
+  if (alreadyInstalled) {
+    console.log('[postinstall] Playwright Chromium already installed — nothing to do.');
+    process.exit(0);
+  }
+
+  console.log('[postinstall] Installing Playwright Chromium...');
+  execSync(`${npxCmd} playwright install chromium`, {
+    stdio: 'inherit',
+    shell: isWin,
+  });
+} catch (err) {
+  // Best-effort attempt: Never fail npm install
+  console.warn(
+    `[postinstall] Note: Automatic browser installation deferred to first run (${err.message})`
+  );
   process.exit(0);
 }
-
-console.log('[postinstall] Installing Playwright Chromium...');
-execSync('pnpm exec playwright install chromium', { stdio: 'inherit' });

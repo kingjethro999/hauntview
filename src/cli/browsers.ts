@@ -1,7 +1,8 @@
 /**
  * src/cli/browsers.ts
  *
- * First-run browser verification and installer for Chromium, Firefox, and WebKit.
+ * First-run browser verification and installer for Chromium, Firefox, WebKit, and Microsoft Edge.
+ * Includes cross-platform execution (Windows .cmd and Unix) and OS-specific diagnostics.
  */
 
 import * as fs from 'fs';
@@ -9,17 +10,24 @@ import * as path from 'path';
 import { execSync } from 'child_process';
 import { chromium, firefox, webkit } from 'playwright';
 import { getCliConfigDir } from './config';
+import {
+  getNpxCommand,
+  getPlatformTroubleshootingAdvice,
+  detectEdgeBrowser,
+} from '../core/platform';
 
 export interface BrowserStatus {
-  name: 'chromium' | 'firefox' | 'webkit';
+  name: 'chromium' | 'firefox' | 'webkit' | 'msedge';
   installed: boolean;
   executablePath?: string;
+  isNative?: boolean;
 }
 
 /**
- * Returns the status of all 3 Playwright browsers
+ * Returns the status of the 3 core Playwright browsers (chromium, firefox, webkit)
+ * with optional Microsoft Edge detection.
  */
-export function getBrowsersStatus(): BrowserStatus[] {
+export function getBrowsersStatus(options?: { includeEdge?: boolean }): BrowserStatus[] {
   const browsers: BrowserStatus[] = [
     { name: 'chromium', installed: false },
     { name: 'firefox', installed: false },
@@ -50,12 +58,33 @@ export function getBrowsersStatus(): BrowserStatus[] {
     browsers[2].installed = false;
   }
 
+  if (options?.includeEdge) {
+    const edge = detectEdgeBrowser();
+    browsers.push({
+      name: 'msedge',
+      installed: edge.installed,
+      executablePath: edge.executablePath,
+      isNative: edge.isNativeToPlatform,
+    });
+  }
+
   return browsers;
 }
 
+/**
+ * Returns the status of all 4 browser engines including Microsoft Edge.
+ */
+export function getAllBrowsersStatus(): BrowserStatus[] {
+  return getBrowsersStatus({ includeEdge: true });
+}
+
+/**
+ * Returns true if the three core Playwright engines (Chromium, Firefox, WebKit) are installed.
+ */
 export function areAllBrowsersInstalled(): boolean {
   const status = getBrowsersStatus();
-  return status.every((b) => b.installed);
+  // Core rites require chromium, firefox, webkit
+  return status.slice(0, 3).every((b) => b.installed);
 }
 
 /**
@@ -67,7 +96,7 @@ function getMarkerPath(): string {
 
 /**
  * Ensures all required browsers are installed on the user machine.
- * Runs `npx playwright install chromium firefox webkit` if missing.
+ * Runs `npx playwright install chromium firefox webkit` using OS-specific shell wrappers.
  */
 export function ensureBrowsersInstalled(options?: { silent?: boolean }): void {
   const marker = getMarkerPath();
@@ -87,8 +116,13 @@ export function ensureBrowsersInstalled(options?: { silent?: boolean }): void {
   }
 
   try {
-    execSync('npx playwright install chromium firefox webkit', {
+    const { command, options: execOptions } = getNpxCommand(
+      'playwright install chromium firefox webkit'
+    );
+
+    execSync(command, {
       stdio: options?.silent ? 'pipe' : 'inherit',
+      shell: execOptions.shell,
     });
 
     const dir = getCliConfigDir();
@@ -108,11 +142,10 @@ export function ensureBrowsersInstalled(options?: { silent?: boolean }): void {
     console.error('\n✗ [haunt] Failed to automatically install Playwright browsers:');
     console.error(`  ${(err as Error).message}\n`);
 
-    if (process.platform === 'linux') {
-      console.warn(
-        '[haunt] Note: On Linux, system libraries may be required. You can install them by running:'
-      );
-      console.warn('  sudo npx playwright install-deps\n');
+    const advice = getPlatformTroubleshootingAdvice();
+    for (const line of advice) {
+      console.warn(line);
     }
+    console.log();
   }
 }

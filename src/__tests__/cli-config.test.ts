@@ -68,6 +68,20 @@ describe('Phase 3 — CLI Configuration and Path Utils', () => {
       expect(res.valid).toBe(false);
       expect(res.error).toBeDefined();
     });
+
+    it('expands Windows %VAR% environment variables', () => {
+      process.env.WIN_TEST_DIR = tmpDir;
+      const res = expandAndValidatePath('%WIN_TEST_DIR%/win-export', { createIfMissing: true });
+      expect(res.valid).toBe(true);
+      expect(res.resolvedPath).toBe(path.join(tmpDir, 'win-export'));
+    });
+
+    it('expands Unix $VAR environment variables', () => {
+      process.env.UNIX_TEST_DIR = tmpDir;
+      const res = expandAndValidatePath('$UNIX_TEST_DIR/unix-export', { createIfMissing: true });
+      expect(res.valid).toBe(true);
+      expect(res.resolvedPath).toBe(path.join(tmpDir, 'unix-export'));
+    });
   });
 
   describe('Config Store CRUD', () => {

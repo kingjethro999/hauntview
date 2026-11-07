@@ -20,7 +20,7 @@ export async function getChromiumLaunchOptions(): Promise<BrowserLaunchConfig> {
   const isRender = process.env.RENDER === 'true';
   const isCI = process.env.CI === 'true';
 
-  if (isRender || isCI) {
+  if ((isRender || isCI) && process.platform === 'linux') {
     // Dynamically import to avoid loading the binary in dev where it's unneeded.
     const { default: sparticuzChromium } = await import('@sparticuz/chromium');
 

@@ -197,6 +197,19 @@ HauntView implements an automated workspace-wide versioning workflow:
 
 ---
 
+## Cross-Platform Support (Windows, macOS, Linux, WSL)
+
+HauntView provides full, first-class support for both Windows and Unix operating systems:
+
+- **Windows Support Highlights:**
+  - **Native Microsoft Edge Execution:** Automatically detects and drives the host's native Microsoft Edge installation via Playwright's `msedge` channel, testing real Windows High Contrast mode (`forced-colors`) and Edge PWA integration.
+  - **Path & Environment Expansion:** Supports Windows drive letters (`C:\...`), UNC network paths (`\\server\share`), backslashes (`\`), forward slashes (`/`), and Windows environment variables (`%USERPROFILE%`, `%APPDATA%`, `%LOCALAPPDATA%`, `%TEMP%`).
+  - **Adaptive Terminal Rendering:** Detects Windows Terminal, PowerShell, or legacy Command Prompt (`cmd.exe`) and adapts icons automatically (Unicode emojis in modern terminals, clean ASCII fallbacks in legacy shells).
+  - **Safe Process Termination:** Cleanly intercepts Ctrl+C (`SIGINT`), `SIGTERM`, and `SIGBREAK` on Windows so no orphaned `chrome.exe` processes linger in Task Manager.
+  - **OS-Standard Config Paths:** Stored in `%APPDATA%\hauntview` on Windows, `~/Library/Preferences/hauntview` on macOS, and `$XDG_CONFIG_HOME/hauntview` on Linux.
+
+---
+
 ## 25 Testing Profiles
 
 ### Device Testing (5 legacy + 3 canonical)
@@ -320,6 +333,7 @@ hauntview/
 │   │   ├── visual-diff.ts      # pixelmatch ectoplasm diff
 │   │   ├── report-store.ts     # SQLite persistence
 │   │   ├── system-capability.ts # Hardware assessment & heuristic
+│   │   ├── platform.ts         # Cross-platform Windows/Unix abstractions
 │   │   └── concurrency-resolver.ts # Priority resolver & hosted guard
 │   ├── cli/                    # HauntView CLI
 │   │   ├── index.ts            # Entrypoint & command routing

@@ -38,7 +38,17 @@ export interface RunComparison {
 let dbInstance: Database.Database | null = null;
 
 export function getDatabasePath(): string {
-  const dataDir = path.join(process.cwd(), '.hauntview', 'data');
+  if (process.env.HAUNT_DB_PATH) {
+    const custom = path.resolve(process.env.HAUNT_DB_PATH);
+    const parent = path.dirname(custom);
+    if (!fs.existsSync(parent)) {
+      fs.mkdirSync(parent, { recursive: true });
+    }
+    return custom;
+  }
+  const dataDir = process.env.HAUNT_DATA_DIR
+    ? path.resolve(process.env.HAUNT_DATA_DIR)
+    : path.join(process.cwd(), '.hauntview', 'data');
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }

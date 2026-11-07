@@ -208,3 +208,33 @@ The CLI supports three export formats:
 In the HauntView Web UI, PDF generation is handled client-side via CSS `@media print` stylesheets and the native browser print dialogue.
 
 Implementing headless PDF generation in the CLI would require launching an additional Chromium headless instance specifically to call `page.pdf()`. This adds substantial memory overhead, increases execution duration, and fails on Firefox and WebKit profile tests. Instead, the **Zip** format provides an all-inclusive archive containing full visual plates and reports without any web runtime bloat.
+
+---
+
+## 9. Extensive Windows & Unix System Support
+
+HauntView provides first-class support tailored to the unique characteristics of Windows (win32) and Unix environments (Linux, macOS, BSD, WSL).
+
+### Windows Support Highlights
+
+- **Path Syntax & Environment Expansion:**
+  - Full support for Windows drive letters (`C:\...`, `D:\...`), backslashes (`\`), forward slashes (`/`), and UNC network shares (`\\server\share`).
+  - Seamless expansion of Windows environment variables (`%USERPROFILE%`, `%APPDATA%`, `%LOCALAPPDATA%`, `%TEMP%`) in both CLI flags and the interactive `haunt setup` wizard.
+  - Tilde (`~`) expands cross-platform to `%USERPROFILE%` on Windows and `$HOME` on Unix.
+- **Native Microsoft Edge Execution:**
+  - On Windows, the `browser-edge` profile automatically detects and drives the host's native Microsoft Edge installation (`channel: 'msedge'`), evaluating real Windows High Contrast modes (`forced-colors`) and Edge PWA integration.
+  - On non-Windows platforms where Edge is absent, it degrades gracefully to standard Chromium with an informative notice.
+- **Adaptive Terminal Rendering:**
+  - On modern Windows Terminal, VS Code, and PowerShell, rich Unicode icons (`👻`, `✓`, `✗`, `⏳`) are rendered.
+  - On legacy Windows Command Prompt (`cmd.exe`), clean ASCII fallbacks (`[HauntView]`, `[OK]`, `[ERR]`, `[*]`) prevent character encoding errors.
+- **Process & Signal Management:**
+  - Safe interrupt handling for Ctrl+C (`SIGINT`), `SIGTERM`, and `SIGBREAK` ensures all background browser processes (Chromium, Firefox, WebKit, Edge) are cleaned up cleanly without orphaned `chrome.exe` tasks in Windows Task Manager.
+- **PowerShell Execution Policy:**
+  - If script execution is blocked on Windows, execute:
+    ```powershell
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+    ```
+- **Configuration Storage:**
+  - Windows: `%APPDATA%\hauntview\config.json`
+  - macOS: `~/Library/Preferences/hauntview/config.json`
+  - Linux / Unix: `$XDG_CONFIG_HOME/hauntview/config.json` or `~/.config/hauntview/config.json`

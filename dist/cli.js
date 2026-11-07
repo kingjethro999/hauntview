@@ -4,11 +4,11 @@
 import { Command } from "commander";
 
 // src/version.ts
-var VERSION = "0.0.5";
+var VERSION = "0.0.6";
 
 // src/cli/runner.ts
-import * as fs7 from "fs";
-import * as path7 from "path";
+import * as fs8 from "fs";
+import * as path8 from "path";
 import { checkbox } from "@inquirer/prompts";
 
 // src/engine.ts
@@ -18,7 +18,7 @@ import { chromium, webkit, firefox } from "playwright";
 async function getChromiumLaunchOptions() {
   const isRender = process.env.RENDER === "true";
   const isCI = process.env.CI === "true";
-  if (isRender || isCI) {
+  if ((isRender || isCI) && process.platform === "linux") {
     const { default: sparticuzChromium } = await import("@sparticuz/chromium");
     sparticuzChromium.setGraphicsMode = false;
     const executablePath = await sparticuzChromium.executablePath();
@@ -7057,6 +7057,23 @@ var HauntViewEngine = class {
             args: options.args
           });
         }
+      } else if (browserType === "msedge") {
+        try {
+          launchedBrowser = await chromium.launch({
+            channel: "msedge",
+            headless: true
+          });
+        } catch {
+          console.warn(
+            "[engine] Microsoft Edge native channel not available. Falling back to Chromium for Edge profile."
+          );
+          const options = await getChromiumLaunchOptions();
+          launchedBrowser = await chromium.launch({
+            headless: true,
+            executablePath: options.executablePath,
+            args: options.args
+          });
+        }
       } else {
         const options = await getChromiumLaunchOptions();
         launchedBrowser = await chromium.launch({
@@ -7179,6 +7196,8 @@ var HauntViewEngine = class {
       browserType = "webkit";
     } else if (profileId === "browser-firefox") {
       browserType = "firefox";
+    } else if (profileId === "browser-edge") {
+      browserType = "msedge";
     }
     const browser = await this.getOrLaunchBrowser(browserType);
     const page = await this.browserPool.acquirePage(browserType, context, browser);
@@ -7436,7 +7455,15 @@ import fs4 from "fs";
 import path4 from "path";
 var dbInstance = null;
 function getDatabasePath() {
-  const dataDir = path4.join(process.cwd(), ".hauntview", "data");
+  if (process.env.HAUNT_DB_PATH) {
+    const custom = path4.resolve(process.env.HAUNT_DB_PATH);
+    const parent = path4.dirname(custom);
+    if (!fs4.existsSync(parent)) {
+      fs4.mkdirSync(parent, { recursive: true });
+    }
+    return custom;
+  }
+  const dataDir = process.env.HAUNT_DATA_DIR ? path4.resolve(process.env.HAUNT_DATA_DIR) : path4.join(process.cwd(), ".hauntview", "data");
   if (!fs4.existsSync(dataDir)) {
     fs4.mkdirSync(dataDir, { recursive: true });
   }
@@ -7674,9 +7701,276 @@ function clampConcurrencyAmount(requested, recommendation) {
 }
 
 // src/cli/config.ts
-import * as fs5 from "fs";
-import * as path5 from "path";
+import * as fs6 from "fs";
+import * as path6 from "path";
+
+// src/core/platform.ts
 import * as os3 from "os";
+import * as path5 from "path";
+import * as fs5 from "fs";
+function getPlatformInfo() {
+  const p = process.platform;
+  const isWindows = p === "win32";
+  const isMacOS = p === "darwin";
+  const isLinux = p === "linux";
+  const isUnix = !isWindows;
+  let isWSL = false;
+  if (isLinux) {
+    if (process.env.WSL_DISTRO_NAME || process.env.WSL_INTEROP) {
+      isWSL = true;
+    } else {
+      try {
+        const procVersion = fs5.readFileSync("/proc/version", "utf8");
+        if (/microsoft|wsl/i.test(procVersion)) {
+          isWSL = true;
+        }
+      } catch {
+      }
+    }
+  }
+  let osName = os3.type();
+  if (isWindows) {
+    const rel = os3.release();
+    const build = parseInt(rel.split(".")[2] || "0", 10);
+    osName = build >= 22e3 ? "Windows 11" : "Windows 10 / Server";
+  } else if (isMacOS) {
+    osName = "macOS";
+  } else if (isLinux) {
+    osName = isWSL ? "Linux (WSL)" : "Linux";
+  }
+  return {
+    platform: p,
+    arch: os3.arch(),
+    isWindows,
+    isMacOS,
+    isLinux,
+    isUnix,
+    isWSL,
+    release: os3.release(),
+    osName
+  };
+}
+function getPlatformConfigDir() {
+  if (process.env.HAUNT_CONFIG_DIR) {
+    return path5.resolve(process.env.HAUNT_CONFIG_DIR);
+  }
+  const { isWindows, isMacOS } = getPlatformInfo();
+  const home = os3.homedir();
+  if (isWindows) {
+    const appData = process.env.APPDATA || (process.env.USERPROFILE ? path5.join(process.env.USERPROFILE, "AppData", "Roaming") : path5.join(home, "AppData", "Roaming"));
+    return path5.join(appData, "hauntview");
+  }
+  if (isMacOS) {
+    return path5.join(home, "Library", "Preferences", "hauntview");
+  }
+  const xdgConfig = process.env.XDG_CONFIG_HOME || path5.join(home, ".config");
+  return path5.join(xdgConfig, "hauntview");
+}
+function expandEnvironmentPath(rawPath, baseDir = process.cwd()) {
+  if (!rawPath || !rawPath.trim()) {
+    return path5.normalize(baseDir);
+  }
+  let expanded = rawPath.trim();
+  expanded = expanded.replace(/%([^%]+)%/g, (_, varName) => {
+    return process.env[varName] !== void 0 ? process.env[varName] : `%${varName}%`;
+  });
+  expanded = expanded.replace(/\$([A-Za-z0-9_]+)/g, (_, varName) => {
+    return process.env[varName] !== void 0 ? process.env[varName] : `$${varName}`;
+  });
+  const home = os3.homedir();
+  if (expanded === "~" || expanded === "~/" || expanded === "~\\") {
+    expanded = home;
+  } else if (expanded.startsWith("~/") || expanded.startsWith("~\\")) {
+    expanded = path5.join(home, expanded.slice(2));
+  } else if (expanded === ".") {
+    expanded = baseDir;
+  } else {
+    expanded = path5.resolve(baseDir, expanded);
+  }
+  return path5.normalize(expanded);
+}
+function probeDirectoryWritability(dirPath) {
+  const probeFile = path5.join(
+    dirPath,
+    `.hauntview-probe-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.tmp`
+  );
+  try {
+    fs5.writeFileSync(probeFile, "ok", "utf8");
+    fs5.unlinkSync(probeFile);
+    return { writable: true };
+  } catch (err) {
+    return {
+      writable: false,
+      error: err.message
+    };
+  }
+}
+function getTerminalCapabilities() {
+  const { isWindows } = getPlatformInfo();
+  const isWindowsTerminal = Boolean(process.env.WT_SESSION);
+  let shellName = "unknown";
+  if (isWindows) {
+    if (process.env.PSModulePath) {
+      shellName = "PowerShell";
+    } else if (process.env.COMSPEC && /cmd\.exe/i.test(process.env.COMSPEC)) {
+      shellName = "Command Prompt (cmd.exe)";
+    } else {
+      shellName = "Windows Console";
+    }
+  } else {
+    shellName = process.env.SHELL ? path5.basename(process.env.SHELL) : "sh";
+  }
+  let supportsUnicode = false;
+  if (isWindows) {
+    supportsUnicode = Boolean(
+      isWindowsTerminal || process.env.TERMINAL_EMULATOR || process.env.TERM_PROGRAM === "vscode" || process.env.TERM === "xterm-256color" || process.env.TERM === "alacritty" || process.env.ConEmuPID
+    );
+  } else {
+    supportsUnicode = process.env.TERM !== "linux";
+  }
+  const supportsColor = Boolean(
+    process.stdout.isTTY && (process.env.COLORTERM || process.env.TERM || isWindowsTerminal || process.env.TERM_PROGRAM === "vscode")
+  );
+  return {
+    supportsUnicode,
+    supportsColor,
+    shellName,
+    isWindowsTerminal
+  };
+}
+function getAdaptiveGlyphs() {
+  const { supportsUnicode } = getTerminalCapabilities();
+  if (supportsUnicode) {
+    return {
+      ghost: "\u{1F47B}",
+      tick: "\u2713",
+      cross: "\u2717",
+      wait: "\u23F3",
+      bullet: "\u2022",
+      arrow: "\u276F",
+      warn: "\u26A0\uFE0F"
+    };
+  }
+  return {
+    ghost: "[HauntView]",
+    tick: "[OK]",
+    cross: "[ERR]",
+    wait: "[*]",
+    bullet: "-",
+    arrow: ">",
+    warn: "[!]"
+  };
+}
+function detectEdgeBrowser() {
+  const { isWindows, isMacOS, isLinux } = getPlatformInfo();
+  if (isWindows) {
+    const candidates = [
+      process.env["ProgramFiles(x86)"] ? path5.join(
+        process.env["ProgramFiles(x86)"],
+        "Microsoft",
+        "Edge",
+        "Application",
+        "msedge.exe"
+      ) : null,
+      process.env.ProgramFiles ? path5.join(process.env.ProgramFiles, "Microsoft", "Edge", "Application", "msedge.exe") : null,
+      process.env.LOCALAPPDATA ? path5.join(process.env.LOCALAPPDATA, "Microsoft", "Edge", "Application", "msedge.exe") : null,
+      "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+      "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe"
+    ].filter(Boolean);
+    for (const candidate of candidates) {
+      if (fs5.existsSync(candidate)) {
+        return {
+          installed: true,
+          executablePath: candidate,
+          isNativeToPlatform: true
+        };
+      }
+    }
+    return {
+      installed: false,
+      isNativeToPlatform: true
+    };
+  }
+  if (isMacOS) {
+    const macPath = "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge";
+    if (fs5.existsSync(macPath)) {
+      return {
+        installed: true,
+        executablePath: macPath,
+        isNativeToPlatform: false
+      };
+    }
+    return { installed: false, isNativeToPlatform: false };
+  }
+  if (isLinux) {
+    const linuxCandidates = [
+      "/opt/microsoft/msedge/msedge",
+      "/usr/bin/microsoft-edge",
+      "/usr/bin/microsoft-edge-stable"
+    ];
+    for (const p of linuxCandidates) {
+      if (fs5.existsSync(p)) {
+        return {
+          installed: true,
+          executablePath: p,
+          isNativeToPlatform: false
+        };
+      }
+    }
+    return { installed: false, isNativeToPlatform: false };
+  }
+  return { installed: false, isNativeToPlatform: false };
+}
+function getNpxCommand(args) {
+  const { isWindows } = getPlatformInfo();
+  if (isWindows) {
+    return {
+      command: `npx.cmd ${args}`,
+      options: { shell: process.env.ComSpec || "cmd.exe" }
+    };
+  }
+  return {
+    command: `npx ${args}`,
+    options: { shell: process.env.SHELL || "/bin/sh" }
+  };
+}
+function getPlatformTroubleshootingAdvice() {
+  const { isWindows, isMacOS, isLinux, isWSL } = getPlatformInfo();
+  const tips = [];
+  if (isWindows) {
+    tips.push("Windows Setup & Troubleshooting:");
+    tips.push(
+      "  \u2022 Execution Policy: If PowerShell scripts are blocked, execute: Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned"
+    );
+    tips.push(
+      "  \u2022 Terminal: Use Windows Terminal (msstore) for high-fidelity Unicode glyphs and colors."
+    );
+    tips.push(
+      "  \u2022 Native Edge: Microsoft Edge runs with native high-contrast and Windows integration."
+    );
+    tips.push(
+      "  \u2022 Manual Browser Installation: run `npx.cmd playwright install chromium firefox webkit`"
+    );
+  } else if (isWSL) {
+    tips.push("Windows Subsystem for Linux (WSL) Notes:");
+    tips.push("  \u2022 Install Linux browser dependencies: sudo npx playwright install-deps");
+    tips.push(
+      "  \u2022 If running headless inside WSL2 without X11/Wayland, standard headless mode is used."
+    );
+  } else if (isMacOS) {
+    tips.push("macOS Setup & Troubleshooting:");
+    tips.push("  \u2022 If necessary, install Xcode command-line tools: xcode-select --install");
+    tips.push("  \u2022 Manual Browser Installation: run `npx playwright install`");
+  } else if (isLinux) {
+    tips.push("Linux Setup & Troubleshooting:");
+    tips.push(
+      "  \u2022 Shared system libraries for Chromium and WebKit can be installed via: sudo npx playwright install-deps"
+    );
+  }
+  return tips;
+}
+
+// src/cli/config.ts
 var DEFAULT_CLI_CONFIG = {
   defaultFormats: ["zip", "html"],
   exportDir: ".",
@@ -7684,29 +7978,16 @@ var DEFAULT_CLI_CONFIG = {
   concurrencyAmount: 2
 };
 function getCliConfigDir() {
-  if (process.env.HAUNT_CONFIG_DIR) {
-    return path5.resolve(process.env.HAUNT_CONFIG_DIR);
-  }
-  const platform2 = process.platform;
-  const home = os3.homedir();
-  if (platform2 === "win32") {
-    const appData = process.env.APPDATA || path5.join(home, "AppData", "Roaming");
-    return path5.join(appData, "hauntview");
-  }
-  if (platform2 === "darwin") {
-    return path5.join(home, "Library", "Preferences", "hauntview");
-  }
-  const xdgConfig = process.env.XDG_CONFIG_HOME || path5.join(home, ".config");
-  return path5.join(xdgConfig, "hauntview");
+  return getPlatformConfigDir();
 }
 function getCliConfigFile() {
-  return path5.join(getCliConfigDir(), "config.json");
+  return path6.join(getCliConfigDir(), "config.json");
 }
 function loadCliConfig() {
   const configFile = getCliConfigFile();
   try {
-    if (fs5.existsSync(configFile)) {
-      const data = JSON.parse(fs5.readFileSync(configFile, "utf8"));
+    if (fs6.existsSync(configFile)) {
+      const data = JSON.parse(fs6.readFileSync(configFile, "utf8"));
       return {
         defaultFormats: Array.isArray(data.defaultFormats) ? data.defaultFormats : DEFAULT_CLI_CONFIG.defaultFormats,
         exportDir: typeof data.exportDir === "string" ? data.exportDir : DEFAULT_CLI_CONFIG.exportDir,
@@ -7720,11 +8001,11 @@ function loadCliConfig() {
 }
 function saveCliConfig(config) {
   const dir = getCliConfigDir();
-  if (!fs5.existsSync(dir)) {
-    fs5.mkdirSync(dir, { recursive: true });
+  if (!fs6.existsSync(dir)) {
+    fs6.mkdirSync(dir, { recursive: true });
   }
   const configFile = getCliConfigFile();
-  fs5.writeFileSync(configFile, JSON.stringify(config, null, 2), "utf8");
+  fs6.writeFileSync(configFile, JSON.stringify(config, null, 2), "utf8");
 }
 function resetCliConfig() {
   saveCliConfig(DEFAULT_CLI_CONFIG);
@@ -7737,23 +8018,12 @@ function expandAndValidatePath(rawPath, options) {
       error: "Path cannot be empty."
     };
   }
-  const trimmed = rawPath.trim();
-  let expanded;
-  if (trimmed === ".") {
-    expanded = process.cwd();
-  } else if (trimmed === "~" || trimmed === "~/" || trimmed === "~\\") {
-    expanded = os3.homedir();
-  } else if (trimmed.startsWith("~/") || trimmed.startsWith("~\\")) {
-    expanded = path5.join(os3.homedir(), trimmed.slice(2));
-  } else {
-    expanded = path5.resolve(process.cwd(), trimmed);
-  }
-  expanded = path5.normalize(expanded);
+  const expanded = expandEnvironmentPath(rawPath, process.cwd());
   const createIfMissing = options?.createIfMissing ?? true;
   try {
-    if (!fs5.existsSync(expanded)) {
+    if (!fs6.existsSync(expanded)) {
       if (createIfMissing) {
-        fs5.mkdirSync(expanded, { recursive: true });
+        fs6.mkdirSync(expanded, { recursive: true });
       } else {
         return {
           valid: false,
@@ -7762,7 +8032,7 @@ function expandAndValidatePath(rawPath, options) {
         };
       }
     }
-    const stat2 = fs5.statSync(expanded);
+    const stat2 = fs6.statSync(expanded);
     if (!stat2.isDirectory()) {
       return {
         valid: false,
@@ -7770,7 +8040,14 @@ function expandAndValidatePath(rawPath, options) {
         error: `Path exists but is not a directory: ${expanded}`
       };
     }
-    fs5.accessSync(expanded, fs5.constants.W_OK);
+    const probe = probeDirectoryWritability(expanded);
+    if (!probe.writable) {
+      return {
+        valid: false,
+        resolvedPath: expanded,
+        error: `Directory is not accessible or writable: ${probe.error || "Access denied"}`
+      };
+    }
     return {
       valid: true,
       resolvedPath: expanded
@@ -7785,11 +8062,11 @@ function expandAndValidatePath(rawPath, options) {
 }
 
 // src/cli/browsers.ts
-import * as fs6 from "fs";
-import * as path6 from "path";
+import * as fs7 from "fs";
+import * as path7 from "path";
 import { execSync } from "child_process";
 import { chromium as chromium2, firefox as firefox2, webkit as webkit2 } from "playwright";
-function getBrowsersStatus() {
+function getBrowsersStatus(options) {
   const browsers = [
     { name: "chromium", installed: false },
     { name: "firefox", installed: false },
@@ -7797,38 +8074,50 @@ function getBrowsersStatus() {
   ];
   try {
     const p = chromium2.executablePath();
-    browsers[0].installed = fs6.existsSync(p);
+    browsers[0].installed = fs7.existsSync(p);
     browsers[0].executablePath = p;
   } catch {
     browsers[0].installed = false;
   }
   try {
     const p = firefox2.executablePath();
-    browsers[1].installed = fs6.existsSync(p);
+    browsers[1].installed = fs7.existsSync(p);
     browsers[1].executablePath = p;
   } catch {
     browsers[1].installed = false;
   }
   try {
     const p = webkit2.executablePath();
-    browsers[2].installed = fs6.existsSync(p);
+    browsers[2].installed = fs7.existsSync(p);
     browsers[2].executablePath = p;
   } catch {
     browsers[2].installed = false;
   }
+  if (options?.includeEdge) {
+    const edge = detectEdgeBrowser();
+    browsers.push({
+      name: "msedge",
+      installed: edge.installed,
+      executablePath: edge.executablePath,
+      isNative: edge.isNativeToPlatform
+    });
+  }
   return browsers;
+}
+function getAllBrowsersStatus() {
+  return getBrowsersStatus({ includeEdge: true });
 }
 function areAllBrowsersInstalled() {
   const status = getBrowsersStatus();
-  return status.every((b) => b.installed);
+  return status.slice(0, 3).every((b) => b.installed);
 }
 function getMarkerPath() {
-  return path6.join(getCliConfigDir(), "browsers-installed.json");
+  return path7.join(getCliConfigDir(), "browsers-installed.json");
 }
 function ensureBrowsersInstalled(options) {
   const marker = getMarkerPath();
   const allInstalled = areAllBrowsersInstalled();
-  if (allInstalled && fs6.existsSync(marker)) {
+  if (allInstalled && fs7.existsSync(marker)) {
     return;
   }
   if (!options?.silent) {
@@ -7840,14 +8129,18 @@ function ensureBrowsersInstalled(options) {
     );
   }
   try {
-    execSync("npx playwright install chromium firefox webkit", {
-      stdio: options?.silent ? "pipe" : "inherit"
+    const { command, options: execOptions } = getNpxCommand(
+      "playwright install chromium firefox webkit"
+    );
+    execSync(command, {
+      stdio: options?.silent ? "pipe" : "inherit",
+      shell: execOptions.shell
     });
     const dir = getCliConfigDir();
-    if (!fs6.existsSync(dir)) {
-      fs6.mkdirSync(dir, { recursive: true });
+    if (!fs7.existsSync(dir)) {
+      fs7.mkdirSync(dir, { recursive: true });
     }
-    fs6.writeFileSync(
+    fs7.writeFileSync(
       marker,
       JSON.stringify({ installedAt: (/* @__PURE__ */ new Date()).toISOString() }, null, 2),
       "utf8"
@@ -7859,12 +8152,11 @@ function ensureBrowsersInstalled(options) {
     console.error("\n\u2717 [haunt] Failed to automatically install Playwright browsers:");
     console.error(`  ${err.message}
 `);
-    if (process.platform === "linux") {
-      console.warn(
-        "[haunt] Note: On Linux, system libraries may be required. You can install them by running:"
-      );
-      console.warn("  sudo npx playwright install-deps\n");
+    const advice = getPlatformTroubleshootingAdvice();
+    for (const line of advice) {
+      console.warn(line);
     }
+    console.log();
   }
 }
 
@@ -7985,9 +8277,9 @@ async function runHaunt(targetUrl, options) {
       });
       const ext = fmt === "markdown" ? "md" : fmt;
       const fileName = `${report.id}.${ext}`;
-      const destPath = path7.join(exportDir, fileName);
-      fs7.writeFileSync(destPath, generated.content);
-      writtenFiles.push(path7.resolve(destPath));
+      const destPath = path8.join(exportDir, fileName);
+      fs8.writeFileSync(destPath, generated.content);
+      writtenFiles.push(path8.resolve(destPath));
     } catch (err) {
       console.error(`\u2717 Failed to generate ${fmt} report: ${err.message}`);
     }
@@ -8016,6 +8308,8 @@ async function runHaunt(targetUrl, options) {
 // src/cli/setup.ts
 import { checkbox as checkbox2, input, confirm } from "@inquirer/prompts";
 async function runSetup(options) {
+  const glyphs = getAdaptiveGlyphs();
+  const platform = getPlatformInfo();
   if (options?.show) {
     const config = loadCliConfig();
     console.log("\nCurrent HauntView CLI Configuration:");
@@ -8024,11 +8318,14 @@ async function runSetup(options) {
   }
   if (options?.reset) {
     resetCliConfig();
-    console.log("\n\u2713 HauntView configuration has been reset to factory defaults.");
+    console.log(`
+${glyphs.tick} HauntView configuration has been reset to factory defaults.`);
     console.log(JSON.stringify(loadCliConfig(), null, 2));
     return;
   }
-  console.log("\n\u{1F52E} HauntView Configuration Wizard\n");
+  console.log(`
+${glyphs.ghost} HauntView Configuration Wizard (${platform.osName})
+`);
   const existing = loadCliConfig();
   const defaultFormats = await checkbox2({
     message: "Select default export types to produce on every run:",
@@ -8051,8 +8348,9 @@ async function runSetup(options) {
     ],
     validate: (choices) => choices.length > 0 ? true : "Please select at least one default format."
   });
+  const pathHint = platform.isWindows ? "Enter default export folder (. for current dir, ~/Downloads, %USERPROFILE%\\Downloads, or full path):" : "Enter default export folder (. for current dir, ~/Downloads, $HOME/Downloads, or full path):";
   const exportDir = await input({
-    message: "Enter default export folder (. for launch folder, ~/Downloads, or full path):",
+    message: pathHint,
     default: existing.exportDir,
     validate: (val) => {
       const check = expandAndValidatePath(val, { createIfMissing: true });
@@ -8068,7 +8366,7 @@ async function runSetup(options) {
     const cap = evaluateSystemCapability();
     if (cap.isConstrained) {
       console.log(`
-! ${cap.constraintReason}`);
+${glyphs.warn} ${cap.constraintReason}`);
       concurrencyAmount = 1;
     } else {
       console.log(
@@ -8094,30 +8392,40 @@ Hardware analysis: ${cap.specs.cpuModel} (${cap.specs.logicalCores} threads, ${(
       concurrencyAmount = parseInt(chosenAmountStr, 10);
     }
   }
-  const updatedConfig = {
+  const newConfig = {
     defaultFormats,
     exportDir,
     concurrency: enableConcurrency,
     concurrencyAmount
   };
-  saveCliConfig(updatedConfig);
-  console.log("\n\u2713 HauntView CLI configuration saved successfully:");
-  console.log(JSON.stringify(updatedConfig, null, 2));
-  console.log("\nYou can re-run this wizard anytime with `haunt setup`.\n");
+  saveCliConfig(newConfig);
+  console.log(`
+${glyphs.tick} Settings saved successfully to configuration store:
+`);
+  console.log(JSON.stringify(newConfig, null, 2));
+  console.log();
 }
 
 // src/cli/doctor.ts
-import * as os4 from "os";
-import * as fs8 from "fs";
+import * as fs9 from "fs";
 function runDoctor() {
+  const glyphs = getAdaptiveGlyphs();
+  const platform = getPlatformInfo();
+  const term = getTerminalCapabilities();
   console.log(`
 HauntView Diagnostics \u2014 v${VERSION}
 `);
   console.log("Environment:");
+  console.log(
+    `  OS:           ${platform.osName} (${platform.platform} ${platform.arch}) release ${platform.release}`
+  );
+  console.log(`  Shell:        ${term.shellName}`);
+  console.log(
+    `  Unicode:      ${term.supportsUnicode ? "Enabled (full glyphs)" : "ASCII fallback"}`
+  );
   console.log(`  Node.js:      ${process.version} (>=22.12.0 LTS recommended)`);
-  console.log(`  OS:           ${os4.platform()} (${os4.arch()}) ${os4.release()}`);
   console.log(`  Config Dir:   ${getCliConfigDir()}`);
-  const hasConfig = fs8.existsSync(getCliConfigFile());
+  const hasConfig = fs9.existsSync(getCliConfigFile());
   console.log(`  Config File:  ${hasConfig ? "present" : "not initialized (run `haunt setup`)"}`);
   console.log("\nSystem Hardware & Concurrency:");
   const cap = evaluateSystemCapability();
@@ -8132,20 +8440,38 @@ HauntView Diagnostics \u2014 v${VERSION}
     console.log(`  Warning:      ${cap.constraintReason}`);
   }
   console.log("\nPlaywright Browsers:");
-  const browsers = getBrowsersStatus();
+  const browsers = getAllBrowsersStatus();
   for (const b of browsers) {
-    const symbol = b.installed ? "\u2713" : "\u2717";
-    const detail = b.installed ? b.executablePath || "installed" : "missing (run `haunt <url>` or `npx playwright install`)";
+    const symbol = b.installed ? glyphs.tick : glyphs.cross;
+    let detail = "";
+    if (b.name === "msedge") {
+      if (b.installed) {
+        detail = `${b.executablePath || "installed"} (${b.isNative ? "native Windows Edge" : "installed"})`;
+      } else {
+        detail = b.isNative ? "not detected in standard Windows paths (Chromium fallback will be used)" : "not installed (Chromium fallback will be used on Unix)";
+      }
+    } else {
+      detail = b.installed ? b.executablePath || "installed" : "missing (run `haunt <url>` or `npx playwright install`)";
+    }
     console.log(`  ${symbol} ${b.name.padEnd(10)}: ${detail}`);
   }
-  const allGood = browsers.every((b) => b.installed);
-  if (allGood) {
-    console.log("\n\u2713 System is fully sensitised for haunting websites.\n");
+  const coreInstalled = browsers.slice(0, 3).every((b) => b.installed);
+  if (coreInstalled) {
+    console.log(`
+${glyphs.tick} System is fully sensitised for haunting websites.
+`);
   } else {
     console.log(
-      "\n! Some browsers are missing. Run `haunt <url>` to trigger first-run installation.\n"
+      `
+${glyphs.warn} Some browsers are missing. Run \`haunt <url>\` to trigger first-run installation.
+`
     );
   }
+  const advice = getPlatformTroubleshootingAdvice();
+  for (const line of advice) {
+    console.log(line);
+  }
+  console.log();
 }
 
 // src/cli/index.ts
