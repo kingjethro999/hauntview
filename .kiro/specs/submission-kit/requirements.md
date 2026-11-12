@@ -37,13 +37,13 @@ scores well on all three rubric pillars.
 ### Requirement 2: Devpost Project Story
 
 **User Story:** As the submitter, I want the Devpost written story to map explicitly to
-the five Kiro evaluation prompts, so that judges can find evidence of each feature
+the four Kiro evaluation prompts, so that judges can find evidence of each feature
 without hunting.
 
 #### Acceptance Criteria
 
 1. THE Devpost Story SHALL contain explicit headings: "Spec-Driven Development",
-   "Steering Docs", "Agent Hooks", "MCP Integration", and "Vibe Coding".
+   "Steering Docs", "Agent Hooks", and "MCP Integration".
 2. UNDER "Spec-Driven Development" THE Story SHALL describe how requirements →
    design → tasks drove implementation and prevented scope creep.
 3. UNDER "Steering Docs" THE Story SHALL describe how `architecture_boundaries.md`,
@@ -53,9 +53,7 @@ without hunting.
    the automation they provide.
 5. UNDER "MCP Integration" THE Story SHALL describe the Medium MCP server, its tools,
    and how Kiro can run rites and interpret evidence without leaving the IDE.
-6. UNDER "Vibe Coding" THE Story SHALL include at least one concrete example of a
-   complex module generated from a conversational prompt.
-7. THE Story SHALL include the live hosted URL and one-command install instructions.
+6. THE Story SHALL include the live hosted URL and one-command install instructions.
 
 ### Requirement 3: Pre-Submission Compliance Audit
 

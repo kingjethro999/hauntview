@@ -29,7 +29,6 @@ Markdown draft of the Devpost project description. Sections:
 - **Steering Docs** — three steering files and their invariants
 - **Agent Hooks** — all five hooks and what they automate
 - **MCP Integration** — The Medium, its five tools, Kiro Power
-- **Vibe Coding** — one concrete example with the prompt
 - **Installation** — one-command
 - **Kiro category** — Costume Contest (default) or Frankenstein (if 5/7 limbs ship)
 
@@ -48,17 +47,10 @@ Automated compliance audit script. Checks:
 ✓ README.md contains "pnpm install" and "pnpm dev"
 ✓ docs/KIRO_USAGE.md exists
 ✓ docs/DEMO_SCRIPT.md exists
-✓ VIBE_CODING_LOG.md exists and has ≥ 3 entries
 ```
 
 Exits with code 1 and a clear error message if any check fails.
 
-### 4. `VIBE_CODING_LOG.md`
-
-Running log of conversational prompts paired with the complex modules they generated.
-Format per entry:
-
-```markdown
 ## Entry N — {date} — {module name}
 
 **Prompt:**
@@ -69,6 +61,7 @@ Format per entry:
 **Spec criteria satisfied:** {list of criteria IDs}
 **Steering files active:** {list}
 **Outcome:** {what it produced, any notable Kiro behavior}
+
 ```
 
 ## Correctness Properties
@@ -82,3 +75,4 @@ Format per entry:
 - `scripts/presubmit.mjs` has a unit test that runs against a fixture directory
   with known missing files and verifies each failure mode exits with code 1.
 - The video script is a Markdown file reviewed by the human; no automated test.
+```

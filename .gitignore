@@ -46,5 +46,4 @@ PHASE_*
 test-results/
 playwright-report/
 usage.txt
-config.bat
 hauntview-*

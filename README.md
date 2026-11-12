@@ -109,7 +109,7 @@ Then ask Kiro in chat:
 ┌────────────────────────────────────────────────────────────────────────┐
 │                                 FACES                                  │
 │   Web UI (Next.js)      CLI (`haunt`)      MCP Server     REST API    │
-│   Parlour Interface     Node.js CLI        Kiro/Claude    Endpoints   │
+│   Parlour Interface     Node.js CLI        Kiro / MCP     Endpoints   │
 │   Zustand Store         Zero Web Bloat     stdio/SSE      /api/test   │
 └────────────────────────────────────┬───────────────────────────────────┘
                                      │ (direct / HTTP / stdio)

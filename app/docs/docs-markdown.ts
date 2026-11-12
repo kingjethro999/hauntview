@@ -188,7 +188,9 @@ haunt self-update
 
 ---
 
-## 4. Kiro Integration (Primary IDE)
+## 4. Connecting Your Agent (Kiro First)
+
+Connect your AI coding agent to HauntView over the Model Context Protocol (MCP). Kiro is the primary client; every other MCP client works too.
 
 ### 4.1 Option A: Install as a Kiro Power (Recommended)
 1. In Kiro IDE, open the **Powers** sidebar and click **Add Custom Power**.
@@ -196,7 +198,7 @@ haunt self-update
 3. Paste repository URL: \`https://github.com/kingjethro999/hauntview\`
 4. Confirm installation.
 
-### Included Kiro Agent Skills:
+#### Included Kiro Agent Skills
 - **\`haunt-a-website\`**: Automatically activated when asking Kiro to test a website or check for failure modes.
 - **\`exorcise-findings\`**: Automatically activated when asking Kiro to fix or patch findings discovered in reports.
 - **\`setup\`**: Configures environment, Playwright browsers, and local defaults.
@@ -213,6 +215,67 @@ haunt self-update
   }
 }
 \`\`\`
+
+### 4.3 Remote HTTP / SSE (Hosted)
+
+Connect any MCP client over Server-Sent Events directly to the hosted engine — no local install.
+
+\`\`\`json
+{
+  "mcpServers": {
+    "hauntview-remote": {
+      "url": "https://hauntview.onrender.com/api/mcp"
+    }
+  }
+}
+\`\`\`
+
+### 4.4 Cursor (\`.cursor/mcp.json\`)
+
+\`\`\`json
+{
+  "mcpServers": {
+    "hauntview": {
+      "command": "node",
+      "args": ["/absolute/path/to/hauntview/dist/cli.js"]
+    }
+  }
+}
+\`\`\`
+
+### 4.5 Windsurf (\`~/.codeium/windsurf/mcp_config.json\`)
+
+\`\`\`json
+{
+  "mcpServers": {
+    "hauntview": {
+      "command": "pnpm",
+      "args": ["--prefix", "/absolute/path/to/hauntview", "mcp"]
+    }
+  }
+}
+\`\`\`
+
+### 4.6 VS Code (\`.vscode/mcp.json\`)
+
+\`\`\`json
+{
+  "servers": {
+    "hauntview": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["mcp"]
+    }
+  }
+}
+\`\`\`
+
+### 4.7 Remote URL vs. Stdio Subprocess
+
+| Transport | Best for | Trade-off |
+| :--- | :--- | :--- |
+| Remote URL (SSE) | Zero local dependencies; streams diagnostics from the hosted engine | Runs in the cloud sandbox, one rite at a time |
+| Stdio subprocess | Spawns a local Node.js process inside your IDE | Needs Node 22 + browsers locally; no cloud round-trips and full parallel execution |
 
 ---
 

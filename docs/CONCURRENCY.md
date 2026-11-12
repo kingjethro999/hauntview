@@ -127,7 +127,7 @@ haunt https://example.com -c -a 4
 haunt https://example.com -c -a 2 --yes
 ```
 
-### MCP (Kiro IDE / Claude Code / Cursor)
+### MCP (Kiro IDE / Cursor / Windsurf)
 
 ```json
 {

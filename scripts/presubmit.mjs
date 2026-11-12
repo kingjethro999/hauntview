@@ -177,35 +177,17 @@ if (!fileExists('docs/DEMO_SCRIPT.md')) {
 }
 pass('docs/DEMO_SCRIPT.md exists');
 
-// 10. VIBE_CODING_LOG.md exists and has ≥ 3 entries
-if (!fileExists('VIBE_CODING_LOG.md')) {
-  fail(
-    'VIBE_CODING_LOG.md exists',
-    'Create VIBE_CODING_LOG.md documenting conversational prompts ' +
-      'paired with the complex modules they generated.'
-  );
-}
-const vibeEntries = countOccurrences('VIBE_CODING_LOG.md', '^## Entry');
-if (vibeEntries < 3) {
-  fail(
-    `VIBE_CODING_LOG.md has ≥ 3 entries (found ${vibeEntries})`,
-    'Add more "## Entry N" sections to VIBE_CODING_LOG.md — ' +
-      'document at least 3 vibe-coded modules.'
-  );
-}
-pass(`VIBE_CODING_LOG.md has ${vibeEntries} entries`);
-
-// 11. docs/DEVPOST_STORY.md exists
+// 10. docs/DEVPOST_STORY.md exists
 if (!fileExists('docs/DEVPOST_STORY.md')) {
   fail(
     'docs/DEVPOST_STORY.md exists',
-    'Create docs/DEVPOST_STORY.md with all five Kiro heading sections ' +
-      '(Spec-Driven Development, Steering Docs, Agent Hooks, MCP Integration, Vibe Coding).'
+    'Create docs/DEVPOST_STORY.md with all four Kiro heading sections ' +
+      '(Spec-Driven Development, Steering Docs, Agent Hooks, MCP Integration).'
   );
 }
 pass('docs/DEVPOST_STORY.md exists');
 
-// 12. Version consistency across all carriers
+// 11. Version consistency across all carriers
 try {
   const { checkVersion } = await import('./check-version.mjs');
   const result = checkVersion(ROOT);

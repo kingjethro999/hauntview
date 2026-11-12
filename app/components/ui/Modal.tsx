@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export interface ModalProps {
@@ -11,7 +11,17 @@ export interface ModalProps {
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   footer?: React.ReactNode;
+  /** Visual tone — 'banish' tints the frame for destructive confirmations. */
+  tone?: 'default' | 'banish';
 }
+
+const WIDTH = {
+  sm: 'max-w-md',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
+  '2xl': 'max-w-6xl',
+};
 
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
@@ -21,73 +31,88 @@ export const Modal: React.FC<ModalProps> = ({
   maxWidth,
   size = 'lg',
   footer,
+  tone = 'default',
 }) => {
+  const titleId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+    if (!isOpen) return;
+    const prior = document.activeElement as HTMLElement | null;
+    const panel = panelRef.current;
+    const focusables = () =>
+      Array.from(
+        panel?.querySelectorAll<HTMLElement>(
+          'button:not(:disabled), a[href], input:not(:disabled), select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) ?? []
+      );
+    // Focus the last action (usually the safe "Keep" / primary), else the panel
+    requestAnimationFrame(() => {
+      const els = focusables();
+      (els[els.length - 1] ?? panel)?.focus();
+    });
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+      if (e.key === 'Tab') {
+        const els = focusables();
+        if (!els.length) return;
+        const first = els[0];
+        const last = els[els.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', onKey);
+      prior?.focus?.();
     };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  const resolvedWidth = maxWidth || size;
-
-  const maxWidthStyles = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
-    '2xl': 'max-w-6xl',
-  };
+  const frame =
+    tone === 'banish'
+      ? 'border-[rgba(255,93,82,0.45)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.9),0_0_60px_-20px_rgba(255,93,82,0.4)]'
+      : 'border-[var(--hv-seam-strong)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.9)]';
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-    >
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 sm:p-6">
+      <div className="hv-dialog-backdrop" onClick={onClose} aria-hidden="true" />
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Modal Container */}
-      <div
-        className={`relative w-full ${maxWidthStyles[resolvedWidth]} bg-[var(--midnight-veil)] border border-[var(--witchcraft-violet)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-10 flex flex-col max-h-[90vh]`}
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        tabIndex={-1}
+        className={`hv-dialog relative w-full ${WIDTH[maxWidth || size]} bg-[var(--hv-vault)] border rounded-[var(--hv-radius-lg)] overflow-hidden flex flex-col max-h-[90vh] ${frame}`}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--witchcraft-violet)]/30 bg-[var(--haunted-purple)]/20">
-          <h3 className="font-display font-bold text-xl text-[var(--bone-white)] tracking-tight">
+        <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-[var(--hv-seam)]">
+          <h2 id={titleId} className="text-[length:var(--hv-step-2)] font-semibold">
             {title}
-          </h3>
+          </h2>
           <button
+            type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="p-1 rounded-lg text-[var(--slate-epitaph)] hover:text-[var(--pumpkin-fire)] hover:bg-[var(--pumpkin-fire)]/10 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--pumpkin-fire)]"
+            className="hv-btn hv-btn--ghost hv-btn--sm !px-2"
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
-
-        {/* Content */}
-        <div className="px-6 py-5 overflow-y-auto flex-1">{children}</div>
-
-        {/* Footer */}
-        {footer && (
-          <div className="px-6 py-4 border-t border-[var(--witchcraft-violet)]/30 bg-[var(--haunted-purple)]/20">
-            {footer}
-          </div>
-        )}
+        <div className="px-6 py-5 overflow-y-auto flex-1 text-[var(--hv-bone-dim)]">{children}</div>
+        {footer && <div className="px-6 py-4 border-t border-[var(--hv-seam)]">{footer}</div>}
       </div>
     </div>
   );

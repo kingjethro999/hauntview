@@ -118,27 +118,6 @@ interpreter; HauntView is the evidence provider.
 
 ---
 
-## Vibe Coding
-
-The visual diff engine (`src/core/visual-diff.ts`) was generated from a single
-conversational prompt:
-
-> "Build me the visual diff engine. It takes a baseline PNG buffer and an apparition PNG
-> buffer at the same viewport, runs pixelmatch, clusters changed regions, and returns a
-> DiffResult with changedRatio, an ectoplasm overlay PNG, and up to 20 change regions
-> sorted largest-first. Never flag a diff as a finding — that's the caller's job."
-
-With `type_and_schema_guardrails.md` active, Kiro produced a fully typed module in
-one pass. The `noUncheckedIndexedAccess` flag forced explicit narrowing on every
-pixel array access. The clustering algorithm (union-find on adjacent changed pixels)
-appeared in the first generation — no iteration needed.
-
-The Haunted House SVG component and the MCP server tool registration were also
-vibe-coded from single prompts, each constrained by their relevant steering files.
-See `VIBE_CODING_LOG.md` for full entries.
-
----
-
 ## Installation
 
 ```bash

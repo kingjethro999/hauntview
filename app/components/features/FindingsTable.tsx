@@ -1,23 +1,25 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Card } from '../ui/Card';
-import { Badge } from '../ui/Badge';
-import { Input } from '../ui/Input';
 import { EmptyState } from '../ui/EmptyState';
 import { Finding } from '@/src/types';
-import {
-  MagnifyingGlassIcon,
-  ChevronDownIcon,
-  ChevronRightIcon,
-  ExclamationCircleIcon,
-  LightBulbIcon,
-  SparklesIcon,
-} from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, ChevronDownIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
 export interface FindingsTableProps {
   findings: Finding[];
   onExorcise?: (finding: Finding) => void;
+}
+
+const SEV_NAME = { all: 'All', error: 'Serious', warning: 'Warning', info: 'Info' } as const;
+const SEV_CHIP = { error: 'hv-chip--scream', warning: 'hv-chip--chill', info: '' } as const;
+
+/** Strip terminal colour codes and split Playwright's call log off the headline. */
+const ANSI = /\u001b\[[0-9;]*m|\[\d+m/g;
+export function cleanMessage(message: string) {
+  const plain = message.replace(ANSI, '');
+  const cut = plain.search(/\n|Call log:/);
+  if (cut === -1) return { headline: plain, rest: '' };
+  return { headline: plain.slice(0, cut).trim(), rest: plain.slice(cut).trim() };
 }
 
 export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorcise }) => {
@@ -53,29 +55,6 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
-  const getSeverityBadge = (severity: Finding['severity']) => {
-    switch (severity) {
-      case 'error':
-        return (
-          <Badge variant="error" size="sm">
-            ERROR
-          </Badge>
-        );
-      case 'warning':
-        return (
-          <Badge variant="warning" size="sm">
-            WARN
-          </Badge>
-        );
-      case 'info':
-        return (
-          <Badge variant="info" size="sm">
-            INFO
-          </Badge>
-        );
-    }
-  };
-
   const getRemediation = (category: string, message: string): string => {
     const cat = category.toLowerCase();
     const msg = message.toLowerCase();
@@ -105,210 +84,134 @@ export const FindingsTable: React.FC<FindingsTableProps> = ({ findings, onExorci
   };
 
   return (
-    <Card variant="default" className="p-6 space-y-5">
-      {/* Search and Filters Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h3 className="font-display font-bold text-lg text-[var(--bone-white)]">
-            Detected Issues & Findings ({filteredFindings.length})
-          </h3>
-          <p className="text-xs text-[var(--slate-epitaph)]">
-            Filter findings by severity or search by keyword and category
-          </p>
-        </div>
-
-        {/* Severity Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+    <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="hv-segmented self-start" role="group" aria-label="Filter by severity">
           {(['all', 'error', 'warning', 'info'] as const).map((sev) => (
             <button
               key={sev}
               type="button"
+              aria-pressed={selectedSeverity === sev}
               onClick={() => setSelectedSeverity(sev)}
-              className={`
-                min-h-[48px] px-3.5 py-2 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer flex items-center gap-1.5
-                ${
-                  selectedSeverity === sev
-                    ? 'bg-[var(--witchcraft-violet)] text-[var(--bone-white)] shadow-[0_2px_8px_rgba(74,43,138,0.4)]'
-                    : 'bg-[var(--haunted-purple)]/50 text-[var(--slate-epitaph)] hover:text-[var(--bone-white)] hover:bg-[var(--haunted-purple)]'
-                }
-              `}
             >
-              <span>{sev}</span>
-              <span className="text-[10px] opacity-75 font-mono">({counts[sev]})</span>
+              {SEV_NAME[sev]}
+              <span className="font-mono text-xs opacity-70">{counts[sev]}</span>
             </button>
           ))}
         </div>
+        <label className="relative block w-full lg:max-w-sm">
+          <span className="sr-only">Search findings</span>
+          <MagnifyingGlassIcon
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--hv-ash)]"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search message, rite or category"
+            className="hv-input !pl-11 !min-h-[44px] !rounded-full !text-sm !font-[family-name:var(--hv-font-body)]"
+          />
+        </label>
       </div>
 
-      {/* Search Input */}
-      <div>
-        <Input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Filter by keyword, profile name, or category..."
-          icon={<MagnifyingGlassIcon className="w-4 h-4" />}
-          className="text-xs"
-        />
-      </div>
-
-      {/* Findings List */}
       {filteredFindings.length === 0 ? (
         <EmptyState
-          icon={<ExclamationCircleIcon className="w-8 h-8 text-[var(--slate-epitaph)]" />}
-          title="No Findings Found"
+          art={searchTerm ? 'ghost' : 'candle'}
+          title={searchTerm ? 'Nothing answers to that name' : 'No findings here'}
           description={
             searchTerm
-              ? 'No issues match your search criteria. Try a different query or clear the filter.'
-              : 'Zero issues detected in this category. Excellent test result!'
+              ? 'No finding matches your search. Try a rite name like “offline”, or clear the search.'
+              : 'This severity came back empty for every rite.'
           }
         />
       ) : (
-        <div className="space-y-2">
+        <ul className="hv-rows">
           {filteredFindings.map((finding, idx) => {
-            const isExpanded = expandedId === finding.id;
-
+            const key = `${finding.id}-${idx}`;
+            const isExpanded = expandedId === key;
+            const { headline, rest } = cleanMessage(finding.message);
             return (
-              <div
-                key={`${finding.id}-${idx}`}
-                className="rounded-lg border border-[var(--witchcraft-violet)]/20 bg-[var(--midnight-veil)]/50 overflow-hidden transition-colors hover:border-[var(--witchcraft-violet)]/40"
-              >
-                <div
-                  onClick={() => toggleExpand(finding.id)}
-                  className="flex items-start gap-3 p-3.5 cursor-pointer select-none"
+              <li key={key} className="border-b border-[var(--hv-seam)]">
+                <button
+                  type="button"
+                  onClick={() => toggleExpand(key)}
+                  aria-expanded={isExpanded}
+                  aria-controls={`finding-${key}`}
+                  className="w-full text-left grid grid-cols-[auto_1fr_auto] items-start gap-4 py-4 px-1 sm:px-2 hover:bg-[rgba(255,255,255,0.025)] transition-colors"
                 >
-                  <div className="mt-0.5 text-[var(--slate-epitaph)]">
-                    {isExpanded ? (
-                      <ChevronDownIcon className="w-4 h-4 text-[var(--pumpkin-fire)]" />
-                    ) : (
-                      <ChevronRightIcon className="w-4 h-4" />
-                    )}
-                  </div>
+                  <span className={`hv-chip mt-0.5 ${SEV_CHIP[finding.severity]}`}>
+                    {SEV_NAME[finding.severity]}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[var(--hv-bone)] leading-snug break-words">
+                      {headline}
+                    </span>
+                    <span className="hv-mono-label mt-1.5 block !tracking-[0.06em] !normal-case">
+                      {finding.profileId} · {finding.category}
+                    </span>
+                  </span>
+                  <ChevronDownIcon
+                    className={`w-4 h-4 mt-1 text-[var(--hv-ash)] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    aria-hidden="true"
+                  />
+                </button>
 
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 flex-1 min-w-0">
-                    <div className="flex-shrink-0 mt-0.5">{getSeverityBadge(finding.severity)}</div>
-
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[var(--bone-white)] leading-snug">
-                        {finding.message}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-[var(--slate-epitaph)]">
-                        <span className="font-mono text-[var(--pumpkin-fire)]">
-                          {finding.profileId}
-                        </span>
-                        <span>•</span>
-                        <span className="bg-[var(--haunted-purple)]/60 px-2 py-0.5 rounded text-[var(--bone-white)]">
-                          {finding.category}
-                        </span>
-                        {finding.location?.selector && (
-                          <>
-                            <span>•</span>
-                            <span className="font-mono text-[10px] truncate max-w-xs text-[#a855f7]">
-                              {finding.location.selector}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Expanded Details Drawer */}
                 {isExpanded && (
-                  <div className="px-6 sm:px-10 pb-5 pt-3 border-t border-[var(--witchcraft-violet)]/20 bg-[var(--midnight-veil)]/70 text-xs space-y-4">
-                    {/* Remediation Guidance */}
-                    <div className="p-3 rounded-lg bg-[var(--witchcraft-violet)]/20 border border-[var(--witchcraft-violet)]/30">
-                      <div className="flex items-center gap-1.5 font-semibold text-[var(--pumpkin-fire)] mb-1">
-                        <LightBulbIcon className="w-4 h-4" />
-                        <span>Recommended Remediation</span>
-                      </div>
-                      <p className="text-[var(--bone-white)] text-xs leading-relaxed">
+                  <div id={`finding-${key}`} className="pb-6 px-1 sm:pl-[6.5rem] space-y-5 text-sm">
+                    <div className="border-l-2 border-[var(--hv-ember)] pl-4">
+                      <p className="hv-mono-label mb-1">What to do</p>
+                      <p className="text-[var(--hv-bone-dim)]">
                         {getRemediation(finding.category, finding.message)}
                       </p>
                     </div>
 
-                    {/* Location Info (Only if selector or file/line exists) */}
-                    {finding.location?.selector && (
-                      <div>
-                        <span className="text-[var(--slate-epitaph)] font-semibold block mb-1">
-                          Target DOM Selector:
-                        </span>
-                        <code className="inline-block p-2 rounded bg-[var(--midnight-veil)] border border-[var(--witchcraft-violet)]/30 font-mono text-xs text-[#a855f7]">
-                          {finding.location.selector}
-                        </code>
-                      </div>
+                    {rest && (
+                      <pre className="p-4 rounded-[var(--hv-radius)] bg-[var(--hv-crypt)] border border-[var(--hv-seam)] text-xs font-mono text-[var(--hv-ash)] whitespace-pre-wrap break-words max-h-60 overflow-auto">
+                        {rest}
+                      </pre>
                     )}
 
-                    {finding.location?.file && (
-                      <div>
-                        <span className="text-[var(--slate-epitaph)] font-semibold block mb-1">
-                          Source Location:
-                        </span>
-                        <code className="inline-block p-2 rounded bg-[var(--midnight-veil)] border border-[var(--witchcraft-violet)]/30 font-mono text-xs text-[var(--success)]">
-                          {finding.location.file}
-                          {finding.location.line ? `:${finding.location.line}` : ''}
-                        </code>
-                      </div>
+                    {(finding.location?.selector || finding.location?.file) && (
+                      <p className="font-mono text-xs text-[var(--hv-moon)] break-all">
+                        {finding.location?.selector}
+                        {finding.location?.file &&
+                          ` ${finding.location.file}${finding.location.line ? `:${finding.location.line}` : ''}`}
+                      </p>
                     )}
 
-                    {/* Structured Details if available */}
                     {finding.details && Object.keys(finding.details).length > 0 && (
-                      <div>
-                        <span className="text-[var(--slate-epitaph)] font-semibold block mb-1.5">
-                          Observation Breakdown:
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                          {Object.entries(finding.details).map(([key, val]) => (
-                            <div
-                              key={key}
-                              className="p-2.5 rounded bg-[var(--haunted-purple)]/40 border border-[var(--witchcraft-violet)]/20 flex flex-col justify-between"
-                            >
-                              <span className="text-[10px] text-[var(--slate-epitaph)] uppercase tracking-wider font-semibold">
-                                {key.replace(/([A-Z])/g, ' $1')}
-                              </span>
-                              <span className="font-mono text-xs text-[#7dd3fc] mt-1 break-all">
-                                {typeof val === 'object' ? JSON.stringify(val) : String(val)}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                      <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+                        {Object.entries(finding.details).map(([k, val]) => (
+                          <div key={k} className="min-w-0">
+                            <dt className="hv-mono-label !tracking-[0.08em]">
+                              {k.replace(/([A-Z])/g, ' $1')}
+                            </dt>
+                            <dd className="font-mono text-xs text-[var(--hv-bone-dim)] break-all mt-0.5">
+                              {typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
                     )}
 
-                    {/* Technical Metadata Footer */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--spirit-smoke)] pt-2 border-t border-[var(--tombstone-gray)]/30">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span>
-                          Rite Engine:{' '}
-                          <strong className="text-[var(--bone-white)]">{finding.profileId}</strong>
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Unique ID:{' '}
-                          <code className="font-mono text-[var(--bone-white)]">{finding.id}</code>
-                        </span>
-                      </div>
-
-                      {onExorcise && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onExorcise(finding);
-                          }}
-                          className="min-h-[48px] px-3 py-2 rounded-[4px] bg-[var(--pumpkin-fire)]/15 border border-[var(--pumpkin-fire)]/50 text-[var(--pumpkin-fire)] hover:bg-[var(--pumpkin-fire)] hover:text-[var(--midnight-veil)] font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
-                        >
-                          <SparklesIcon className="w-3.5 h-3.5" />
-                          <span>Fix with Kiro</span>
-                        </button>
-                      )}
-                    </div>
+                    {onExorcise && (
+                      <button
+                        type="button"
+                        onClick={() => onExorcise(finding)}
+                        className="hv-btn hv-btn--outline hv-btn--sm"
+                      >
+                        <SparklesIcon className="w-4 h-4" aria-hidden="true" />
+                        Draft a fix prompt
+                      </button>
+                    )}
                   </div>
                 )}
-              </div>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
-    </Card>
+    </div>
   );
 };

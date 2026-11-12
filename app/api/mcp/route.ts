@@ -1,6 +1,6 @@
 /**
  * Remote Model Context Protocol (MCP) Streamable HTTP / SSE Endpoint
- * Allows AI agents (Cursor, Claude Code, Kiro, Windsurf) to connect directly
+ * Allows AI agents (Kiro, Cursor, Windsurf, VS Code) to connect directly
  * via URL (e.g. https://hauntview.onrender.com/api/mcp) without running local processes.
  */
 

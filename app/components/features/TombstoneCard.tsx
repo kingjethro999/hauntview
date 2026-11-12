@@ -3,16 +3,52 @@
 import React, { useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { TestReportSummary } from '@/src/core/report-store';
-import { ClockIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { CandleIndicator } from './CandleIndicator';
 
 export interface TombstoneCardProps {
   report: TestReportSummary;
+  index?: number;
+  /** Shows a Banish control. Confirmation is the caller's job. */
+  onBanish?: (report: TestReportSummary) => void;
+  /** Plays the dissolve; the caller removes the record afterwards. */
+  banishing?: boolean;
+}
+
+export type Verdict = { word: string; tone: 'restless' | 'uneasy' | 'peace' };
+
+export function verdictFor(r: TestReportSummary): Verdict {
+  if (r.errorCount > 0) return { word: 'Restless', tone: 'restless' };
+  if (r.warningCount > 0) return { word: 'Uneasy', tone: 'uneasy' };
+  return { word: 'At peace', tone: 'peace' };
+}
+
+const TONE_COLOR = { restless: '#ffb3ad', uneasy: '#ffd79e', peace: '#b9f0c9' };
+
+function hostOf(url: string) {
+  try {
+    const u = new URL(url);
+    return u.host + (u.pathname === '/' ? '' : u.pathname);
+  } catch {
+    return url;
+  }
 }
 
 const noopSubscribe = () => () => {};
 
-export const TombstoneCard: React.FC<TombstoneCardProps> = ({ report }) => {
-  const isPeaceful = report.errorCount === 0;
+/**
+ * A past run as a headstone. Its height encodes how restless the run was
+ * (total findings), so a glance across the graveyard shows where the trouble
+ * is. The verdict is always written out in words — never colour alone.
+ */
+export const TombstoneCard: React.FC<TombstoneCardProps> = ({
+  report,
+  index = 0,
+  onBanish,
+  banishing = false,
+}) => {
+  const v = verdictFor(report);
+  const restlessness = Math.min(1, report.totalFindings / 30);
+  const when = new Date(report.startTime);
   const isOld = useSyncExternalStore(
     noopSubscribe,
     () => Date.now() - report.startTime > 7 * 24 * 60 * 60 * 1000,
@@ -20,102 +56,79 @@ export const TombstoneCard: React.FC<TombstoneCardProps> = ({ report }) => {
   );
 
   return (
-    <div
-      className={`relative group rounded-t-[45px] rounded-b-[4px] border-2 transition-all duration-300 p-5 flex flex-col justify-between overflow-hidden ${
-        isPeaceful
-          ? 'bg-gradient-to-b from-[var(--ghost-mist)] to-[#0A1824] border-[var(--tombstone-gray)] hover:border-[var(--ectoplasm-green)] shadow-[0_8px_24px_rgba(0,0,0,0.6)] hover:shadow-[0_8px_30px_rgba(154,255,154,0.15)]'
-          : 'bg-gradient-to-b from-[#1E293B] to-[#0F172A] border-[#475569] hover:border-[#F28B77] shadow-[0_8px_24px_rgba(0,0,0,0.6)] hover:shadow-[0_8px_30px_rgba(242,139,119,0.2)]'
+    <article
+      className={`hv-stone hv-rise ${v.tone === 'restless' ? 'hv-stone--restless' : ''} ${
+        banishing ? 'hv-dissolve' : ''
       }`}
+      style={{ '--h': restlessness, '--i': Math.min(index, 10) } as React.CSSProperties}
+      aria-label={`${v.word}: ${report.url}`}
     >
-      {/* Cobweb Indicator for older runs */}
+      <span className="hv-stone__candle">
+        <CandleIndicator status={v.tone === 'peace' ? 'ok' : 'findings'} size="md" decorative />
+      </span>
+
       {isOld && (
-        <div className="absolute top-1 right-1 opacity-40 pointer-events-none select-none text-xs">
-          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8-8z"
-              opacity="0.3"
-            />
-            <path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8z" opacity="0.5" />
-          </svg>
-        </div>
+        <svg
+          className="absolute top-0 right-3 w-14 h-14 text-[var(--hv-ash)] opacity-30"
+          viewBox="0 0 60 60"
+          fill="none"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M60 0 20 40M60 0 35 55M60 0 5 25M60 0v60M60 0H0" strokeWidth="0.6" />
+          <path d="M48 0q2 10 12 12M36 0q4 20 24 24M24 0q6 30 36 36" strokeWidth="0.6" />
+        </svg>
       )}
 
-      {/* Headstone Engraving Arc */}
-      <div className="text-center pt-2 pb-3 border-b border-[var(--tombstone-gray)]/40">
-        <div className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-serif font-bold uppercase tracking-widest text-[var(--spirit-smoke)] bg-[var(--midnight-veil)]/70 border border-[var(--tombstone-gray)] mb-1">
-          {isPeaceful ? 'Peaceful Grave' : 'Restless Ground'}
-        </div>
-        <h4
-          className="font-serif font-bold text-base text-[var(--bone-white)] truncate px-2 group-hover:text-[var(--pumpkin-fire)] transition-colors"
-          title={report.url}
-        >
-          {report.url}
-        </h4>
-        <div className="text-[11px] font-mono text-[var(--grave-dust)] mt-0.5">
-          {new Date(report.startTime).toLocaleDateString()} •{' '}
-          {new Date(report.startTime).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </div>
-      </div>
-
-      {/* Epitaph Stats */}
-      <div className="my-4 space-y-2.5">
-        <div className="flex items-center justify-between text-xs font-serif">
-          <span className="text-[var(--spirit-smoke)]">Séance Duration:</span>
-          <span className="font-mono text-[var(--bone-white)] flex items-center gap-1">
-            <ClockIcon className="w-3.5 h-3.5 text-[var(--pumpkin-fire)]" />
-            {(report.duration / 1000).toFixed(1)}s
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between text-xs font-serif">
-          <span className="text-[var(--spirit-smoke)]">Rites Performed:</span>
-          <span className="font-mono text-[var(--bone-white)]">
-            {report.successfulProfiles} / {report.totalProfiles}
-          </span>
-        </div>
-
-        {/* Severity Count Pills */}
-        <div className="pt-2 flex items-center justify-between gap-1.5 text-[11px] font-mono">
-          <span
-            className={`px-2 py-0.5 rounded border ${
-              report.errorCount > 0
-                ? 'bg-[#7C2D12]/60 text-[#F28B77] border-[#F28B77]/60'
-                : 'bg-[var(--ghost-mist)] text-[var(--grave-dust)] border-[var(--tombstone-gray)]'
-            }`}
-          >
-            {report.errorCount} Screams
-          </span>
-          <span
-            className={`px-2 py-0.5 rounded border ${
-              report.warningCount > 0
-                ? 'bg-[#78350F]/60 text-[var(--pumpkin-fire)] border-[var(--pumpkin-fire)]/60'
-                : 'bg-[var(--ghost-mist)] text-[var(--grave-dust)] border-[var(--tombstone-gray)]'
-            }`}
-          >
-            {report.warningCount} Chills
-          </span>
-          <span className="px-2 py-0.5 rounded bg-[var(--ghost-mist)] text-[#B9AEE0] border border-[var(--tombstone-gray)]">
-            {report.totalFindings} Total
-          </span>
-        </div>
-      </div>
-
-      {/* Headstone Base / Exhume Action */}
-      <div className="pt-3 border-t border-[var(--tombstone-gray)]/40 flex items-center justify-between">
-        <span className="text-[11px] font-serif text-[var(--spirit-smoke)] italic">
-          {isPeaceful ? 'No omens lingering' : 'Omens remain'}
-        </span>
-        <Link
-          href={`/results/${report.id}`}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[4px] bg-[var(--ghost-mist)] border border-[var(--pumpkin-fire)]/40 text-[var(--pumpkin-fire)] hover:bg-[var(--pumpkin-fire)] hover:text-[var(--midnight-veil)] text-xs font-serif font-bold transition-all shadow-[0_0_8px_rgba(255,121,31,0.2)] cursor-pointer"
-        >
-          <SparklesIcon className="w-3.5 h-3.5" />
-          <span>Read Grimoire</span>
+      <p className="hv-stone__verdict" style={{ color: TONE_COLOR[v.tone] }}>
+        {v.word}
+      </p>
+      <h3 className="hv-stone__url" title={report.url}>
+        <Link href={`/results/${report.id}`} className="hv-stone__link">
+          {hostOf(report.url)}
         </Link>
-      </div>
-    </div>
+      </h3>
+
+      <dl className="hv-stone__epitaph">
+        <div>
+          <dt>serious</dt>
+          <dd>
+            <b>{report.errorCount}</b>
+          </dd>
+        </div>
+        <div>
+          <dt>warnings</dt>
+          <dd>
+            <b>{report.warningCount}</b>
+          </dd>
+        </div>
+        <div>
+          <dt>total</dt>
+          <dd>
+            <b>{report.totalFindings}</b>
+          </dd>
+        </div>
+      </dl>
+
+      <p className="hv-stone__date">
+        <time dateTime={when.toISOString()}>
+          {when.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+        </time>
+        {' · '}
+        {report.successfulProfiles}/{report.totalProfiles} rites
+      </p>
+
+      {onBanish && (
+        <button
+          type="button"
+          className="hv-btn hv-btn--banish hv-btn--sm hv-stone__banish"
+          onClick={() => onBanish(report)}
+          disabled={banishing}
+          aria-label={`Banish the run for ${report.url}`}
+        >
+          Banish
+        </button>
+      )}
+    </article>
   );
 };

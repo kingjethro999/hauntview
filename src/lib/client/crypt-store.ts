@@ -46,12 +46,16 @@ interface CryptStoreState {
   summaries: TestReportSummary[];
   // Hydration indicator for safe SSR/CSR transition
   _hasHydrated: boolean;
+  // IDs the user banished — never re-imported from the server listing
+  banished: string[];
 
   // Actions
   setHasHydrated: (state: boolean) => void;
   addReport: (report: TestReport) => void;
   deleteReport: (id: string) => void;
   clearAll: () => void;
+  /** Merge server-listed summaries, skipping duplicates and banished runs. */
+  importSummaries: (incoming: TestReportSummary[]) => void;
   getReport: (id: string) => TestReport | undefined;
 }
 
@@ -112,6 +116,7 @@ export const useCryptStore = create<CryptStoreState>()(
       reports: {},
       summaries: [],
       _hasHydrated: false,
+      banished: [],
 
       setHasHydrated: (state: boolean) => {
         set({ _hasHydrated: state });
@@ -120,6 +125,8 @@ export const useCryptStore = create<CryptStoreState>()(
       addReport: (report: TestReport) => {
         const summary = createSummaryFromReport(report);
         set((state) => {
+          // A fresh run of a banished ID shouldn't stay hidden
+          const banished = state.banished.filter((b) => b !== report.id);
           // Remove duplicate summary if already present
           const existingSummaries = state.summaries.filter((s) => s.id !== report.id);
           const nextSummaries = [summary, ...existingSummaries];
@@ -142,6 +149,7 @@ export const useCryptStore = create<CryptStoreState>()(
           return {
             reports: nextReports,
             summaries: nextSummaries,
+            banished,
           };
         });
       },
@@ -153,12 +161,25 @@ export const useCryptStore = create<CryptStoreState>()(
           return {
             reports: nextReports,
             summaries: state.summaries.filter((s) => s.id !== id),
+            banished: state.banished.includes(id) ? state.banished : [...state.banished, id],
           };
         });
       },
 
       clearAll: () => {
-        set({ reports: {}, summaries: [] });
+        set((state) => ({
+          reports: {},
+          summaries: [],
+          banished: Array.from(new Set([...state.banished, ...state.summaries.map((s) => s.id)])),
+        }));
+      },
+
+      importSummaries: (incoming: TestReportSummary[]) => {
+        set((state) => {
+          const skip = new Set([...state.summaries.map((s) => s.id), ...state.banished]);
+          const fresh = incoming.filter((r) => !skip.has(r.id));
+          return fresh.length ? { summaries: [...state.summaries, ...fresh] } : state;
+        });
       },
 
       getReport: (id: string) => {

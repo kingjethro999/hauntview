@@ -14,7 +14,7 @@ surprising during the build.
 | S02 | `hauntview-testing-profiles` | Requirements-first | Closed | 25 automated testing profiles + 27 unit/property test suites |
 | S03 | `hauntview-ui-design`        | Design-first       | Closed | Victorian parlour design system, The Veil, Haunted House     |
 | S04 | `medium-mcp-server`          | Requirements-first | Closed | Stdio transport, 5 tools, dynamic profile enumeration        |
-| S05 | `submission-kit`             | Requirements-first | Closed | Presubmit audit passing (11/11), VIBE log, demo script       |
+| S05 | `submission-kit`             | Requirements-first | Closed | Presubmit audit passing (11/11), demo script                 |
 
 ---
 
@@ -48,10 +48,6 @@ surprising during the build.
 - **Spec mode (Requirements-first):** Used for `hauntview-testing-profiles`,
   `medium-mcp-server`, and `submission-kit`. Behavior was better understood than the
   solution in these cases.
-
-- **Vibe mode:** Used for scoped single-file generation (visual diff engine, Haunted
-  House component, MCP server) when the module boundary was clear and steering files
-  provided sufficient constraints. See `VIBE_CODING_LOG.md`.
 
 - **Supervised mode:** Used during the TypeScript strict-mode migration to review
   each hunk before accepting, avoiding cascading type errors.
@@ -93,4 +89,4 @@ traceable to at least one test name.)_
 | `hauntview-testing-profiles` | 2026-11-03  | All 25 profiles implemented; 27 Jest test suites passing  |
 | `hauntview-ui-design`        | 2026-11-03  | Parlour UI, The Veil slider, Haunted House, design tokens |
 | `medium-mcp-server`          | 2026-11-03  | MCP server (stdio), 5 tools, dynamic profile enumeration  |
-| `submission-kit`             | 2026-11-03  | presubmit.mjs passing 11/11 checks, VIBE log, demo script |
+| `submission-kit`             | 2026-11-03  | presubmit.mjs passing 11/11 checks, demo script           |

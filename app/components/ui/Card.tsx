@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -6,29 +8,38 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
+const VARIANT = {
+  default: 'hv-panel',
+  ghostly: '',
+  outlined: 'hv-card',
+  accent: 'hv-panel border-[rgba(var(--hv-ember-rgb),0.45)] shadow-[var(--hv-glow-md)]',
+};
+
+/**
+ * Surface primitive. `hoverable` cards carry the lantern: a soft ember glow
+ * tracks the pointer across the card (CSS vars --mx/--my, transform-free).
+ */
 export const Card: React.FC<CardProps> = ({
   variant = 'default',
   hoverable = false,
   children,
   className = '',
+  onPointerMove,
   ...props
 }) => {
-  const baseStyles = 'rounded-lg transition-all duration-200';
-
-  const variantStyles = {
-    default: 'victorian-panel',
-    ghostly: 'bg-transparent border-none shadow-none',
-    outlined: 'border rounded-lg bg-transparent hover:bg-[rgba(255,121,31,0.05)]',
-    accent: 'victorian-panel border-[var(--candle-primary)] shadow-[0_0_20px_rgba(255,121,31,0.2)]',
+  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (hoverable) {
+      const r = e.currentTarget.getBoundingClientRect();
+      e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`);
+    }
+    onPointerMove?.(e);
   };
-
-  const hoverStyles = hoverable
-    ? 'hover:border-[var(--candle-primary)] hover:shadow-[0_8px_32px_rgba(255,121,31,0.15)] hover:-translate-y-0.5 cursor-pointer'
-    : '';
 
   return (
     <div
-      className={`${baseStyles} ${variantStyles[variant]} ${hoverStyles} ${className}`}
+      className={`${hoverable ? 'hv-card hv-card--interactive' : VARIANT[variant]} ${className}`}
+      onPointerMove={handleMove}
       {...props}
     >
       {children}

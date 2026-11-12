@@ -1,22 +1,33 @@
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
-import { Space_Grotesk, Inter } from 'next/font/google';
+import { Cormorant_Garamond, Inter, JetBrains_Mono, UnifrakturMaguntia } from 'next/font/google';
 import './globals.css';
 import './haunting.css';
+import './nocturne.css';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { Toaster } from 'sonner';
 import NextTopLoader from 'nextjs-toploader';
 import { AtmosphereLayer } from './components/features/AtmosphereLayer';
-import { HauntingEffects } from './components/features/HauntingEffects';
 
-const spaceGrotesk = Space_Grotesk({
-  variable: '--font-space-grotesk',
+// Display: high-contrast Garamond for headings — elegant, a little funereal.
+const cormorant = Cormorant_Garamond({
+  variable: '--font-cormorant',
   subsets: ['latin'],
-  weight: ['400', '600', '700'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
   display: 'swap',
 });
 
+// Blackletter is reserved for the wordmark only.
+const unifraktur = UnifrakturMaguntia({
+  variable: '--font-unifraktur',
+  subsets: ['latin'],
+  weight: '400',
+  display: 'swap',
+});
+
+// Body: Inter for long-form readability at small sizes.
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
@@ -24,11 +35,19 @@ const inter = Inter({
   display: 'swap',
 });
 
+// Data: URLs, timings, counts.
+const jetbrains = JetBrains_Mono({
+  variable: '--font-jetbrains',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
+});
+
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: 'var(--midnight-veil)',
+  themeColor: '#07060d',
 };
 
 export const metadata: Metadata = {
@@ -48,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${inter.variable} dark h-full`}
+      className={`${cormorant.variable} ${unifraktur.variable} ${inter.variable} ${jetbrains.variable} dark h-full`}
     >
       <head>
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -79,10 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body
-        className="min-h-full flex flex-col antialiased"
-        style={{ background: '#100d13', color: 'var(--bone-white)' }}
-      >
+      <body className="min-h-full flex flex-col antialiased">
         <a
           id="skip-link"
           href="#main"
@@ -104,8 +120,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           showForHashAnchor={true}
         />
         <AtmosphereLayer />
-        <HauntingEffects />
-        <Suspense fallback={<div className="h-16 bg-[var(--midnight-veil)]" />}>
+        <Suspense fallback={<div className="h-[72px]" />}>
           <Navbar />
         </Suspense>
         <main id="main" tabIndex={-1} className="flex-1 flex flex-col w-full focus:outline-none">
